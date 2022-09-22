@@ -12,7 +12,7 @@ export const incrementBalance = makeHandler({
 			sqs: {
 				arn: {
 					// eslint-disable-next-line @typescript-eslint/naming-convention
-					"Fn::ImportValue": "account-${opt:stage, 'dev'}:IncrementBalance",
+					"Fn::ImportValue": "balance-${opt:stage, 'dev'}:IncrementBalance",
 				},
 			},
 		},

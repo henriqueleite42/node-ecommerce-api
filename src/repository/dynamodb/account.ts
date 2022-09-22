@@ -1,22 +1,17 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { PutItemCommand, UpdateItemCommand } from "@aws-sdk/client-dynamodb";
+import { PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { cleanObj } from "@techmmunity/utils";
 import { v4 } from "uuid";
 
-import type {
-	AccountRepository,
-	AccountEntity,
-	IncrementBalanceInput,
-} from "../../models/account";
+import type { AccountRepository, AccountEntity } from "../../models/account";
 
 import { DynamodbRepository } from ".";
 
 export interface AccountTable {
 	accountId: string;
 	discordId: string;
-	balance: number;
 	createdAt: string;
 }
 
@@ -32,7 +27,6 @@ export class AccountRepositoryDynamoDB
 		const item: AccountEntity = {
 			accountId: v4(),
 			discordId,
-			balance: 0,
 			createdAt: new Date(),
 		};
 
@@ -54,22 +48,6 @@ export class AccountRepositoryDynamoDB
 
 	public getByDiscordId(discordId: string) {
 		return this.getSingleItem(this.indexDiscordId({ discordId }));
-	}
-
-	public async incrementBalance({ accountId, amount }: IncrementBalanceInput) {
-		await this.dynamodb.send(
-			new UpdateItemCommand({
-				TableName: this.tableName,
-				UpdateExpression: "SET #balance = #balance + :amount",
-				ExpressionAttributeNames: {
-					"#balance": "balance",
-				},
-				ExpressionAttributeValues: marshall({
-					":amount": amount,
-				}),
-				Key: this.indexAccountId({ accountId }).Key,
-			}),
-		);
 	}
 
 	// Keys
@@ -112,7 +90,6 @@ export class AccountRepositoryDynamoDB
 		return cleanObj({
 			accountId: `ACCOUNT#${entity.accountId}`,
 			discordId: `DISCORD#${entity.discordId}`,
-			balance: entity.balance,
 			createdAt: entity.createdAt.toISOString(),
 		});
 	}
@@ -121,7 +98,6 @@ export class AccountRepositoryDynamoDB
 		return {
 			accountId: table.accountId.replace("ACCOUNT#", ""),
 			discordId: table.discordId.replace("DISCORD#", ""),
-			balance: table.balance,
 			createdAt: new Date(table.createdAt),
 		};
 	}
