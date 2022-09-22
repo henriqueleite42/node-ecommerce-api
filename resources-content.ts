@@ -1,13 +1,13 @@
 import type { AWS } from "@serverless/typescript";
 
-export const resourcesAccount: AWS["resources"] = {
+export const resourcesContent: AWS["resources"] = {
 	Resources: {
 		AccountDynamoDBTable: {
 			DeletionPolicy: "Retain",
 			UpdateReplacePolicy: "Retain",
 			Type: "AWS::DynamoDB::Table",
 			Properties: {
-				TableName: "accounts",
+				TableName: "contents",
 				BillingMode: "PROVISIONED",
 				ProvisionedThroughput: {
 					ReadCapacityUnits: 3,
@@ -15,30 +15,38 @@ export const resourcesAccount: AWS["resources"] = {
 				},
 				AttributeDefinitions: [
 					{
-						AttributeName: "accountId",
+						AttributeName: "storeId_productId_contentId",
 						AttributeType: "S",
 					},
 					{
-						AttributeName: "discordId",
+						AttributeName: "storeId_productId",
+						AttributeType: "S",
+					},
+					{
+						AttributeName: "createdAt_contentId",
 						AttributeType: "S",
 					},
 				],
 				KeySchema: [
 					{
-						AttributeName: "accountId",
+						AttributeName: "storeId_productId_contentId",
 						KeyType: "HASH",
 					},
 				],
 				GlobalSecondaryIndexes: [
 					{
-						IndexName: "discordId",
+						IndexName: "StoreIdProductIdCreatedAtContentId",
 						KeySchema: [
 							{
-								AttributeName: "discordId",
+								AttributeName: "storeId_productId",
 								KeyType: "HASH",
 							},
+							{
+								AttributeName: "createdAt_contentId",
+								KeyType: "SORT",
+							},
 						],
-					}
+					},
 				],
 			},
 		},

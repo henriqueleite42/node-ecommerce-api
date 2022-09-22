@@ -1,13 +1,13 @@
 import type { AWS } from "@serverless/typescript";
 
-export const resourcesAccount: AWS["resources"] = {
+export const resourcesCounter: AWS["resources"] = {
 	Resources: {
 		AccountDynamoDBTable: {
 			DeletionPolicy: "Retain",
 			UpdateReplacePolicy: "Retain",
 			Type: "AWS::DynamoDB::Table",
 			Properties: {
-				TableName: "accounts",
+				TableName: "counters",
 				BillingMode: "PROVISIONED",
 				ProvisionedThroughput: {
 					ReadCapacityUnits: 3,
@@ -15,30 +15,34 @@ export const resourcesAccount: AWS["resources"] = {
 				},
 				AttributeDefinitions: [
 					{
-						AttributeName: "accountId",
+						AttributeName: "pk",
 						AttributeType: "S",
 					},
 					{
-						AttributeName: "discordId",
-						AttributeType: "S",
+						AttributeName: "counter",
+						AttributeType: "N",
 					},
 				],
 				KeySchema: [
 					{
-						AttributeName: "accountId",
+						AttributeName: "pk",
 						KeyType: "HASH",
 					},
 				],
 				GlobalSecondaryIndexes: [
 					{
-						IndexName: "discordId",
+						IndexName: "PkCounter",
 						KeySchema: [
 							{
-								AttributeName: "discordId",
+								AttributeName: "pk",
 								KeyType: "HASH",
 							},
+							{
+								AttributeName: "counter",
+								KeyType: "SORT",
+							},
 						],
-					}
+					},
 				],
 			},
 		},

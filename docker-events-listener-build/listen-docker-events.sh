@@ -33,9 +33,9 @@ do
 		aws --endpoint-url=http://localstack:4566 ssm put-parameter --name "$SERVICE_NAME-local-pgHost" --type String --value "localhost" --overwrite
 		aws --endpoint-url=http://localstack:4566 ssm put-parameter --name "$SERVICE_NAME-local-pgPort" --type String --value "4510" --overwrite
 		aws --endpoint-url=http://localstack:4566 ssm put-parameter --name "$SERVICE_NAME-local-sourceEmailToSendEmails" --type String --value "foo@bar.com" --overwrite
-		aws --endpoint-url=http://localstack:4566 ssm put-parameter --name "$SERVICE_NAME-local-imageDomainUrl" --type String --value "http://localhost" --overwrite
-		aws --endpoint-url=http://localstack:4566 ssm put-parameter --name "$SERVICE_NAME-local-videoDomainUrl" --type String --value "http://localhost" --overwrite
-		aws --endpoint-url=http://localstack:4566 ssm put-parameter --name "$SERVICE_NAME-local-rawVideoDomainUrl" --type String --value "http://localhost" --overwrite
+		aws --endpoint-url=http://localstack:4566 ssm put-parameter --name "$SERVICE_NAME-local-imageUrl" --type String --value "http://localhost" --overwrite
+		aws --endpoint-url=http://localstack:4566 ssm put-parameter --name "$SERVICE_NAME-local-videoUrl" --type String --value "http://localhost" --overwrite
+		aws --endpoint-url=http://localstack:4566 ssm put-parameter --name "$SERVICE_NAME-local-rawVideoUrl" --type String --value "http://localhost" --overwrite
 		aws --endpoint-url=http://localstack:4566 ssm put-parameter --name "$SERVICE_NAME-local-jwtSecret" --type String --value "fake" --overwrite
 		aws --endpoint-url=http://localstack:4566 ssm put-parameter --name "$SERVICE_NAME-local-discordClientId" --type String --value "fake" --overwrite
 		aws --endpoint-url=http://localstack:4566 ssm put-parameter --name "$SERVICE_NAME-local-discordClientSecret" --type String --value "fake" --overwrite

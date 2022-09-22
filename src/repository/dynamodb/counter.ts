@@ -71,93 +71,63 @@ export class CounterRepositoryDynamoDB
 	}
 
 	public async getTopStores() {
-		const stores = [] as Array<GetTopStoresOutput>;
+		const result = await this.dynamodb.send(
+			new QueryCommand(this.indexTopStores()),
+		);
 
-		let nextPageCursor: any;
-
-		do {
-			// eslint-disable-next-line no-await-in-loop
-			const result = await this.dynamodb.send(
-				new QueryCommand(this.indexTopStores(nextPageCursor)),
-			);
-
-			result.Items?.forEach(item => {
-				stores.push(this.tableToStore(unmarshall(item) as CounterTable));
-			});
-
-			nextPageCursor = result.LastEvaluatedKey;
-		} while (nextPageCursor);
-
-		const sortedStores = stores.sort((a, b) => a.count - b.count);
-
-		return sortedStores.slice(0, this.topLength);
+		return (
+			result.Items?.map(item =>
+				this.tableToStore(unmarshall(item) as CounterTable),
+			) || []
+		);
 	}
 
 	public async getTopProducts() {
-		const products = [] as Array<GetTopProductsOutput>;
+		const result = await this.dynamodb.send(
+			new QueryCommand(this.indexTopProducts()),
+		);
 
-		let nextPageCursor: any;
-
-		do {
-			// eslint-disable-next-line no-await-in-loop
-			const result = await this.dynamodb.send(
-				new QueryCommand(this.indexTopProducts(nextPageCursor)),
-			);
-
-			result.Items?.forEach(item => {
-				products.push(this.tableToProduct(unmarshall(item) as CounterTable));
-			});
-
-			nextPageCursor = result.LastEvaluatedKey;
-		} while (nextPageCursor);
-
-		const sortedProducts = products.sort((a, b) => a.count - b.count);
-
-		return sortedProducts.slice(0, this.topLength);
+		return (
+			result.Items?.map(item =>
+				this.tableToProduct(unmarshall(item) as CounterTable),
+			) || []
+		);
 	}
 
 	// Keys
 
-	private indexTopStores(cursor: Record<string, any> | undefined) {
+	private indexTopStores() {
 		return {
 			TableName: this.tableName,
-			IndexName: "SkPk",
-			Limit: 100,
-			ExclusiveStartKey: cursor,
-			KeyConditionExpression: "#sk = :sk AND begins_with(#pk, :pk)",
+			IndexName: "PkCount",
+			Limit: this.topLength,
+			KeyConditionExpression: "#pk = :pk",
 			ExpressionAttributeNames: {
-				"#sk": "sk",
 				"#pk": "pk",
 			},
 			ExpressionAttributeValues: marshall({
-				":sk": "TOTAL_RECEIVED",
-				":pk": "STORE#",
+				":pk": "TOTAL_RECEIVED#STORE#",
 			}),
 			Key: marshall({
-				sk: "TOTAL_RECEIVED",
-				pk: "STORE#",
+				pk: "TOTAL_RECEIVED#STORE#",
 			}),
 		};
 	}
 
-	private indexTopProducts(cursor: Record<string, any> | undefined) {
+	private indexTopProducts() {
 		return {
 			TableName: this.tableName,
-			IndexName: "SkPk",
-			Limit: 100,
-			ExclusiveStartKey: cursor,
-			KeyConditionExpression: "#sk = :sk AND begins_with(#pk, :pk)",
+			IndexName: "PkCount",
+			Limit: this.topLength,
+			KeyConditionExpression: "#pk = :pk",
 			ExpressionAttributeNames: {
-				"#sk": "sk",
 				"#pk": "pk",
 			},
 			ExpressionAttributeValues: marshall({
-				":sk": "TOTAL_RECEIVED",
-				":pk": "PRODUCT#",
+				":pk": "TOTAL_RECEIVED#PRODUCT#",
 			}),
 			Key: marshall({
-				sk: "TOTAL_RECEIVED",
-				pk: "PRODUCT#",
+				pk: "TOTAL_RECEIVED#PRODUCT#",
 			}),
 		};
 	}
@@ -165,7 +135,7 @@ export class CounterRepositoryDynamoDB
 	// Mappers
 
 	protected tableToStore(table: CounterTable): GetTopStoresOutput {
-		const [, storeId] = table.pk.split("#");
+		const [, , storeId] = table.pk.split("#");
 
 		return {
 			storeId,
@@ -174,7 +144,7 @@ export class CounterRepositoryDynamoDB
 	}
 
 	protected tableToProduct(table: CounterTable): GetTopProductsOutput {
-		const [, productId, , storeId] = table.pk.split("#");
+		const [, , productId, , storeId] = table.pk.split("#");
 
 		return {
 			productId,

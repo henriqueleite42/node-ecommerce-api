@@ -2,6 +2,7 @@
 
 import { PutItemCommand, UpdateItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall } from "@aws-sdk/util-dynamodb";
+import { cleanObj } from "@techmmunity/utils";
 import { v4 } from "uuid";
 
 import type {
@@ -108,12 +109,12 @@ export class AccountRepositoryDynamoDB
 	// Mappers
 
 	protected entityToTable(entity: AccountEntity): AccountTable {
-		return {
+		return cleanObj({
 			accountId: `ACCOUNT#${entity.accountId}`,
 			discordId: `DISCORD#${entity.discordId}`,
 			balance: entity.balance,
 			createdAt: entity.createdAt.toISOString(),
-		};
+		});
 	}
 
 	protected tableToEntity(table: AccountTable): AccountEntity {

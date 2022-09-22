@@ -2,8 +2,8 @@ import { createWithDiscordId } from "./http/account/create-with-discord-id/handl
 import { getByDiscordId } from "./http/account/get-by-discord-id/handler";
 import { incrementBalance } from "./queue/account/increment-balance/handler";
 
-export const accountDomain = {
-	accountDomainCreateWithDiscordId: createWithDiscordId,
-	accountDomainGetByDiscordId: getByDiscordId,
-	accountDomainIncrementBalance: incrementBalance,
+export const account = {
+	accountCreateWithDiscordId: createWithDiscordId,
+	accountGetByDiscordId: getByDiscordId,
+	accountIncrementBalance: incrementBalance,
 };

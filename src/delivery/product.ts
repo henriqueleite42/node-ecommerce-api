@@ -7,13 +7,13 @@ import { incrementSalesCount } from "./queue/product/increment-sales-count/handl
 import { incrementTotalBilled } from "./queue/product/increment-total-billed/handler";
 import { updateImg } from "./queue/product/update-img/handler";
 
-export const productDomain = {
-	productDomainCreateFromThirdParty: createFromThirdParty,
-	productDomainEdit: edit,
-	productDomainGetById: getById,
-	productDomainGetPaginated: getPaginated,
-	productDomainTop: top,
-	productDomainUpdateImg: updateImg,
-	productDomainIncrementSalesCount: incrementSalesCount,
-	productDomainIncrementTotalBilled: incrementTotalBilled,
+export const product = {
+	productCreateFromThirdParty: createFromThirdParty,
+	productEdit: edit,
+	productGetById: getById,
+	productGetPaginated: getPaginated,
+	productTop: top,
+	productUpdateImg: updateImg,
+	productIncrementSalesCount: incrementSalesCount,
+	productIncrementTotalBilled: incrementTotalBilled,
 };

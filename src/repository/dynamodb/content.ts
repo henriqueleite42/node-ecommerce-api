@@ -2,6 +2,7 @@
 
 import { BatchWriteItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall } from "@aws-sdk/util-dynamodb";
+import { cleanObj } from "@techmmunity/utils";
 import type {
 	ContentEntity,
 	ContentRepository,
@@ -121,7 +122,7 @@ export class ContentRepositoryDynamoDB
 		const storeId = `STORE#${entity.storeId}`;
 		const createdAt = entity.createdAt.toISOString();
 
-		return {
+		return cleanObj({
 			contentId,
 			productId,
 			storeId,
@@ -132,7 +133,7 @@ export class ContentRepositoryDynamoDB
 			rawContentPath: entity.rawContentPath,
 			processedContentPath: entity.processedContentPath,
 			createdAt,
-		};
+		});
 	}
 
 	protected tableToEntity(table: ContentTable): ContentEntity {

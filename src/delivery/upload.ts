@@ -1,5 +1,5 @@
 import { fromUrl } from "./queue/upload/from-url/handler";
 
-export const uploadDomain = {
-	uploadDomainFromUrl: fromUrl,
+export const upload = {
+	uploadFromUrl: fromUrl,
 };

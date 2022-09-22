@@ -2,6 +2,7 @@
 
 import { BatchWriteItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall } from "@aws-sdk/util-dynamodb";
+import { cleanObj } from "@techmmunity/utils";
 import type {
 	AccessEntity,
 	AccessIds,
@@ -128,7 +129,7 @@ export class AccessRepositoryDynamoDB
 
 		const primaryKey = `${accountId}#${storeId}#${productId}#${variationId}`;
 
-		return {
+		return cleanObj({
 			accountId,
 			storeId,
 			productId,
@@ -139,7 +140,7 @@ export class AccessRepositoryDynamoDB
 			accountId_storeId_productId_variationId: primaryKey,
 			accountId_storeId: `${accountId}#${storeId}`,
 			createdAt_productId_variationId: `${createdAt}#${primaryKey}#${variationId}`,
-		};
+		});
 	}
 
 	protected tableToEntity(table: AccessTable): AccessEntity {

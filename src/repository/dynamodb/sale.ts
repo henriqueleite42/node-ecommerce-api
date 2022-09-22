@@ -2,6 +2,7 @@
 
 import { PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall } from "@aws-sdk/util-dynamodb";
+import { cleanObj } from "@techmmunity/utils";
 import type {
 	SaleEntity,
 	SaleRepository,
@@ -148,7 +149,7 @@ export class SaleRepositoryDynamoDB
 	// Mappers
 
 	protected entityToTable(entity: SaleEntity): SaleTable {
-		return {
+		return cleanObj({
 			saleId: `SALE#${entity.saleId}`,
 			storeId: `ACCOUNT#${entity.storeId}`,
 			clientId: `ACCOUNT#${entity.clientId}`,
@@ -159,7 +160,7 @@ export class SaleRepositoryDynamoDB
 			products: entity.products,
 			finalPrice: entity.finalPrice,
 			createdAt: entity.createdAt.toISOString(),
-		};
+		});
 	}
 
 	protected tableToEntity(table: SaleTable): SaleEntity {

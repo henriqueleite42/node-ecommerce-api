@@ -4,10 +4,10 @@ import { top } from "./http/store/top/handler";
 import { incrementSalesCount } from "./queue/store/increment-sales-count/handler";
 import { incrementTotalBilled } from "./queue/store/increment-total-billed/handler";
 
-export const storeDomain = {
-	storeDomainCreate: create,
-	storeDomainEdit: edit,
-	storeDomainTop: top,
-	storeDomainIncrementSalesCount: incrementSalesCount,
-	storeDomainIncrementTotalBilled: incrementTotalBilled,
+export const store = {
+	storeCreate: create,
+	storeEdit: edit,
+	storeTop: top,
+	storeIncrementSalesCount: incrementSalesCount,
+	storeIncrementTotalBilled: incrementTotalBilled,
 };

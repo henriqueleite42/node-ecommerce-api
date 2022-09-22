@@ -189,7 +189,7 @@ export class StoreRepositoryDynamoDB
 		const storeId = `STORE#${entity.storeId}`;
 		const accountId = `ACCOUNT#${entity.accountId}`;
 
-		return {
+		return cleanObj({
 			storeId,
 			accountId,
 			accountId_storeId: `${accountId}#${storeId}`,
@@ -199,7 +199,7 @@ export class StoreRepositoryDynamoDB
 			bannerUrl: entity.bannerUrl,
 			avatarUrl: entity.avatarUrl,
 			createdAt: entity.createdAt.toISOString(),
-		};
+		});
 	}
 
 	protected tableToEntity(table: StoreTable): StoreEntity {

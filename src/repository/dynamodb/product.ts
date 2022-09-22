@@ -2,6 +2,7 @@
 
 import { PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall } from "@aws-sdk/util-dynamodb";
+import { cleanObj } from "@techmmunity/utils";
 import type {
 	CreateInput,
 	EditInput,
@@ -170,7 +171,7 @@ export class ProductRepositoryDynamoDB
 		const type = `TYPE#${entity.type}`;
 		const createdAt = entity.createdAt.toISOString();
 
-		return {
+		return cleanObj({
 			productId,
 			storeId,
 			type: type as ProductTypeEnum,
@@ -184,7 +185,7 @@ export class ProductRepositoryDynamoDB
 			variations: entity.variations,
 			deliveryMethod: entity.deliveryMethod,
 			createdAt,
-		};
+		});
 	}
 
 	protected tableToEntity(table: ProductTable): ProductEntity {
