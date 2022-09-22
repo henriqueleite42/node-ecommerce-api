@@ -5,10 +5,21 @@ import type {
 	WalletRepository,
 	IncrementBalanceInput,
 	AdminWithdrawalInput,
+	CreateInput,
 } from "models/wallet";
 
 export class WalletUseCaseImplementation implements WalletUseCase {
 	public constructor(private readonly walletRepository: WalletRepository) {}
+
+	public async create(p: CreateInput) {
+		const wallet = await this.walletRepository.getById(p);
+
+		if (wallet) {
+			throw new Error("ACCOUNT_ALREADY_HAS_WALLET");
+		}
+
+		return this.walletRepository.create(p);
+	}
 
 	public async incrementBalance({ accountId, amount }: IncrementBalanceInput) {
 		const { monetizzerProfit, gnFee, storeProfit } =

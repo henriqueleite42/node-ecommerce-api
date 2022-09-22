@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { UpdateItemCommand } from "@aws-sdk/client-dynamodb";
+import { PutItemCommand, UpdateItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { cleanObj } from "@techmmunity/utils";
 import type {
@@ -9,6 +9,7 @@ import type {
 	GetByIdInput,
 	IncrementBalanceInput,
 	WithdrawalInput,
+	CreateInput,
 } from "models/wallet";
 
 import { DynamodbRepository } from ".";
@@ -24,6 +25,23 @@ export class WalletRepositoryDynamoDB
 	implements WalletRepository
 {
 	protected readonly tableName = "wallets";
+
+	public async create({ accountId }: CreateInput) {
+		const item: WalletEntity = {
+			accountId,
+			balance: 0,
+			withdrawalMethods: [],
+		};
+
+		await this.dynamodb.send(
+			new PutItemCommand({
+				TableName: this.tableName,
+				Item: marshall(this.entityToTable(item)),
+			}),
+		);
+
+		return item;
+	}
 
 	public async incrementBalance({ accountId, amount }: IncrementBalanceInput) {
 		await this.dynamodb.send(

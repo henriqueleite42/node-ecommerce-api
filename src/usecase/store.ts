@@ -1,3 +1,4 @@
+import type { TopicManager } from "adapters/topic-manager";
 import type { CounterRepository } from "models/counters";
 import type {
 	CreateInput,
@@ -14,6 +15,7 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 	public constructor(
 		private readonly storeRepository: StoreRepository,
 		private readonly counterRepository: CounterRepository,
+		private readonly topicManager: TopicManager,
 	) {}
 
 	public async create(p: CreateInput) {
@@ -23,7 +25,14 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 			throw new Error("DUPLICATED_NAME");
 		}
 
-		return this.storeRepository.create(p);
+		const store = await this.storeRepository.create(p);
+
+		await this.topicManager.sendMsg({
+			to: "",
+			message: store,
+		});
+
+		return store;
 	}
 
 	public async edit(p: EditInput) {

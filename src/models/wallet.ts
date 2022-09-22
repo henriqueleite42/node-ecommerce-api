@@ -37,12 +37,18 @@ export interface WithdrawalInput {
 
 export type GetByIdInput = Pick<WalletEntity, "accountId">;
 
+export interface CreateInput {
+	accountId: string;
+}
+
 export interface WalletRepository {
 	incrementBalance: (p: IncrementBalanceInput) => Promise<void>;
 
 	withdrawal: (p: WithdrawalInput) => Promise<void>;
 
 	getById: (p: GetByIdInput) => Promise<WalletEntity | null>;
+
+	create: (p: CreateInput) => Promise<WalletEntity>;
 }
 
 /**
@@ -63,4 +69,6 @@ export interface WalletUseCase {
 	incrementBalance: (p: IncrementBalanceInput) => Promise<void>;
 
 	adminWithdrawal: (p: AdminWithdrawalInput) => Promise<void>;
+
+	create: (p: CreateInput) => Promise<WalletEntity>;
 }

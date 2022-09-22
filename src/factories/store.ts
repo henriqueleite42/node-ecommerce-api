@@ -1,3 +1,4 @@
+import { SNSAdapter } from "adapters/implementations/sns";
 import { Service } from "factories";
 import type { StoreUseCase } from "models/store";
 import { getDynamoInstance } from "repository/dynamodb";
@@ -8,10 +9,15 @@ import { StoreUseCaseImplementation } from "usecase/store";
 export class StoreService extends Service<StoreUseCase> {
 	public getInstance() {
 		const dynamodb = getDynamoInstance();
+		const sns = new SNSAdapter();
 
 		const storeRepository = new StoreRepositoryDynamoDB(dynamodb);
 		const counterRepository = new CounterRepositoryDynamoDB(dynamodb);
 
-		return new StoreUseCaseImplementation(storeRepository, counterRepository);
+		return new StoreUseCaseImplementation(
+			storeRepository,
+			counterRepository,
+			sns,
+		);
 	}
 }
