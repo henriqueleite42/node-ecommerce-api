@@ -65,6 +65,14 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 		return this.storeRepository.getManyById(topStores);
 	}
 
+	public getStoresCount() {
+		return this.counterRepository.getTotal("STORES");
+	}
+
+	public async increaseStoresCount() {
+		await this.counterRepository.incrementTotal("STORES");
+	}
+
 	public async increaseSalesCount({ storeId }: IncreaseSalesCountInput) {
 		await this.counterRepository.incrementStore({
 			storeId,

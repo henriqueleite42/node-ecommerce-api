@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { QueryCommand, UpdateItemCommand } from "@aws-sdk/client-dynamodb";
+import {
+	GetItemCommand,
+	QueryCommand,
+	UpdateItemCommand,
+} from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import type {
 	CounterEntity,
@@ -9,6 +13,7 @@ import type {
 	GetTopStoresOutput,
 	IncrementProductInput,
 	IncrementStoreInput,
+	TotalCounterTypes,
 } from "models/counters";
 
 import { DynamodbRepository } from ".";
@@ -31,16 +36,9 @@ export class CounterRepositoryDynamoDB
 		await this.dynamodb.send(
 			new UpdateItemCommand({
 				TableName: this.tableName,
-				UpdateExpression: "SET #count = #count + :count",
-				ExpressionAttributeNames: {
-					"#count": "count",
-				},
-				ExpressionAttributeValues: marshall({
-					":count": qtd,
-				}),
+				...this.updateExpression(qtd),
 				Key: marshall({
-					pk: `STORE#${storeId}`,
-					sk: type,
+					pk: `${type}#STORE#${storeId}`,
 				}),
 			}),
 		);
@@ -55,19 +53,42 @@ export class CounterRepositoryDynamoDB
 		await this.dynamodb.send(
 			new UpdateItemCommand({
 				TableName: this.tableName,
-				UpdateExpression: "SET #count = #count + :count",
-				ExpressionAttributeNames: {
-					"#count": "count",
-				},
-				ExpressionAttributeValues: marshall({
-					":count": qtd,
-				}),
+				...this.updateExpression(qtd),
 				Key: marshall({
-					pk: `PRODUCT#${productId}#STORE#${storeId}`,
-					sk: type,
+					pk: `${type}#PRODUCT#${productId}#STORE#${storeId}`,
 				}),
 			}),
 		);
+	}
+
+	public async incrementTotal(type: TotalCounterTypes) {
+		await this.dynamodb.send(
+			new UpdateItemCommand({
+				TableName: this.tableName,
+				// eslint-disable-next-line @typescript-eslint/no-magic-numbers
+				...this.updateExpression(1),
+				Key: marshall({
+					pk: `TOTAL#${type}`,
+				}),
+			}),
+		);
+	}
+
+	public async getTotal(type: TotalCounterTypes) {
+		const item = await this.dynamodb.send(
+			new GetItemCommand({
+				TableName: this.tableName,
+				Key: marshall({
+					pk: `TOTAL#${type}`,
+				}),
+			}),
+		);
+
+		if (!item.Item) return 0;
+
+		const { count } = unmarshall(item.Item) as CounterTable;
+
+		return count;
 	}
 
 	public async getTopStores() {
@@ -128,6 +149,18 @@ export class CounterRepositoryDynamoDB
 			}),
 			Key: marshall({
 				pk: "TOTAL_RECEIVED#PRODUCT#",
+			}),
+		};
+	}
+
+	private updateExpression(qtd: number) {
+		return {
+			UpdateExpression: "SET #count = #count + :count",
+			ExpressionAttributeNames: {
+				"#count": "count",
+			},
+			ExpressionAttributeValues: marshall({
+				":count": qtd,
 			}),
 		};
 	}

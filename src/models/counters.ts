@@ -26,8 +26,10 @@ export interface IncrementProductInput {
 export interface IncrementStoreInput {
 	storeId: string;
 	qtd: number;
-	type: ProductCounterTypes;
+	type: StoreCounterTypes;
 }
+
+export type TotalCounterTypes = "STORES";
 
 export interface GetTopStoresOutput {
 	storeId: string;
@@ -44,6 +46,10 @@ export interface CounterRepository {
 	incrementProduct: (p: IncrementProductInput) => Promise<void>;
 
 	incrementStore: (p: IncrementStoreInput) => Promise<void>;
+
+	incrementTotal: (p: TotalCounterTypes) => Promise<void>;
+
+	getTotal: (p: TotalCounterTypes) => Promise<number>;
 
 	getTopStores: () => Promise<Array<GetTopStoresOutput>>;
 

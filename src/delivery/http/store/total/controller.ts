@@ -1,29 +1,24 @@
 import type { APIGatewayEvent } from "aws-lambda";
-import { WalletService } from "factories/wallet";
+import { StoreService } from "factories/store";
 import { makeController } from "helpers/make-controller";
-
-import { validate } from "./validate";
 
 import { StatusCodeEnum } from "types/enums/status-code";
 
 export const controller = makeController<APIGatewayEvent>(
-	async ({ event }) => {
+	async () => {
 		try {
-			const params = await validate((event.body || {}) as any);
+			const service = new StoreService().getInstance();
 
-			const service = new WalletService().getInstance();
-
-			await service.adminWithdrawal(params);
+			const stores = await service.getStoresCount();
 
 			return {
-				statusCode: StatusCodeEnum.NO_CONTENT,
+				statusCode: StatusCodeEnum.SUCCESS,
+				body: JSON.stringify({
+					count: stores,
+				}),
 			};
 		} catch (err: any) {
 			switch (err.message) {
-				case "NOT_ENOUGH_FUNDS":
-					return {
-						statusCode: StatusCodeEnum.FORBIDDEN,
-					};
 				default:
 					return {
 						statusCode: StatusCodeEnum.INTERNAL,

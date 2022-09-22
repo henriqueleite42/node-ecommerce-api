@@ -81,6 +81,10 @@ export interface StoreUseCase {
 
 	getTop: () => Promise<Array<StoreEntity>>;
 
+	getStoresCount: () => Promise<number>;
+
+	increaseStoresCount: () => Promise<void>;
+
 	increaseSalesCount: (p: IncreaseSalesCountInput) => Promise<void>;
 
 	increaseTotalBilled: (p: IncreaseTotalBilledInput) => Promise<void>;
