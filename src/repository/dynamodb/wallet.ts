@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { PutItemCommand, UpdateItemCommand } from "@aws-sdk/client-dynamodb";
-import { marshall } from "@aws-sdk/util-dynamodb";
+import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { cleanObj } from "@techmmunity/utils";
 import type {
 	WalletEntity,
@@ -10,6 +10,7 @@ import type {
 	IncrementBalanceInput,
 	WithdrawalInput,
 	CreateInput,
+	AddWWMInput,
 } from "models/wallet";
 
 import { DynamodbRepository } from ".";
@@ -78,6 +79,30 @@ export class WalletRepositoryDynamoDB
 
 	public getById({ accountId }: GetByIdInput) {
 		return this.getSingleItem(this.indexAccountId({ accountId }));
+	}
+
+	public async addWWM({ accountId, ...data }: AddWWMInput) {
+		const result = await this.dynamodb.send(
+			new UpdateItemCommand({
+				TableName: this.tableName,
+				ReturnValues: "ALL_NEW",
+				Key: this.indexAccountId({ accountId }).Key,
+				UpdateExpression:
+					"SET #withdrawalMethods = list_append(#withdrawalMethods, :WWM)",
+				ExpressionAttributeNames: {
+					"#withdrawalMethods": "withdrawalMethods",
+				},
+				ExpressionAttributeValues: marshall({
+					":WWM": data,
+				}),
+			}),
+		);
+
+		if (!result.Attributes) {
+			return null;
+		}
+
+		return this.tableToEntity(unmarshall(result.Attributes) as WalletTable);
 	}
 
 	// Keys

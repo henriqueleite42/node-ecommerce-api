@@ -13,16 +13,20 @@ export const controller = makeController<APIGatewayEvent>(
 
 			const service = new WalletService().getInstance();
 
-			await service.adminWithdrawal(params);
+			await service.addWWMPix(params);
 
 			return {
 				statusCode: StatusCodeEnum.NO_CONTENT,
 			};
 		} catch (err: any) {
 			switch (err.message) {
-				case "NOT_ENOUGH_FUNDS":
+				case "WALLET_NOT_FOUND":
 					return {
-						statusCode: StatusCodeEnum.BAD_REQUEST,
+						statusCode: StatusCodeEnum.NOT_FOUND,
+					};
+				case "DUPLICATED_WWM":
+					return {
+						statusCode: StatusCodeEnum.CONFLICT,
 					};
 				default:
 					return {

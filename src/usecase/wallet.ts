@@ -6,7 +6,10 @@ import type {
 	IncrementBalanceInput,
 	AdminWithdrawalInput,
 	CreateInput,
+	AddWWMPixInput,
 } from "models/wallet";
+
+import { WithdrawalMethodEnum } from "types/enums/withdrawal-method";
 
 export class WalletUseCaseImplementation implements WalletUseCase {
 	public constructor(private readonly walletRepository: WalletRepository) {}
@@ -62,6 +65,30 @@ export class WalletUseCaseImplementation implements WalletUseCase {
 				amount: -amount,
 			}),
 		]);
+	}
+
+	public async addWWMPix({ accountId, pixKey }: AddWWMPixInput) {
+		const wallet = await this.walletRepository.getById({ accountId });
+
+		if (!wallet) {
+			throw new Error("WALLET_NOT_FOUND");
+		}
+
+		const type = WithdrawalMethodEnum.PIX;
+
+		const isDuplicatedWWM = wallet.withdrawalMethods.find(
+			wwm => wwm.type === type && wwm.pixKey === pixKey,
+		);
+
+		if (isDuplicatedWWM) {
+			throw new Error("DUPLICATED_WWM");
+		}
+
+		await this.walletRepository.addWWM({
+			accountId,
+			type,
+			pixKey,
+		});
 	}
 
 	// Internal methods

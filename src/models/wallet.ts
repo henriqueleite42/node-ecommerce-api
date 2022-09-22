@@ -41,6 +41,10 @@ export interface CreateInput {
 	accountId: string;
 }
 
+export interface AddWWMInput extends AllWWMs {
+	accountId: string;
+}
+
 export interface WalletRepository {
 	incrementBalance: (p: IncrementBalanceInput) => Promise<void>;
 
@@ -49,6 +53,8 @@ export interface WalletRepository {
 	getById: (p: GetByIdInput) => Promise<WalletEntity | null>;
 
 	create: (p: CreateInput) => Promise<WalletEntity>;
+
+	addWWM: (p: AddWWMInput) => Promise<WalletEntity | null>;
 }
 
 /**
@@ -65,10 +71,16 @@ export interface AdminWithdrawalInput {
 	amount: number;
 }
 
+export interface AddWWMPixInput extends Omit<WWMPix, "type"> {
+	accountId: string;
+}
+
 export interface WalletUseCase {
 	incrementBalance: (p: IncrementBalanceInput) => Promise<void>;
 
 	adminWithdrawal: (p: AdminWithdrawalInput) => Promise<void>;
 
 	create: (p: CreateInput) => Promise<WalletEntity>;
+
+	addWWMPix: (p: AddWWMPixInput) => Promise<void>;
 }
