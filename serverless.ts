@@ -11,6 +11,7 @@ import { resourcesCounter } from "./resources-counter";
 import { resourcesProduct } from "./resources-product";
 import { resourcesSale } from "./resources-sale";
 import { resourcesStore } from "./resources-store";
+import { resourcesWallet } from "./resources-wallet";
 
 import { access } from "./src/delivery/access";
 import { account } from "./src/delivery/account";
@@ -19,6 +20,7 @@ import { product } from "./src/delivery/product";
 import { sale } from "./src/delivery/sale";
 import { store } from "./src/delivery/store";
 import { upload } from "./src/delivery/upload";
+import { wallet } from "./src/delivery/wallet";
 
 config();
 
@@ -140,6 +142,12 @@ const uploadConfig = {
 	functions: upload,
 };
 
+const walletConfig = {
+	service: "wallet",
+	resources: resourcesWallet,
+	functions: wallet,
+};
+
 const getConfig = () => {
 	switch (process.env.DEPLOY_TYPE) {
 		case "ACCESS":
@@ -165,6 +173,9 @@ const getConfig = () => {
 
 		case "UPLOAD":
 			return merge(baseConfig, uploadConfig);
+
+		case "WALLET":
+			return merge(baseConfig, walletConfig);
 
 		default:
 			throw new Error("Invalid module")

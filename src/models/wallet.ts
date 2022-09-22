@@ -1,20 +1,20 @@
 import type { WithdrawalMethodEnum } from "types/enums/withdrawal-method";
 
-interface BaseBWM {
+interface BaseWWM {
 	type: WithdrawalMethodEnum;
 }
 
-export interface BWMPix extends BaseBWM {
+export interface WWMPix extends BaseWWM {
 	type: WithdrawalMethodEnum.PIX;
 	pixKey: string;
 }
 
-export type AllBWMs = BWMPix;
+export type AllWWMs = WWMPix;
 
-export interface BalanceEntity {
+export interface WalletEntity {
 	accountId: string;
 	balance: number;
-	withdrawalMethods: Array<AllBWMs>;
+	withdrawalMethods: Array<AllWWMs>;
 }
 
 /**
@@ -35,14 +35,14 @@ export interface WithdrawalInput {
 	amount: number;
 }
 
-export type GetByIdInput = Pick<BalanceEntity, "accountId">;
+export type GetByIdInput = Pick<WalletEntity, "accountId">;
 
-export interface BalanceRepository {
+export interface WalletRepository {
 	incrementBalance: (p: IncrementBalanceInput) => Promise<void>;
 
 	withdrawal: (p: WithdrawalInput) => Promise<void>;
 
-	getById: (p: GetByIdInput) => Promise<BalanceEntity | null>;
+	getById: (p: GetByIdInput) => Promise<WalletEntity | null>;
 }
 
 /**
@@ -53,8 +53,14 @@ export interface BalanceRepository {
  *
  */
 
-export interface BalanceUseCase {
+export interface AdminWithdrawalInput {
+	adminId: string;
+	accountId: string;
+	amount: number;
+}
+
+export interface WalletUseCase {
 	incrementBalance: (p: IncrementBalanceInput) => Promise<void>;
 
-	withdrawal: (p: WithdrawalInput) => Promise<void>;
+	adminWithdrawal: (p: AdminWithdrawalInput) => Promise<void>;
 }

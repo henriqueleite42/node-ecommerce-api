@@ -1,6 +1,7 @@
 import { S3Adapter } from "adapters/implementations/s3";
 import { SQSAdapter } from "adapters/implementations/sqs";
 import { Service } from "factories";
+import type { ProductUseCase } from "models/product";
 import { UploadManagerProvider } from "providers/implementations/upload-manager";
 import { getDynamoInstance } from "repository/dynamodb";
 import { ContentRepositoryDynamoDB } from "repository/dynamodb/content";
@@ -9,7 +10,7 @@ import { ProductRepositoryDynamoDB } from "repository/dynamodb/product";
 import { ContentUseCaseImplementation } from "usecase/content";
 import { ProductUseCaseImplementation } from "usecase/product";
 
-export class ProductService extends Service<ProductUseCaseImplementation> {
+export class ProductService extends Service<ProductUseCase> {
 	public getInstance() {
 		const dynamodb = getDynamoInstance();
 		const sqs = new SQSAdapter();

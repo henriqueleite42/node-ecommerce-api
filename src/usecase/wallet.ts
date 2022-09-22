@@ -1,47 +1,52 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-import type {
-	BalanceUseCase,
-	BalanceRepository,
-	IncrementBalanceInput,
-	WithdrawalInput,
-} from "models/balance";
 
-export class BalanceUseCaseImplementation implements BalanceUseCase {
-	public constructor(private readonly balanceRepository: BalanceRepository) {}
+import type {
+	WalletUseCase,
+	WalletRepository,
+	IncrementBalanceInput,
+	AdminWithdrawalInput,
+} from "models/wallet";
+
+export class WalletUseCaseImplementation implements WalletUseCase {
+	public constructor(private readonly walletRepository: WalletRepository) {}
 
 	public async incrementBalance({ accountId, amount }: IncrementBalanceInput) {
 		const { monetizzerProfit, gnFee, storeProfit } =
 			this.getFeeTaxProfit(amount);
 
 		await Promise.all([
-			this.balanceRepository.incrementBalance({
+			this.walletRepository.incrementBalance({
 				accountId: "OFFICIAL",
 				amount: monetizzerProfit,
 			}),
-			this.balanceRepository.incrementBalance({
+			this.walletRepository.incrementBalance({
 				accountId: "GERENCIANET",
 				amount: gnFee,
 			}),
-			this.balanceRepository.incrementBalance({
+			this.walletRepository.incrementBalance({
 				accountId,
 				amount: storeProfit,
 			}),
 		]);
 	}
 
-	public async withdrawal({ accountId, amount }: WithdrawalInput) {
-		const balance = await this.balanceRepository.getById({ accountId });
+	public async adminWithdrawal({
+		adminId,
+		accountId,
+		amount,
+	}: AdminWithdrawalInput) {
+		const wallet = await this.walletRepository.getById({ accountId });
 
-		if (!balance || balance.balance < amount) {
-			throw new Error("NOT_ENOUGH_FOUNDS");
+		if (!wallet || wallet.balance < amount) {
+			throw new Error("NOT_ENOUGH_FUNDS");
 		}
 
 		await Promise.all([
-			this.balanceRepository.incrementBalance({
-				accountId: process.env.RAZAL_ACCOUNT_ID!,
+			this.walletRepository.incrementBalance({
+				accountId: adminId,
 				amount,
 			}),
-			this.balanceRepository.incrementBalance({
+			this.walletRepository.incrementBalance({
 				accountId,
 				amount: -amount,
 			}),

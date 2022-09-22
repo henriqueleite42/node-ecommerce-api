@@ -4,26 +4,26 @@ import { UpdateItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { cleanObj } from "@techmmunity/utils";
 import type {
-	BalanceEntity,
-	BalanceRepository,
+	WalletEntity,
+	WalletRepository,
 	GetByIdInput,
 	IncrementBalanceInput,
 	WithdrawalInput,
-} from "models/balance";
+} from "models/wallet";
 
 import { DynamodbRepository } from ".";
 
-export interface BalanceTable {
+export interface WalletTable {
 	accountId: string;
 	balance: number;
-	withdrawalMethods: BalanceEntity["withdrawalMethods"];
+	withdrawalMethods: WalletEntity["withdrawalMethods"];
 }
 
-export class BalanceRepositoryDynamoDB
-	extends DynamodbRepository<BalanceTable, BalanceEntity>
-	implements BalanceRepository
+export class WalletRepositoryDynamoDB
+	extends DynamodbRepository<WalletTable, WalletEntity>
+	implements WalletRepository
 {
-	protected readonly tableName = "balances";
+	protected readonly tableName = "wallets";
 
 	public async incrementBalance({ accountId, amount }: IncrementBalanceInput) {
 		await this.dynamodb.send(
@@ -64,7 +64,7 @@ export class BalanceRepositoryDynamoDB
 
 	// Keys
 
-	private indexAccountId(entity: Pick<BalanceEntity, "accountId">) {
+	private indexAccountId(entity: Pick<WalletEntity, "accountId">) {
 		return {
 			ExpressionAttributeNames: {
 				"#accountId": "accountId",
@@ -80,7 +80,7 @@ export class BalanceRepositoryDynamoDB
 
 	// Mappers
 
-	protected entityToTable(entity: BalanceEntity): BalanceTable {
+	protected entityToTable(entity: WalletEntity): WalletTable {
 		return cleanObj({
 			accountId: `ACCOUNT#${entity.accountId}`,
 			balance: entity.balance,
@@ -88,7 +88,7 @@ export class BalanceRepositoryDynamoDB
 		});
 	}
 
-	protected tableToEntity(table: BalanceTable): BalanceEntity {
+	protected tableToEntity(table: WalletTable): WalletEntity {
 		return {
 			accountId: table.accountId.replace("ACCOUNT#", ""),
 			balance: table.balance,

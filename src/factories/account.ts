@@ -1,10 +1,11 @@
 import { Service } from "factories";
+import type { AccountUseCase } from "models/account";
 import { getDynamoInstance } from "repository/dynamodb";
 import { AccountRepositoryDynamoDB } from "repository/dynamodb/account";
 import { StoreRepositoryDynamoDB } from "repository/dynamodb/store";
 import { AccountUseCaseImplementation } from "usecase/account";
 
-export class AccountService extends Service<AccountUseCaseImplementation> {
+export class AccountService extends Service<AccountUseCase> {
 	public getInstance() {
 		const dynamodb = getDynamoInstance();
 
