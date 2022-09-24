@@ -22,6 +22,18 @@ export class AuthManagerProvider extends AuthManager {
 		}
 	}
 
+	public getAuthData(authHeader: string) {
+		const [authType, credentials] = authHeader.split(" ");
+
+		switch (authType) {
+			case "BOT":
+			case "BOT_ADM":
+				return this.getBotData(credentials);
+			default:
+				return {};
+		}
+	}
+
 	private isBotAuthorized(credentials: string) {
 		const [, token] = Buffer.from(credentials).toString("utf8").split("#");
 
@@ -42,5 +54,13 @@ export class AuthManagerProvider extends AuthManager {
 		if (!data.admin) return false;
 
 		return true;
+	}
+
+	private getBotData(credentials?: string) {
+		if (!credentials) return {};
+
+		const [dataString] = Buffer.from(credentials).toString("utf8").split("#");
+
+		return JSON.parse(dataString);
 	}
 }

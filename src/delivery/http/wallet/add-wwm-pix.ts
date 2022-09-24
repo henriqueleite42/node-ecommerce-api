@@ -25,7 +25,7 @@ const httpManager = new LambdaProvider<WalletUseCase, AddWWMPixInput>({
 		new ValidatorProvider([
 			{
 				key: "accountId",
-				loc: "body",
+				loc: "auth",
 				validations: [Validations.required, Validations.uuid],
 			},
 			{

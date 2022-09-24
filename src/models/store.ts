@@ -1,7 +1,7 @@
 import type { PaginatedItems } from "./types";
 
 export interface StoreEntity {
-	storeId: string;
+	storeId: string; // Same as accountId
 	accountId: string;
 	name: string;
 	description?: string;

@@ -33,7 +33,8 @@ const httpManager = new LambdaProvider<SaleUseCase, CreateSaleInput>({
 			},
 			{
 				key: "clientId",
-				loc: "body",
+				as: "accountId",
+				loc: "auth",
 				validations: [Validations.required, Validations.uuid],
 			},
 			{

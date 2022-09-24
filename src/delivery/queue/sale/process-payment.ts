@@ -24,7 +24,9 @@ const sqsManager = new SQSProvider<ProcessPaymentSaleInput, SaleUseCase>({
 
 export const func = sqsManager
 	.setFunc(async ({ service, data }) => {
-		await service.processPayment({ saleId: data.saleId });
+		await service.processPayment({
+			saleId: data.saleId,
+		});
 	})
 	.getFunc();
 

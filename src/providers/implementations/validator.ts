@@ -4,10 +4,12 @@ import { Validator } from "providers/validator";
 export class ValidatorProvider<T> extends Validator<T> {
 	public validate(p: ValidateInput) {
 		const entries = this.validations.map(
-			({ key, loc, validations, transform }) => {
-				const value = loc ? p?.[loc]?.[key as any] : (p as any)?.[key as any];
+			({ key, as, loc, validations, transform }) => {
+				const value = loc
+					? p?.[loc]?.[as || (key as any)]
+					: (p as any)?.[as || (key as any)];
 
-				validations?.forEach(v => v(key as string, value));
+				validations?.forEach(v => v(as || (key as string), value));
 
 				if (transform) {
 					const transformLength = transform.length;

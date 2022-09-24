@@ -25,7 +25,8 @@ const httpManager = new LambdaProvider<WalletUseCase, AdminWithdrawalInput>({
 		new ValidatorProvider([
 			{
 				key: "adminId",
-				loc: "body",
+				as: "accountId",
+				loc: "auth",
 				validations: [Validations.required, Validations.uuid],
 			},
 			{

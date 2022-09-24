@@ -28,7 +28,8 @@ const httpManager = new LambdaProvider<ProductUseCase, CreateProductInput>({
 		new ValidatorProvider([
 			{
 				key: "storeId",
-				loc: "body",
+				as: "accountId",
+				loc: "auth",
 				validations: [Validations.required, Validations.uuid],
 			},
 			{

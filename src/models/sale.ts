@@ -95,7 +95,8 @@ export interface CreateSaleInput extends Omit<CreateInput, "products"> {
 }
 
 export interface AddProductSaleInput {
-	saleId: SaleEntity["saleId"];
+	clientId: string;
+	saleId: string;
 	product: {
 		productId: string;
 		variationId?: string;
@@ -103,6 +104,7 @@ export interface AddProductSaleInput {
 }
 
 export interface CheckoutSaleInput {
+	clientId: string;
 	saleId: string;
 	paymentMethod: PaymentMethodEnum;
 }

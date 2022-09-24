@@ -23,6 +23,7 @@ export class LambdaProvider<U, I> extends HttpManager<U, I> {
 					body: event.body ? JSON.parse(event.body) : undefined,
 					query: event.queryStringParameters,
 					headers: event.headers,
+					auth: this.authManager.getAuthData(event.headers?.authorization),
 				});
 
 				const serviceInstance = this.service.getInstance();

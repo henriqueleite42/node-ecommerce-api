@@ -57,11 +57,15 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		return sale;
 	}
 
-	public async addProduct({ saleId, product }: AddProductSaleInput) {
+	public async addProduct({ clientId, saleId, product }: AddProductSaleInput) {
 		const sale = await this.saleRepository.getById({ saleId });
 
 		if (!sale) {
 			throw new Error("SALE_NOT_FOUND");
+		}
+
+		if (sale.clientId !== clientId) {
+			throw new Error("UNAUTHORIZED");
 		}
 
 		if (sale.status !== SalesStatusEnum.IN_CART) {
@@ -96,11 +100,19 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		}) as Promise<SaleEntity>;
 	}
 
-	public async checkout({ paymentMethod, saleId }: CheckoutSaleInput) {
+	public async checkout({
+		clientId,
+		paymentMethod,
+		saleId,
+	}: CheckoutSaleInput) {
 		const sale = await this.saleRepository.getById({ saleId });
 
 		if (!sale) {
 			throw new Error("SALE_NOT_FOUND");
+		}
+
+		if (sale.clientId !== clientId) {
+			throw new Error("UNAUTHORIZED");
 		}
 
 		if (sale.status !== SalesStatusEnum.IN_CART) {

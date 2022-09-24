@@ -22,6 +22,12 @@ const httpManager = new LambdaProvider<SaleUseCase, CheckoutSaleInput>({
 	.setValidation(
 		new ValidatorProvider([
 			{
+				key: "clientId",
+				as: "accountId",
+				loc: "auth",
+				validations: [Validations.required, Validations.uuid],
+			},
+			{
 				key: "saleId",
 				loc: "body",
 				validations: [Validations.required, Validations.uuid],

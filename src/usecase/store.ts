@@ -19,7 +19,15 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 	) {}
 
 	public async create(p: CreateInput) {
-		const storeWithSameName = await this.getByName(p);
+		const accountAlreadyHasStore = await this.storeRepository.getById({
+			storeId: p.accountId,
+		});
+
+		if (accountAlreadyHasStore) {
+			throw new Error("ALREADY_HAS_STORE");
+		}
+
+		const storeWithSameName = await this.storeRepository.getByName(p);
 
 		if (storeWithSameName) {
 			throw new Error("DUPLICATED_NAME");

@@ -24,14 +24,15 @@ const httpManager = new LambdaProvider<ProductUseCase, EditInput>({
 	.setValidation(
 		new ValidatorProvider([
 			{
+				key: "storeId",
+				as: "accountId",
+				loc: "auth",
+				validations: [Validations.required, Validations.uuid],
+			},
+			{
 				key: "productId",
 				loc: "body",
 				validations: [Validations.required, Validations.code],
-			},
-			{
-				key: "storeId",
-				loc: "body",
-				validations: [Validations.required, Validations.uuid],
 			},
 			{
 				key: "name",

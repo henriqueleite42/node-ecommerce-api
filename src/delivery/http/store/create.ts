@@ -29,7 +29,7 @@ const httpManager = new LambdaProvider<StoreUseCase, CreateInput>({
 		new ValidatorProvider([
 			{
 				key: "accountId",
-				loc: "body",
+				loc: "auth",
 				validations: [Validations.required, Validations.uuid],
 			},
 			{
