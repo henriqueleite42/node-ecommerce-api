@@ -22,11 +22,13 @@ export interface SaleTable {
 	saleId: string;
 	storeId: string;
 	clientId: string;
-	status_createdAt: string;
+	origin: string;
 	status: SalesStatusEnum;
 	products: SaleEntity["products"];
 	finalPrice: number;
 	createdAt: string;
+
+	status_createdAt: string;
 }
 
 export class SaleRepositoryDynamoDB
@@ -153,13 +155,15 @@ export class SaleRepositoryDynamoDB
 			saleId: `SALE#${entity.saleId}`,
 			storeId: `ACCOUNT#${entity.storeId}`,
 			clientId: `ACCOUNT#${entity.clientId}`,
-			status_createdAt: `STATUS#${
-				entity.status
-			}#CREATED_AT#${entity.createdAt.toISOString()}`,
+			origin: entity.origin,
 			status: entity.status,
 			products: entity.products,
 			finalPrice: entity.finalPrice,
 			createdAt: entity.createdAt.toISOString(),
+
+			status_createdAt: `STATUS#${
+				entity.status
+			}#CREATED_AT#${entity.createdAt.toISOString()}`,
 		});
 	}
 
@@ -168,6 +172,7 @@ export class SaleRepositoryDynamoDB
 			saleId: table.saleId.replace("SALE#$", ""),
 			storeId: table.storeId.replace("ACCOUNT#$", ""),
 			clientId: table.clientId.replace("ACCOUNT#$", ""),
+			origin: table.origin,
 			status: table.status,
 			products: table.products,
 			finalPrice: table.finalPrice,

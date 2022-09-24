@@ -38,6 +38,11 @@ const httpManager = new LambdaProvider<SaleUseCase, CreateSaleInput>({
 				validations: [Validations.required, Validations.uuid],
 			},
 			{
+				key: "origin",
+				loc: "body",
+				validations: [Validations.required, Validations.saleOrigin],
+			},
+			{
 				key: "products",
 				loc: "body",
 				validations: [

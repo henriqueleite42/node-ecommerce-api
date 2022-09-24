@@ -270,6 +270,17 @@ export class Validations {
 		}
 	}
 
+	public static saleOrigin(key: string, p?: any) {
+		if (!p) return;
+
+		if (typeof p !== "string") {
+			throw new Error(`${key} must be a string`);
+		}
+
+		if (!p.startsWith("DISCORD#")) {
+			throw new Error(`${key} must be a valid origin`);
+		}
+	}
 	// Diversified
 
 	public static uuid(key: string, p?: any) {

@@ -18,13 +18,14 @@ import { DynamodbRepository } from ".";
 export interface StoreTable {
 	storeId: string;
 	accountId: string;
-	accountId_storeId: string;
 	name: string;
 	description?: string;
 	color?: string;
 	bannerUrl?: string;
 	avatarUrl?: string;
 	createdAt: string;
+
+	accountId_storeId: string;
 }
 
 export class StoreRepositoryDynamoDB
@@ -192,13 +193,14 @@ export class StoreRepositoryDynamoDB
 		return cleanObj({
 			storeId,
 			accountId,
-			accountId_storeId: `${accountId}#${storeId}`,
 			name: `NAME#${entity.name}`,
 			description: entity.description,
 			color: entity.color,
 			bannerUrl: entity.bannerUrl,
 			avatarUrl: entity.avatarUrl,
 			createdAt: entity.createdAt.toISOString(),
+
+			accountId_storeId: `${accountId}#${storeId}`,
 		});
 	}
 

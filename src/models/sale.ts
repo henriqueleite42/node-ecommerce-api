@@ -20,6 +20,7 @@ export interface SaleEntity {
 	saleId: string;
 	storeId: string;
 	clientId: string;
+	origin: string;
 	status: SalesStatusEnum;
 	products: Array<SaleProduct>;
 	finalPrice: number;

@@ -23,9 +23,6 @@ export interface ProductTable {
 	productId: string;
 	storeId: string;
 	type: ProductTypeEnum;
-	storeId_type: string;
-	storeId_productId: string;
-	createdAt_productId: string;
 	name: string;
 	description: string;
 	color?: string;
@@ -39,6 +36,10 @@ export interface ProductTable {
 	}>;
 	deliveryMethod: DeliveryMethodEnum;
 	createdAt: string;
+
+	storeId_type: string;
+	storeId_productId: string;
+	createdAt_productId: string;
 }
 
 export class ProductRepositoryDynamoDB
@@ -175,9 +176,6 @@ export class ProductRepositoryDynamoDB
 			productId,
 			storeId,
 			type: type as ProductTypeEnum,
-			storeId_type: `${storeId}#${type}`,
-			storeId_productId: `${storeId}#${productId}`,
-			createdAt_productId: `${createdAt}#${productId}`,
 			name: entity.name,
 			description: entity.description,
 			color: entity.color,
@@ -185,6 +183,10 @@ export class ProductRepositoryDynamoDB
 			variations: entity.variations,
 			deliveryMethod: entity.deliveryMethod,
 			createdAt,
+
+			storeId_type: `${storeId}#${type}`,
+			storeId_productId: `${storeId}#${productId}`,
+			createdAt_productId: `${createdAt}#${productId}`,
 		});
 	}
 

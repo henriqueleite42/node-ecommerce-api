@@ -22,10 +22,11 @@ export interface ContentTable {
 	type: MediaTypeEnum;
 	rawContentPath?: string;
 	processedContentPath?: string;
+	createdAt: string;
+
 	storeId_productId: string;
 	createdAt_contentId: string;
 	storeId_productId_contentId: string;
-	createdAt: string;
 }
 
 export class ContentRepositoryDynamoDB
@@ -127,12 +128,13 @@ export class ContentRepositoryDynamoDB
 			productId,
 			storeId,
 			type: entity.type,
-			storeId_productId: `${storeId}#${productId}`,
-			createdAt_contentId: `${createdAt}#${contentId}`,
-			storeId_productId_contentId: `${storeId}#${productId}#${contentId}`,
 			rawContentPath: entity.rawContentPath,
 			processedContentPath: entity.processedContentPath,
 			createdAt,
+
+			storeId_productId: `${storeId}#${productId}`,
+			createdAt_contentId: `${createdAt}#${contentId}`,
+			storeId_productId_contentId: `${storeId}#${productId}#${contentId}`,
 		});
 	}
 
