@@ -1,7 +1,7 @@
 import type {
 	AccountUseCase,
-	AccountEntity,
 	AccountRepository,
+	CreateWithDiscordIdInput,
 } from "models/account";
 import type { StoreRepository } from "models/store";
 
@@ -11,7 +11,7 @@ export class AccountUseCaseImplementation implements AccountUseCase {
 		private readonly storeRepository: StoreRepository,
 	) {}
 
-	public async createWithDiscordId(p: Pick<AccountEntity, "discordId">) {
+	public async createWithDiscordId(p: CreateWithDiscordIdInput) {
 		const account = await this.accountRepository.getByDiscordId(p.discordId);
 
 		if (account) {

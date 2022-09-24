@@ -1,14 +1,14 @@
-import { createFromThirdParty } from "./http/product/create-from-third-party/handler";
-import { edit } from "./http/product/edit/handler";
-import { getById } from "./http/product/get-by-id/handler";
-import { getPaginated } from "./http/product/get-paginated/handler";
-import { top } from "./http/product/top/handler";
-import { incrementSalesCount } from "./queue/product/increment-sales-count/handler";
-import { incrementTotalBilled } from "./queue/product/increment-total-billed/handler";
-import { updateImg } from "./queue/product/update-img/handler";
+import { create } from "./http/product/create";
+import { edit } from "./http/product/edit";
+import { getById } from "./http/product/get-by-id";
+import { getPaginated } from "./http/product/get-paginated";
+import { top } from "./http/product/top";
+import { incrementSalesCount } from "./queue/product/increment-sales-count";
+import { incrementTotalBilled } from "./queue/product/increment-total-billed";
+import { updateImg } from "./queue/product/update-img";
 
 export const product = {
-	productCreateFromThirdParty: createFromThirdParty,
+	productCreate: create,
 	productEdit: edit,
 	productGetById: getById,
 	productGetPaginated: getPaginated,

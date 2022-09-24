@@ -80,7 +80,7 @@ export interface ProductRepository {
  *
  */
 
-export interface CreateFromThirdPartyInput extends CreateInput {
+export interface CreateProductInput extends CreateInput {
 	imageUrl: ProductEntity["imageUrl"];
 	contents?: Array<{
 		type: MediaTypeEnum;
@@ -106,9 +106,7 @@ export interface IncreaseTotalBilledInput {
 }
 
 export interface ProductUseCase {
-	createFromThirdParty: (
-		p: CreateFromThirdPartyInput,
-	) => Promise<ProductEntity>;
+	create: (p: CreateProductInput) => Promise<ProductEntity>;
 
 	edit: (p: EditInput) => Promise<ProductEntity>;
 
@@ -123,4 +121,6 @@ export interface ProductUseCase {
 	increaseSalesCount: (p: IncreaseSalesCountInput) => Promise<void>;
 
 	increaseTotalBilled: (p: IncreaseTotalBilledInput) => Promise<void>;
+
+	getTop: () => Promise<Array<ProductEntity>>;
 }

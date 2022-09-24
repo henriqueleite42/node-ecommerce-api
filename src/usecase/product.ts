@@ -1,7 +1,7 @@
 import type { ContentUseCase } from "models/content";
 import type { CounterRepository } from "models/counters";
 import type {
-	CreateFromThirdPartyInput,
+	CreateProductInput,
 	EditInput,
 	GetProductsByTypeInput,
 	ProductRepository,
@@ -13,7 +13,9 @@ import type {
 } from "models/product";
 import type { UploadManager } from "providers/upload-manager";
 
+import { isAutomaticDelivery } from "types/enums/delivery-method";
 import { MediaTypeEnum } from "types/enums/media-type";
+import { isPreMadeProduct } from "types/enums/product-type";
 
 export class ProductUseCaseImplementation implements ProductUseCase {
 	public constructor(
@@ -23,10 +25,15 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 		private readonly uploadManager: UploadManager,
 	) {}
 
-	public async createFromThirdParty({
-		imageUrl,
-		...p
-	}: CreateFromThirdPartyInput) {
+	public async create({ imageUrl, ...p }: CreateProductInput) {
+		if (p.variations && p.price) {
+			throw new Error("PRICE_CONFLICT");
+		}
+
+		if (!isPreMadeProduct(p.type) && isAutomaticDelivery(p.deliveryMethod)) {
+			throw new Error("INVALID_DELIVERY_METHOD");
+		}
+
 		const product = await this.productRepository.create(p);
 
 		if (imageUrl) {

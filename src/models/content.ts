@@ -54,4 +54,6 @@ export interface ContentUseCase {
 	createManyWithUrl: (
 		p: CreateManyWithUrlInput,
 	) => Promise<Array<ContentEntity>>;
+
+	edit: (p: EditInput) => Promise<ContentEntity | null>;
 }

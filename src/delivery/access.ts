@@ -1,4 +1,4 @@
-import { create } from "./queue/access/create/handler";
+import { create } from "./queue/access/create";
 
 export const access = {
 	accessAccess: create,

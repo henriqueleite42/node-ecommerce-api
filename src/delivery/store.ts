@@ -1,10 +1,10 @@
-import { create } from "./http/store/create/handler";
-import { edit } from "./http/store/edit/handler";
-import { top } from "./http/store/top/handler";
-import { total } from "./http/store/total/handler";
-import { incrementSalesCount } from "./queue/store/increment-sales-count/handler";
-import { incrementStoresCount } from "./queue/store/increment-stores-count/handler";
-import { incrementTotalBilled } from "./queue/store/increment-total-billed/handler";
+import { create } from "./http/store/create";
+import { edit } from "./http/store/edit";
+import { top } from "./http/store/top";
+import { total } from "./http/store/total";
+import { incrementSalesCount } from "./queue/store/increment-sales-count";
+import { incrementStoresCount } from "./queue/store/increment-stores-count";
+import { incrementTotalBilled } from "./queue/store/increment-total-billed";
 
 export const store = {
 	storeCreate: create,
