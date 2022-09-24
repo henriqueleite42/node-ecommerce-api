@@ -12,7 +12,6 @@ import { SQSProvider } from "providers/implementations/sqs";
 
 const sqsManager = new SQSProvider<undefined, StoreUseCase>({
 	from: "TOPIC",
-	domain: "store",
 	queue: "IncrementStoresCount",
 }).setService(new StoreService());
 

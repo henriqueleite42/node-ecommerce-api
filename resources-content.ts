@@ -2,7 +2,7 @@ import type { AWS } from "@serverless/typescript";
 
 export const resourcesContent: AWS["resources"] = {
 	Resources: {
-		AccountDynamoDBTable: {
+		ContentDynamoDBTable: {
 			DeletionPolicy: "Retain",
 			UpdateReplacePolicy: "Retain",
 			Type: "AWS::DynamoDB::Table",
@@ -48,6 +48,13 @@ export const resourcesContent: AWS["resources"] = {
 						],
 					},
 				],
+			},
+		},
+		UpdateRawImgQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'dev'}-update-raw-img",
 			},
 		},
 	},

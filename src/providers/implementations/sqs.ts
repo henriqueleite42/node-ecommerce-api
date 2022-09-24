@@ -32,7 +32,7 @@ export class SQSProvider<D, U> extends QueueManager<D, U> {
 					sqs: {
 						arn: {
 							// eslint-disable-next-line @typescript-eslint/naming-convention
-							"Fn::ImportValue": `${this.config.domain}-\${opt:stage, 'dev'}:${this.config.queue}`,
+							Ref: `${this.config.queue}Queue`,
 						},
 					},
 				},
@@ -40,10 +40,28 @@ export class SQSProvider<D, U> extends QueueManager<D, U> {
 		};
 	}
 
+	protected getData(event: SQSEvent) {
+		switch (this.config.from) {
+			case "QUEUE":
+				return this.getSqsMessage(event);
+			case "TOPIC":
+				return this.getSnsMessage(event);
+			default:
+				throw new Error("Invalid `from` (SQSProvider)");
+		}
+	}
+
+	protected getSqsMessage(event?: SQSEvent) {
+		if (!event) return undefined as unknown as D;
+
+		const parsedJson = JSON.parse(event.Records[0].body);
+
+		return JSON.parse(parsedJson) as D;
+	}
+
 	protected getSnsMessage(event?: SQSEvent) {
 		if (!event) return undefined as unknown as D;
 
-		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 		const parsedJson = JSON.parse(event.Records[0].body) as SNSMessage;
 
 		return JSON.parse(parsedJson.Message) as D;

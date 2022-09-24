@@ -2,7 +2,7 @@ import type { AWS } from "@serverless/typescript";
 
 export const resourcesStore: AWS["resources"] = {
 	Resources: {
-		AccountDynamoDBTable: {
+		StoreDynamoDBTable: {
 			DeletionPolicy: "Retain",
 			UpdateReplacePolicy: "Retain",
 			Type: "AWS::DynamoDB::Table",
@@ -67,5 +67,91 @@ export const resourcesStore: AWS["resources"] = {
 				],
 			},
 		},
+		StoreCreatedTopic: {
+			Type: "AWS::SNS::Topic",
+			Properties: {
+				TopicName: "${self:service}-${opt:stage, 'dev'}-store-created",
+			},
+		},
+		IncrementStoresCountQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'dev'}-increment-stores-count",
+			},
+		},
+		IncrementStoresCountSubscription: {
+			Type: "AWS::SNS::Subscription",
+			Properties: {
+				Protocol: "sqs",
+				Endpoint: {
+					"Fn::GetAtt": ["IncrementStoresCountQueue", "Arn"],
+				},
+				Region: "${self:custom.region.${opt:stage, 'dev'}}",
+				TopicArn: {
+					Ref: "SaleCreatedTopic"
+				},
+			},
+		},
+		IncrementSalesCountQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'dev'}-increment-sales-count",
+			},
+		},
+		IncrementSalesCountSubscription: {
+			Type: "AWS::SNS::Subscription",
+			Properties: {
+				Protocol: "sqs",
+				Endpoint: {
+					"Fn::GetAtt": ["IncrementSalesCountQueue", "Arn"],
+				},
+				Region: "${self:custom.region.${opt:stage, 'dev'}}",
+				TopicArn: {
+					"Fn::ImportValue": "sale-${opt:stage, 'dev'}:PaymentProcessedTopicArn"
+				},
+			},
+		},
+		IncrementTotalBilledQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'dev'}-increment-total-billed",
+			},
+		},
+		IncrementTotalBilledSubscription: {
+			Type: "AWS::SNS::Subscription",
+			Properties: {
+				Protocol: "sqs",
+				Endpoint: {
+					"Fn::GetAtt": ["IncrementTotalBilledQueue", "Arn"],
+				},
+				Region: "${self:custom.region.${opt:stage, 'dev'}}",
+				TopicArn: {
+					"Fn::ImportValue": "sale-${opt:stage, 'dev'}:PaymentProcessedTopicArn"
+				},
+			},
+		},
 	},
+	Outputs: {
+		StoreCreatedTopicArn: {
+			Value: {
+				Ref: "StoreCreatedTopic"
+			},
+			Export: {
+				Name: {
+					"Fn::Join": [
+						":",
+						[
+							{
+								Ref: "AWS::StackName",
+							},
+							"StoreCreatedTopicArn",
+						],
+					],
+				},
+			}
+		}
+	}
 };

@@ -13,7 +13,6 @@ import { SQSProvider } from "providers/implementations/sqs";
 
 const sqsManager = new SQSProvider<SaleEntity, ProductUseCase>({
 	from: "TOPIC",
-	domain: "product",
 	queue: "IncrementSalesCount",
 }).setService(new ProductService());
 

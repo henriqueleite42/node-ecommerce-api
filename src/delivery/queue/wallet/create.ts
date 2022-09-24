@@ -13,8 +13,7 @@ import { SQSProvider } from "providers/implementations/sqs";
 
 const sqsManager = new SQSProvider<StoreEntity, WalletUseCase>({
 	from: "TOPIC",
-	domain: "wallet",
-	queue: "Create",
+	queue: "CreateWallet",
 }).setService(new WalletService());
 
 /**

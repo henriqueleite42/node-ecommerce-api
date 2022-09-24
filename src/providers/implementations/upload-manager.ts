@@ -24,7 +24,7 @@ export class UploadManagerProvider implements UploadManager {
 
 	public async uploadFromUrlBackground(p: UploadFromUrlInput) {
 		await this.queueManager.sendMsg({
-			to: "",
+			to: process.env.UPLOAD_FROM_URL_QUEUE_URL!,
 			message: p,
 			metadata: {
 				type: p.type,

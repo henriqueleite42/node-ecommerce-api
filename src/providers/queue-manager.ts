@@ -13,8 +13,7 @@ type RouteOutput = void;
 type Func = (p: RouteInput) => RouteOutput;
 
 interface Config {
-	from: "TOPIC";
-	domain: string;
+	from: "QUEUE" | "TOPIC";
 	queue: string;
 }
 

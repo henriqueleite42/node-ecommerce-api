@@ -12,8 +12,7 @@ import { SQSProvider } from "providers/implementations/sqs";
 import type { FileUploadedMsg } from "providers/upload-manager";
 
 const sqsManager = new SQSProvider<FileUploadedMsg, ContentUseCase>({
-	from: "TOPIC",
-	domain: "content",
+	from: "QUEUE",
 	queue: "UpdateRawImg",
 }).setService(new ContentService());
 

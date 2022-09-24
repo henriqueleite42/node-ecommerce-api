@@ -50,7 +50,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		});
 
 		await this.topicManager.sendMsg({
-			to: "",
+			to: process.env.SALE_CREATED_TOPIC_ARN!,
 			message: sale,
 		});
 
@@ -155,7 +155,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		});
 
 		await this.topicManager.sendMsg({
-			to: "",
+			to: process.env.PAYMENT_PROCESSED_TOPIC_ARN!,
 			message: sale,
 		});
 	}

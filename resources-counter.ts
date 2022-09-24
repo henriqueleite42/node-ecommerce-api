@@ -2,7 +2,7 @@ import type { AWS } from "@serverless/typescript";
 
 export const resourcesCounter: AWS["resources"] = {
 	Resources: {
-		AccountDynamoDBTable: {
+		CounterDynamoDBTable: {
 			DeletionPolicy: "Retain",
 			UpdateReplacePolicy: "Retain",
 			Type: "AWS::DynamoDB::Table",

@@ -13,8 +13,7 @@ import { UploadManagerProvider } from "providers/implementations/upload-manager"
 import type { UploadFromUrlInput } from "providers/upload-manager";
 
 const sqsManager = new SQSProvider<UploadFromUrlInput, undefined>({
-	from: "TOPIC",
-	domain: "upload",
+	from: "QUEUE",
 	queue: "UploadFromUrl",
 });
 

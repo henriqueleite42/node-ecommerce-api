@@ -11,8 +11,7 @@ import type { ProcessPaymentSaleInput, SaleUseCase } from "models/sale";
 import { SQSProvider } from "providers/implementations/sqs";
 
 const sqsManager = new SQSProvider<ProcessPaymentSaleInput, SaleUseCase>({
-	from: "TOPIC",
-	domain: "sale",
+	from: "QUEUE",
 	queue: "ProcessPayment",
 }).setService(new SaleService());
 

@@ -36,7 +36,7 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 		const store = await this.storeRepository.create(p);
 
 		await this.topicManager.sendMsg({
-			to: "",
+			to: process.env.STORE_CREATED_TOPIC_ARN!,
 			message: store,
 		});
 

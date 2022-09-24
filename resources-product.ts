@@ -2,7 +2,7 @@ import type { AWS } from "@serverless/typescript";
 
 export const resourcesProduct: AWS["resources"] = {
 	Resources: {
-		AccountDynamoDBTable: {
+		ProductDynamoDBTable: {
 			DeletionPolicy: "Retain",
 			UpdateReplacePolicy: "Retain",
 			Type: "AWS::DynamoDB::Table",
@@ -65,6 +65,53 @@ export const resourcesProduct: AWS["resources"] = {
 						],
 					},
 				],
+			},
+		},
+		UpdateImgQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'dev'}-update-img",
+			},
+		},
+		IncrementSalesCountQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'dev'}-increment-sales-count",
+			},
+		},
+		IncrementSalesCountSubscription: {
+			Type: "AWS::SNS::Subscription",
+			Properties: {
+				Protocol: "sqs",
+				Endpoint: {
+					"Fn::GetAtt": ["IncrementSalesCountQueue", "Arn"],
+				},
+				Region: "${self:custom.region.${opt:stage, 'dev'}}",
+				TopicArn: {
+					"Fn::ImportValue": "sale-${opt:stage, 'dev'}:PaymentProcessedTopicArn"
+				},
+			},
+		},
+		IncrementTotalBilledQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'dev'}-increment-total-billed",
+			},
+		},
+		IncrementTotalBilledSubscription: {
+			Type: "AWS::SNS::Subscription",
+			Properties: {
+				Protocol: "sqs",
+				Endpoint: {
+					"Fn::GetAtt": ["IncrementTotalBilledQueue", "Arn"],
+				},
+				Region: "${self:custom.region.${opt:stage, 'dev'}}",
+				TopicArn: {
+					"Fn::ImportValue": "sale-${opt:stage, 'dev'}:PaymentProcessedTopicArn"
+				},
 			},
 		},
 	},
