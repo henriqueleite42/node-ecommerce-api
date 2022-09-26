@@ -4,7 +4,7 @@ import type { AuthManager } from "./auth-manager";
 import { DeliveryManager } from "./delivery-manager";
 import type { Validator } from "./validator";
 
-import type { StatusCodeEnum } from "types/enums/status-code";
+import type { StatusCodeEnum } from "../types/enums/status-code";
 
 interface RouteInput {
 	event: APIGatewayEvent;

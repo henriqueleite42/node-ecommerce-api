@@ -3,17 +3,19 @@
 import { BatchWriteItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { cleanObj } from "@techmmunity/utils";
+
 import type {
 	ContentEntity,
 	ContentRepository,
 	CreateManyInput,
 	EditInput,
-} from "models/content";
-import { genCode } from "utils/id/gen-code";
+} from "../../models/content";
 
 import { DynamodbRepository } from ".";
 
-import type { MediaTypeEnum } from "types/enums/media-type";
+import { genCode } from "../../utils/id/gen-code";
+
+import type { MediaTypeEnum } from "../../types/enums/media-type";
 
 export interface ContentTable {
 	contentId: string;

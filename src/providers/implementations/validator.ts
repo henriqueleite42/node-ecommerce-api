@@ -1,5 +1,5 @@
-import type { ValidateInput } from "providers/validator";
-import { Validator } from "providers/validator";
+import type { ValidateInput } from "../../providers/validator";
+import { Validator } from "../../providers/validator";
 
 export class ValidatorProvider<T> extends Validator<T> {
 	public validate(p: ValidateInput) {

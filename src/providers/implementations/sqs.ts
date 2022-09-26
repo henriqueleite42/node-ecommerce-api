@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
 import type { SNSMessage, SQSEvent } from "aws-lambda";
-import type { SetFunc } from "providers/queue-manager";
-import { QueueManager } from "providers/queue-manager";
+
+import type { SetFunc } from "../../providers/queue-manager";
+import { QueueManager } from "../../providers/queue-manager";
 
 export class SQSProvider<D, U> extends QueueManager<D, U> {
 	public setFunc(func: SetFunc<D, U>) {

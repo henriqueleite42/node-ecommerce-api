@@ -15,8 +15,8 @@
 		"allowSyntheticDefaultImports": true,
 		"esModuleInterop": true,
 		"sourceMap": false,
-		"skipLibCheck": true,
-		"baseUrl": "src"
+		"skipLibCheck": true
+		// "baseUrl": "src" Base Path Doesn't work with Webpack
 	},
 	"include": ["src", "jest.config.js"]
 }

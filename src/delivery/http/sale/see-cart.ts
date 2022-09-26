@@ -8,16 +8,18 @@
  *
  */
 
-import { SaleService } from "factories/sale";
-import type { GetByClientIdStatusInput, SaleUseCase } from "models/sale";
-import { Transform } from "providers/implementations/transform";
-import { Validations } from "providers/implementations/validations";
-
+import { SaleService } from "../../../factories/sale";
+import type {
+	GetByClientIdStatusInput,
+	SaleUseCase,
+} from "../../../models/sale";
 import { AuthManagerProvider } from "../../../providers/implementations/auth-manager";
 import { LambdaProvider } from "../../../providers/implementations/lambda";
+import { Transform } from "../../../providers/implementations/transform";
+import { Validations } from "../../../providers/implementations/validations";
 import { ValidatorProvider } from "../../../providers/implementations/validator";
 
-import { SalesStatusEnum } from "types/enums/sale-status";
+import { SalesStatusEnum } from "../../../types/enums/sale-status";
 
 const httpManager = new LambdaProvider<SaleUseCase, GetByClientIdStatusInput>({
 	method: "GET",

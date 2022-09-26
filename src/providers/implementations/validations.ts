@@ -9,15 +9,16 @@ import {
 	isEmail,
 	isUrl,
 } from "@techmmunity/utils";
-import type { Validations as ValidationsType } from "providers/validator";
 import { validate } from "uuid";
+
+import type { Validations as ValidationsType } from "../../providers/validator";
 
 import { ValidatorProvider } from "./validator";
 
-import { DeliveryMethodEnum } from "types/enums/delivery-method";
-import { MediaTypeEnum } from "types/enums/media-type";
-import { PaymentMethodEnum } from "types/enums/payment-method";
-import { ProductTypeEnum } from "types/enums/product-type";
+import { DeliveryMethodEnum } from "../../types/enums/delivery-method";
+import { MediaTypeEnum } from "../../types/enums/media-type";
+import { PaymentMethodEnum } from "../../types/enums/payment-method";
+import { ProductTypeEnum } from "../../types/enums/product-type";
 
 export class Validations {
 	public static required(key: string, p?: any) {

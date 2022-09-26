@@ -6,6 +6,7 @@ import {
 	UpdateItemCommand,
 } from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
+
 import type {
 	CounterEntity,
 	CounterRepository,
@@ -14,7 +15,7 @@ import type {
 	IncrementProductInput,
 	IncrementStoreInput,
 	TotalCounterTypes,
-} from "models/counters";
+} from "../../models/counters";
 
 import { DynamodbRepository } from ".";
 

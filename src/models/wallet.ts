@@ -1,4 +1,4 @@
-import type { WithdrawalMethodEnum } from "types/enums/withdrawal-method";
+import type { WithdrawalMethodEnum } from "../types/enums/withdrawal-method";
 
 interface BaseWWM {
 	type: WithdrawalMethodEnum;

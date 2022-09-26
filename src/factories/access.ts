@@ -1,9 +1,10 @@
-import { SNSAdapter } from "adapters/implementations/sns";
-import { Service } from "factories";
-import type { AccessUseCase } from "models/access";
-import { getDynamoInstance } from "repository/dynamodb";
-import { AccessRepositoryDynamoDB } from "repository/dynamodb/access";
-import { AccessUseCaseImplementation } from "usecase/access";
+import { SNSAdapter } from "../adapters/implementations/sns";
+import type { AccessUseCase } from "../models/access";
+import { getDynamoInstance } from "../repository/dynamodb";
+import { AccessRepositoryDynamoDB } from "../repository/dynamodb/access";
+import { AccessUseCaseImplementation } from "../usecase/access";
+
+import { Service } from ".";
 
 export class AccessService extends Service<AccessUseCase> {
 	public getInstance() {

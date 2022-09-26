@@ -1,4 +1,4 @@
-import { AuthManager } from "providers/auth-manager";
+import { AuthManager } from "../../providers/auth-manager";
 
 export class AuthManagerProvider extends AuthManager {
 	public isAuthorized(authHeader: string) {

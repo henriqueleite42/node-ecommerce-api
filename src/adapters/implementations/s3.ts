@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import type { FileManager, SaveFileInput } from "adapters/file-manager";
+
+import type { FileManager, SaveFileInput } from "../../adapters/file-manager";
 
 export class S3Adapter implements FileManager {
 	private readonly s3: S3Client;

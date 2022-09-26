@@ -1,5 +1,5 @@
-import type { ContentUseCase } from "models/content";
-import type { CounterRepository } from "models/counters";
+import type { ContentUseCase } from "../models/content";
+import type { CounterRepository } from "../models/counters";
 import type {
 	CreateProductInput,
 	EditInput,
@@ -10,12 +10,12 @@ import type {
 	UpdateImgInput,
 	IncreaseSalesCountInput,
 	IncreaseTotalBilledInput,
-} from "models/product";
-import type { UploadManager } from "providers/upload-manager";
+} from "../models/product";
+import type { UploadManager } from "../providers/upload-manager";
 
-import { isAutomaticDelivery } from "types/enums/delivery-method";
-import { MediaTypeEnum } from "types/enums/media-type";
-import { isPreMadeProduct } from "types/enums/product-type";
+import { isAutomaticDelivery } from "../types/enums/delivery-method";
+import { MediaTypeEnum } from "../types/enums/media-type";
+import { isPreMadeProduct } from "../types/enums/product-type";
 
 export class ProductUseCaseImplementation implements ProductUseCase {
 	public constructor(

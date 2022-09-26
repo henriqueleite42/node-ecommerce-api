@@ -6,10 +6,10 @@
  *
  */
 
-import { ProductService } from "factories/product";
-import type { ProductUseCase } from "models/product";
-import { SQSProvider } from "providers/implementations/sqs";
-import type { FileUploadedMsg } from "providers/upload-manager";
+import { ProductService } from "../../../factories/product";
+import type { ProductUseCase } from "../../../models/product";
+import { SQSProvider } from "../../../providers/implementations/sqs";
+import type { FileUploadedMsg } from "../../../providers/upload-manager";
 
 const sqsManager = new SQSProvider<FileUploadedMsg, ProductUseCase>({
 	from: "QUEUE",

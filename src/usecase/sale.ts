@@ -1,6 +1,6 @@
-import type { PixManager } from "adapters/pix-manager";
-import type { TopicManager } from "adapters/topic-manager";
-import type { ProductEntity, ProductRepository } from "models/product";
+import type { PixManager } from "../adapters/pix-manager";
+import type { TopicManager } from "../adapters/topic-manager";
+import type { ProductEntity, ProductRepository } from "../models/product";
 import type {
 	AddProductSaleInput,
 	CreateSaleInput,
@@ -13,10 +13,10 @@ import type {
 	SaleUseCase,
 	CheckoutSaleInput,
 	ProcessPaymentSaleInput,
-} from "models/sale";
+} from "../models/sale";
 
-import { PaymentMethodEnum } from "types/enums/payment-method";
-import { SalesStatusEnum } from "types/enums/sale-status";
+import { PaymentMethodEnum } from "../types/enums/payment-method";
+import { SalesStatusEnum } from "../types/enums/sale-status";
 
 export class SaleUseCaseImplementation implements SaleUseCase {
 	public constructor(

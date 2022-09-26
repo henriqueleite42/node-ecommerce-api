@@ -2,7 +2,8 @@
 
 import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
 import type { MessageAttributeValue } from "@aws-sdk/client-sns";
-import type { TopicManager, SendMsgInput } from "adapters/topic-manager";
+
+import type { TopicManager, SendMsgInput } from "../../adapters/topic-manager";
 
 export class SNSAdapter implements TopicManager {
 	private readonly sns: SNSClient;

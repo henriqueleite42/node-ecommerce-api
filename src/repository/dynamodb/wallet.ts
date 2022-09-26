@@ -3,6 +3,7 @@
 import { PutItemCommand, UpdateItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { cleanObj } from "@techmmunity/utils";
+
 import type {
 	WalletEntity,
 	WalletRepository,
@@ -11,7 +12,7 @@ import type {
 	WithdrawalInput,
 	CreateInput,
 	AddWWMInput,
-} from "models/wallet";
+} from "../../models/wallet";
 
 import { DynamodbRepository } from ".";
 

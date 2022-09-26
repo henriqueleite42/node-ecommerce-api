@@ -8,9 +8,8 @@
  *
  */
 
-import { StoreService } from "factories/store";
-import type { GetByNameInput, StoreUseCase } from "models/store";
-
+import { StoreService } from "../../../factories/store";
+import type { GetByNameInput, StoreUseCase } from "../../../models/store";
 import { AuthManagerProvider } from "../../../providers/implementations/auth-manager";
 import { LambdaProvider } from "../../../providers/implementations/lambda";
 

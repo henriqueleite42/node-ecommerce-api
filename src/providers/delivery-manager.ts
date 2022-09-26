@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
-import type { Service } from "factories";
+import type { Service } from "../factories";
 
-import type { Lambda } from "types/aws";
+import type { Lambda } from "../types/aws";
 
 export abstract class DeliveryManager<C, F, U> {
 	protected func: F;
@@ -37,7 +37,7 @@ export abstract class DeliveryManager<C, F, U> {
 			.substring(1)
 			.replace(/\\/g, "/")}`;
 
-		const funcName = fileName.split(".").shift()!;
+		const funcName = fileName.split("/")!.pop()!.split(".")!.shift()!;
 
 		return `${path}/${funcName}.func`;
 	}

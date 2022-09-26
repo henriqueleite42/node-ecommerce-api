@@ -1,10 +1,10 @@
-import type { CreatePixOutput } from "adapters/pix-manager";
+import type { CreatePixOutput } from "../adapters/pix-manager";
 
 import type { PaginatedItems } from "./types";
 
-import type { DeliveryMethodEnum } from "types/enums/delivery-method";
-import type { PaymentMethodEnum } from "types/enums/payment-method";
-import type { SalesStatusEnum } from "types/enums/sale-status";
+import type { DeliveryMethodEnum } from "../types/enums/delivery-method";
+import type { PaymentMethodEnum } from "../types/enums/payment-method";
+import type { SalesStatusEnum } from "../types/enums/sale-status";
 
 export interface SaleProduct {
 	productId: string;

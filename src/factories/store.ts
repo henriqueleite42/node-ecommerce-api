@@ -1,10 +1,11 @@
-import { SNSAdapter } from "adapters/implementations/sns";
-import { Service } from "factories";
-import type { StoreUseCase } from "models/store";
-import { getDynamoInstance } from "repository/dynamodb";
-import { CounterRepositoryDynamoDB } from "repository/dynamodb/counter";
-import { StoreRepositoryDynamoDB } from "repository/dynamodb/store";
-import { StoreUseCaseImplementation } from "usecase/store";
+import { SNSAdapter } from "../adapters/implementations/sns";
+import type { StoreUseCase } from "../models/store";
+import { getDynamoInstance } from "../repository/dynamodb";
+import { CounterRepositoryDynamoDB } from "../repository/dynamodb/counter";
+import { StoreRepositoryDynamoDB } from "../repository/dynamodb/store";
+import { StoreUseCaseImplementation } from "../usecase/store";
+
+import { Service } from ".";
 
 export class StoreService extends Service<StoreUseCase> {
 	public getInstance() {

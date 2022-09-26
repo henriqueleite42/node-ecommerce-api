@@ -2,8 +2,8 @@ import type {
 	AccountUseCase,
 	AccountRepository,
 	CreateWithDiscordIdInput,
-} from "models/account";
-import type { StoreRepository } from "models/store";
+} from "../models/account";
+import type { StoreRepository } from "../models/store";
 
 export class AccountUseCaseImplementation implements AccountUseCase {
 	public constructor(

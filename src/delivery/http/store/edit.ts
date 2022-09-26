@@ -8,12 +8,11 @@
  *
  */
 
-import { StoreService } from "factories/store";
-import type { EditInput, StoreUseCase } from "models/store";
-import { Validations } from "providers/implementations/validations";
-
+import { StoreService } from "../../../factories/store";
+import type { EditInput, StoreUseCase } from "../../../models/store";
 import { AuthManagerProvider } from "../../../providers/implementations/auth-manager";
 import { LambdaProvider } from "../../../providers/implementations/lambda";
+import { Validations } from "../../../providers/implementations/validations";
 import { ValidatorProvider } from "../../../providers/implementations/validator";
 
 const httpManager = new LambdaProvider<StoreUseCase, EditInput>({

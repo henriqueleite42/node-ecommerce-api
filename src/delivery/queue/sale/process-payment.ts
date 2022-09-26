@@ -6,9 +6,12 @@
  *
  */
 
-import { SaleService } from "factories/sale";
-import type { ProcessPaymentSaleInput, SaleUseCase } from "models/sale";
-import { SQSProvider } from "providers/implementations/sqs";
+import { SaleService } from "../../../factories/sale";
+import type {
+	ProcessPaymentSaleInput,
+	SaleUseCase,
+} from "../../../models/sale";
+import { SQSProvider } from "../../../providers/implementations/sqs";
 
 const sqsManager = new SQSProvider<ProcessPaymentSaleInput, SaleUseCase>({
 	from: "QUEUE",

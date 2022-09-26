@@ -21,6 +21,9 @@ import { store } from "./src/delivery/store";
 import { upload } from "./src/delivery/upload";
 import { wallet } from "./src/delivery/wallet";
 
+// You need to change this if you changed the one at docker-events-listener-build/listen-docker-events.sh
+const SERVICE_NAME = "monetizzer"
+
 config();
 
 const baseConfig: Partial<AWS> = {
@@ -41,7 +44,7 @@ const baseConfig: Partial<AWS> = {
 			production: "us-east-1",
 		},
 		localstack: {
-			host: "http://localstack",
+			host: "http://localhost",
 			stages: ["local"],
 		},
 	},
@@ -51,8 +54,7 @@ const baseConfig: Partial<AWS> = {
 		runtime: "nodejs16.x",
 		memorySize: 512,
 		timeout: 5,
-		// logRetentionInDays: process.env.NODE_ENV === "production" ? 7 : 1,
-		logRetentionInDays: 1,
+		logRetentionInDays: process.env.NODE_ENV === "production" ? 3 : 1,
 		apiGateway: {
 			minimumCompressionSize: 1024,
 			shouldStartNameWithService: false,
@@ -63,6 +65,7 @@ const baseConfig: Partial<AWS> = {
 			NODE_PATH: "./:/opt/node_modules",
 			NODE_ENV: "${opt:stage, 'dev'}",
 			CLOUD_REGION: "${self:provider.region}",
+			API_BOT_TOKEN: `\${ssm:${SERVICE_NAME}-\${opt:stage, 'dev'}-apiBotToken}`,
 		},
 		iam: {
 			role: {
@@ -97,13 +100,6 @@ const baseConfig: Partial<AWS> = {
 
 const accountConfig = {
 	service: "account",
-	provider: {
-		environment: {
-			ACCESS_CREATED_TOPIC_ARN: {
-				Ref: "AccessCreatedTopicArn"
-			},
-		}
-	},
 	resources: resourcesAccount,
 	functions: account,
 };
@@ -143,13 +139,19 @@ const saleConfig = {
 	service: "sale",
 	provider: {
 		environment: {
+			GERENCIANET_CERTIFICATE_CERT: `\${ssm:${SERVICE_NAME}-\${opt:stage, 'dev'}-gerencianetCertificateCert}`,
+			GERENCIANET_CERTIFICATE_KEY: `\${ssm:${SERVICE_NAME}-\${opt:stage, 'dev'}-gerencianetCertificateKey}`,
+			GERENCIANET_URL: `\${ssm:${SERVICE_NAME}-\${opt:stage, 'dev'}-gerencianetUrl}`,
+			GERENCIANET_CLIENT_ID: `\${ssm:${SERVICE_NAME}-\${opt:stage, 'dev'}-gerencianetClientId}`,
+			GERENCIANET_CLIENT_SECRET: `\${ssm:${SERVICE_NAME}-\${opt:stage, 'dev'}-gerencianetClientSecret}`,
+			GERENCIANET_PIX_KEY: `\${ssm:${SERVICE_NAME}-\${opt:stage, 'dev'}-gerencianetPixKey}`,
 			SALE_CREATED_TOPIC_ARN: {
 				Ref: "SaleCreatedTopicArn"
 			},
 			PAYMENT_PROCESSED_TOPIC_ARN: {
 				Ref: "PaymentProcessedTopicArn"
 			},
-		}
+		},
 	},
 	resources: resourcesSale,
 	functions: sale,
@@ -188,7 +190,7 @@ const walletConfig = {
 };
 
 const getConfig = () => {
-	switch (process.env.DEPLOY_TYPE) {
+	switch (process.env.API_MODULE) {
 		case "ACCOUNT":
 			return merge(baseConfig, accountConfig);
 
@@ -214,7 +216,7 @@ const getConfig = () => {
 			return merge(baseConfig, walletConfig);
 
 		default:
-			throw new Error("Invalid module")
+			throw new Error("Missing API_MODULE env var")
 	}
 };
 

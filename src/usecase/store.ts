@@ -1,5 +1,5 @@
-import type { TopicManager } from "adapters/topic-manager";
-import type { CounterRepository } from "models/counters";
+import type { TopicManager } from "../adapters/topic-manager";
+import type { CounterRepository } from "../models/counters";
 import type {
 	CreateInput,
 	EditInput,
@@ -9,7 +9,7 @@ import type {
 	IncreaseTotalBilledInput,
 	StoreRepository,
 	StoreUseCase,
-} from "models/store";
+} from "../models/store";
 
 export class StoreUseCaseImplementation implements StoreUseCase {
 	public constructor(

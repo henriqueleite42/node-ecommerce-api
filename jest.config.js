@@ -6,9 +6,7 @@ module.exports = {
 		"^.+\\.(t|j)s$": "ts-jest",
 	},
 	collectCoverageFrom: [
-		"./api/**/service.ts",
-		"./api/**/helpers/**/*.ts",
-		"!./api/upload/extract-image-colors/helpers/get-img-colors.ts"
+		".",
 	],
 	setupFiles: ["./tests/setup.ts"],
 	coverageDirectory: "../coverage",

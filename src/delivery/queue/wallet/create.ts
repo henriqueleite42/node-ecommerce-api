@@ -6,10 +6,10 @@
  *
  */
 
-import { WalletService } from "factories/wallet";
-import type { StoreEntity } from "models/store";
-import type { WalletUseCase } from "models/wallet";
-import { SQSProvider } from "providers/implementations/sqs";
+import { WalletService } from "../../../factories/wallet";
+import type { StoreEntity } from "../../../models/store";
+import type { WalletUseCase } from "../../../models/wallet";
+import { SQSProvider } from "../../../providers/implementations/sqs";
 
 const sqsManager = new SQSProvider<StoreEntity, WalletUseCase>({
 	from: "TOPIC",

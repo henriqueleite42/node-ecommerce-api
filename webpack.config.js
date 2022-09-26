@@ -1,8 +1,7 @@
 const path = require('path');
 const slsw = require('serverless-webpack');
 // const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-// const nodeExternals = require('webpack-node-externals');
-const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const nodeExternals = require('webpack-node-externals');
 const TerserPlugin = require('terser-webpack-plugin');
 
 const isLocal = process.env.NODE_ENV !== "production";
@@ -26,8 +25,6 @@ module.exports = {
     // What file extensions we want Webpack to care about, and in what order
     // https://webpack.js.org/configuration/resolve/#resolveextensions
     extensions: ['.js', '.ts'],
-    // `yarn add -D tsconfig-paths-webpack-plugin` if you need path aliases
-    plugins: [new TsconfigPathsPlugin()],
   },
   // Where the bundled files will be output. Not strictly necessary with
   // Serverless Webpack.
@@ -45,7 +42,7 @@ module.exports = {
   // Node's native modules will also be available.
   externals: [
 		'aws-sdk',
-		// nodeExternals()
+		nodeExternals()
 	],
 	optimization: {
 		minimize: true,
@@ -78,10 +75,6 @@ module.exports = {
           experimentalFileCaching: true,
         },
       },
-			{
-				test: /\.node$/,
-				use: 'node-loader'
-			},
     ],
   },
   // We still want type checking, just without the burden on build performance,

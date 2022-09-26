@@ -3,12 +3,13 @@
 import { BatchWriteItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { cleanObj } from "@techmmunity/utils";
+
 import type {
 	AccessEntity,
 	AccessIds,
 	AccessRepository,
 	CreateManyInput,
-} from "models/access";
+} from "../../models/access";
 
 import { DynamodbRepository } from ".";
 

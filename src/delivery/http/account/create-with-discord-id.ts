@@ -6,15 +6,14 @@
  *
  */
 
-import { AccountService } from "factories/account";
-import { Validations } from "providers/implementations/validations";
-
+import { AccountService } from "../../../factories/account";
 import type {
 	AccountUseCase,
 	CreateWithDiscordIdInput,
 } from "../../../models/account";
 import { AuthManagerProvider } from "../../../providers/implementations/auth-manager";
 import { LambdaProvider } from "../../../providers/implementations/lambda";
+import { Validations } from "../../../providers/implementations/validations";
 import { ValidatorProvider } from "../../../providers/implementations/validator";
 
 import { StatusCodeEnum } from "../../../types/enums/status-code";

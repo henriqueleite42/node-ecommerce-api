@@ -1,4 +1,4 @@
-import type { MediaTypeEnum } from "types/enums/media-type";
+import type { MediaTypeEnum } from "../types/enums/media-type";
 
 export interface ContentEntity {
 	contentId: string;

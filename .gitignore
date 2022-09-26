@@ -1,3 +1,12 @@
+# Temp
+tmp/
+/layers
+src/test.ts
+*.p8
+*.sql
+*.csv
+*.txt
+
 # Compiled Output
 /dist
 /build
@@ -5,28 +14,16 @@
 /.webpack
 
 # Logs
-logs
+/logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
-# OS
-.DS_Store
-
 # Tests
 /coverage
 /.nyc_output
-
-# IDEs and editors
-/.idea
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
 
 # IDE - VSCode
 .vscode/*
@@ -39,29 +36,20 @@ lerna-debug.log*
 *.env*
 !.env.docker.sample
 
-# Core
-src/core
-
-# Local Database
-/mongo-volume
 
 # Docker
-docker/
+/docker
 
 # tsconfig
 tsconfig*
 !tsconfig.json
-!tsconfig.paths.json
-!tsconfig.build.json
 
 # AWS
-/aws_credentials.txt
+!docker-events-listener-build/aws_config.txt
+!docker-events-listener-build/aws_credentials.txt
 
 # Deploy
 .serverless
-
-# GraphQL
-schema.gql
 
 # Serverless
 serverless.d.ts
@@ -70,12 +58,3 @@ serverless.js.map
 
 # NPM
 package-lock.json
-
-# Temp
-tmp/
-/layers
-src/test.ts
-*.p8
-*.sql
-*.csv
-*.txt

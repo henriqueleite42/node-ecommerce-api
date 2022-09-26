@@ -6,10 +6,10 @@
  *
  */
 
-import { ProductService } from "factories/product";
-import type { ProductUseCase } from "models/product";
-import type { SaleEntity } from "models/sale";
-import { SQSProvider } from "providers/implementations/sqs";
+import { ProductService } from "../../../factories/product";
+import type { ProductUseCase } from "../../../models/product";
+import type { SaleEntity } from "../../../models/sale";
+import { SQSProvider } from "../../../providers/implementations/sqs";
 
 const sqsManager = new SQSProvider<SaleEntity, ProductUseCase>({
 	from: "TOPIC",

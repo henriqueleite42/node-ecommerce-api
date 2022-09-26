@@ -6,9 +6,9 @@
  *
  */
 
-import { StoreService } from "factories/store";
-import type { StoreUseCase } from "models/store";
-import { SQSProvider } from "providers/implementations/sqs";
+import { StoreService } from "../../../factories/store";
+import type { StoreUseCase } from "../../../models/store";
+import { SQSProvider } from "../../../providers/implementations/sqs";
 
 const sqsManager = new SQSProvider<undefined, StoreUseCase>({
 	from: "TOPIC",

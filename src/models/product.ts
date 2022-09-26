@@ -1,8 +1,8 @@
 import type { PaginatedItems } from "./types";
 
-import type { DeliveryMethodEnum } from "types/enums/delivery-method";
-import type { MediaTypeEnum } from "types/enums/media-type";
-import type { ProductTypeEnum } from "types/enums/product-type";
+import type { DeliveryMethodEnum } from "../types/enums/delivery-method";
+import type { MediaTypeEnum } from "../types/enums/media-type";
+import type { ProductTypeEnum } from "../types/enums/product-type";
 
 interface ProductVariation {
 	id: string;

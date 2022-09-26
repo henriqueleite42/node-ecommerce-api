@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
-import type { AuthManager } from "providers/auth-manager";
-import { HttpManager } from "providers/http-manager";
+import type { AuthManager } from "../../providers/auth-manager";
+import { HttpManager } from "../../providers/http-manager";
 
-import { StatusCodeEnum } from "types/enums/status-code";
+import { StatusCodeEnum } from "../../types/enums/status-code";
 
 export class LambdaProvider<U, I> extends HttpManager<U, I> {
 	public setAuth(authManager: AuthManager) {

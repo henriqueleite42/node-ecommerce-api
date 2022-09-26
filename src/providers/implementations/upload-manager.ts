@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import type { FileManager } from "adapters/file-manager";
-import type { QueueManager } from "adapters/queue-manager";
 import axios from "axios";
 import type { ReadStream } from "fs";
 import { v4 } from "uuid";
 
+import type { FileManager } from "../../adapters/file-manager";
+import type { QueueManager } from "../../adapters/queue-manager";
 import type { UploadManager, UploadFromUrlInput } from "../upload-manager";
 
-import { MediaTypeEnum } from "types/enums/media-type";
+import { MediaTypeEnum } from "../../types/enums/media-type";
 
 export class UploadManagerProvider implements UploadManager {
 	private readonly folders: Record<MediaTypeEnum, string> = {

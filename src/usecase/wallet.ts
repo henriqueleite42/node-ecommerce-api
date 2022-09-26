@@ -7,9 +7,9 @@ import type {
 	AdminWithdrawalInput,
 	CreateInput,
 	AddWWMPixInput,
-} from "models/wallet";
+} from "../models/wallet";
 
-import { WithdrawalMethodEnum } from "types/enums/withdrawal-method";
+import { WithdrawalMethodEnum } from "../types/enums/withdrawal-method";
 
 export class WalletUseCaseImplementation implements WalletUseCase {
 	public constructor(private readonly walletRepository: WalletRepository) {}

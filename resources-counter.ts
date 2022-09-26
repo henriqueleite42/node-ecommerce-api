@@ -8,7 +8,6 @@ export const resourcesCounter: AWS["resources"] = {
 			Type: "AWS::DynamoDB::Table",
 			Properties: {
 				TableName: "counters",
-				BillingMode: "PROVISIONED",
 				ProvisionedThroughput: {
 					ReadCapacityUnits: 3,
 					WriteCapacityUnits: 1,

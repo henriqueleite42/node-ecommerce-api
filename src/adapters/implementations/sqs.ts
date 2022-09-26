@@ -2,7 +2,8 @@
 
 import type { MessageAttributeValue } from "@aws-sdk/client-sns";
 import { SendMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
-import type { QueueManager, SendMsgInput } from "adapters/queue-manager";
+
+import type { QueueManager, SendMsgInput } from "../../adapters/queue-manager";
 
 export class SQSAdapter implements QueueManager {
 	private readonly sqs: SQSClient;

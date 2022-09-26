@@ -8,12 +8,11 @@
  *
  */
 
-import { WalletService } from "factories/wallet";
-import type { AddWWMPixInput, WalletUseCase } from "models/wallet";
-import { Validations } from "providers/implementations/validations";
-
+import { WalletService } from "../../../factories/wallet";
+import type { AddWWMPixInput, WalletUseCase } from "../../../models/wallet";
 import { AuthManagerProvider } from "../../../providers/implementations/auth-manager";
 import { LambdaProvider } from "../../../providers/implementations/lambda";
+import { Validations } from "../../../providers/implementations/validations";
 import { ValidatorProvider } from "../../../providers/implementations/validator";
 
 const httpManager = new LambdaProvider<WalletUseCase, AddWWMPixInput>({

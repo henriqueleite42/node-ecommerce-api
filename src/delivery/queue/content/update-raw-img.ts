@@ -6,10 +6,10 @@
  *
  */
 
-import { ContentService } from "factories/content";
-import type { ContentUseCase } from "models/content";
-import { SQSProvider } from "providers/implementations/sqs";
-import type { FileUploadedMsg } from "providers/upload-manager";
+import { ContentService } from "../../../factories/content";
+import type { ContentUseCase } from "../../../models/content";
+import { SQSProvider } from "../../../providers/implementations/sqs";
+import type { FileUploadedMsg } from "../../../providers/upload-manager";
 
 const sqsManager = new SQSProvider<FileUploadedMsg, ContentUseCase>({
 	from: "QUEUE",

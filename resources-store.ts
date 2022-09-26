@@ -8,7 +8,6 @@ export const resourcesStore: AWS["resources"] = {
 			Type: "AWS::DynamoDB::Table",
 			Properties: {
 				TableName: "stores",
-				BillingMode: "PROVISIONED",
 				ProvisionedThroughput: {
 					ReadCapacityUnits: 3,
 					WriteCapacityUnits: 1,

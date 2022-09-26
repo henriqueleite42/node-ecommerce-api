@@ -1,10 +1,10 @@
-import type { TopicManager } from "adapters/topic-manager";
+import type { TopicManager } from "../adapters/topic-manager";
 import type {
 	AccessIds,
 	AccessRepository,
 	AccessUseCase,
 	CreateManyInput,
-} from "models/access";
+} from "../models/access";
 
 export class AccessUseCaseImplementation implements AccessUseCase {
 	public constructor(

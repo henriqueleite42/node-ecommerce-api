@@ -8,12 +8,14 @@
  *
  */
 
-import { ProductService } from "factories/product";
-import type { GetProductsByTypeInput, ProductUseCase } from "models/product";
-import { Validations } from "providers/implementations/validations";
-
+import { ProductService } from "../../../factories/product";
+import type {
+	GetProductsByTypeInput,
+	ProductUseCase,
+} from "../../../models/product";
 import { AuthManagerProvider } from "../../../providers/implementations/auth-manager";
 import { LambdaProvider } from "../../../providers/implementations/lambda";
+import { Validations } from "../../../providers/implementations/validations";
 import { ValidatorProvider } from "../../../providers/implementations/validator";
 
 const httpManager = new LambdaProvider<ProductUseCase, GetProductsByTypeInput>({

@@ -6,11 +6,11 @@
  *
  */
 
-import { S3Adapter } from "adapters/implementations/s3";
-import { SQSAdapter } from "adapters/implementations/sqs";
-import { SQSProvider } from "providers/implementations/sqs";
-import { UploadManagerProvider } from "providers/implementations/upload-manager";
-import type { UploadFromUrlInput } from "providers/upload-manager";
+import { S3Adapter } from "../../../adapters/implementations/s3";
+import { SQSAdapter } from "../../../adapters/implementations/sqs";
+import { SQSProvider } from "../../../providers/implementations/sqs";
+import { UploadManagerProvider } from "../../../providers/implementations/upload-manager";
+import type { UploadFromUrlInput } from "../../../providers/upload-manager";
 
 const sqsManager = new SQSProvider<UploadFromUrlInput, undefined>({
 	from: "QUEUE",

@@ -1,11 +1,12 @@
-import { GerenciarnetManager } from "adapters/implementations/gerencianet";
-import { SNSAdapter } from "adapters/implementations/sns";
-import { Service } from "factories";
-import type { SaleUseCase } from "models/sale";
-import { getDynamoInstance } from "repository/dynamodb";
-import { ProductRepositoryDynamoDB } from "repository/dynamodb/product";
-import { SaleRepositoryDynamoDB } from "repository/dynamodb/sale";
-import { SaleUseCaseImplementation } from "usecase/sale";
+import { GerenciarnetManager } from "../adapters/implementations/gerencianet";
+import { SNSAdapter } from "../adapters/implementations/sns";
+import type { SaleUseCase } from "../models/sale";
+import { getDynamoInstance } from "../repository/dynamodb";
+import { ProductRepositoryDynamoDB } from "../repository/dynamodb/product";
+import { SaleRepositoryDynamoDB } from "../repository/dynamodb/sale";
+import { SaleUseCaseImplementation } from "../usecase/sale";
+
+import { Service } from ".";
 
 export class SaleService extends Service<SaleUseCase> {
 	public getInstance() {

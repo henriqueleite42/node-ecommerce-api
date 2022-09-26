@@ -3,8 +3,8 @@ import type {
 	ContentUseCase,
 	CreateManyWithUrlInput,
 	EditInput,
-} from "models/content";
-import type { UploadManager } from "providers/upload-manager";
+} from "../models/content";
+import type { UploadManager } from "../providers/upload-manager";
 
 export class ContentUseCaseImplementation implements ContentUseCase {
 	public constructor(

@@ -3,6 +3,7 @@
 import { PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { cleanObj } from "@techmmunity/utils";
+
 import type {
 	CreateInput,
 	EditInput,
@@ -11,13 +12,14 @@ import type {
 	GetProductsByTypeInput,
 	ProductEntity,
 	ProductRepository,
-} from "models/product";
-import { genCode } from "utils/id/gen-code";
+} from "../../models/product";
 
 import { DynamodbRepository } from ".";
 
-import type { DeliveryMethodEnum } from "types/enums/delivery-method";
-import type { ProductTypeEnum } from "types/enums/product-type";
+import { genCode } from "../../utils/id/gen-code";
+
+import type { DeliveryMethodEnum } from "../../types/enums/delivery-method";
+import type { ProductTypeEnum } from "../../types/enums/product-type";
 
 export interface ProductTable {
 	productId: string;

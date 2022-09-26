@@ -8,9 +8,8 @@
  *
  */
 
-import { ProductService } from "factories/product";
-import type { ProductUseCase } from "models/product";
-
+import { ProductService } from "../../../factories/product";
+import type { ProductUseCase } from "../../../models/product";
 import { AuthManagerProvider } from "../../../providers/implementations/auth-manager";
 import { LambdaProvider } from "../../../providers/implementations/lambda";
 

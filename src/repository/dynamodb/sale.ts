@@ -3,6 +3,8 @@
 import { PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { cleanObj } from "@techmmunity/utils";
+import { v4 } from "uuid";
+
 import type {
 	SaleEntity,
 	SaleRepository,
@@ -11,12 +13,11 @@ import type {
 	GetByIdInput,
 	GetByClientIdStatusInput,
 	GetByStoreIdStatusInput,
-} from "models/sale";
-import { v4 } from "uuid";
+} from "../../models/sale";
 
 import { DynamodbRepository } from ".";
 
-import { SalesStatusEnum } from "types/enums/sale-status";
+import { SalesStatusEnum } from "../../types/enums/sale-status";
 
 export interface SaleTable {
 	saleId: string;

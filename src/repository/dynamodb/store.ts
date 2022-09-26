@@ -3,6 +3,7 @@
 import { PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { cleanObj } from "@techmmunity/utils";
+
 import type {
 	CreateInput,
 	EditInput,
@@ -11,7 +12,7 @@ import type {
 	GetByNameInput,
 	GetManyByIdInput,
 	StoreEntity,
-} from "models/store";
+} from "../../models/store";
 
 import { DynamodbRepository } from ".";
 
