@@ -22,7 +22,7 @@ const httpManager = new LambdaProvider<WalletUseCase, AdminWithdrawalInput>({
 	method: "POST",
 	path: "wallets/admin-withdrawal",
 })
-	.setAuth(new AuthManagerProvider(["BOT_ADM"]))
+	.setAuth(new AuthManagerProvider(["BOT"], true))
 	.setValidation(
 		new ValidatorProvider([
 			{

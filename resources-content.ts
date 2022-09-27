@@ -7,6 +7,11 @@ const PROVISIONED_THROUGHPUT_CONTENTS = {
 
 export const resourcesContent: AWS["resources"] = {
 	Resources: {
+		/**
+		 *
+		 * Database
+		 *
+		 */
 		ContentDynamoDBTable: {
 			DeletionPolicy: "Retain",
 			UpdateReplacePolicy: "Retain",
@@ -55,6 +60,28 @@ export const resourcesContent: AWS["resources"] = {
 				],
 			},
 		},
+		/**
+		 *
+		 * Storage
+		 *
+		 */
+		RawMediaStorage: {
+			Type: "AWS::S3::Bucket",
+			Properties: {
+				BucketName: "monetizzer-${self:service}-${opt:stage, 'dev'}-raw-media",
+				PublicAccessBlockConfiguration: {
+					BlockPublicAcls : true,
+					BlockPublicPolicy : true,
+					IgnorePublicAcls : true,
+					RestrictPublicBuckets : true,
+				},
+			},
+		},
+		/**
+		 *
+		 * Queues And Topics
+		 *
+		 */
 		UpdateRawImgQueue: {
 			Type: "AWS::SQS::Queue",
 			Properties: {

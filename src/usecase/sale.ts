@@ -1,3 +1,5 @@
+/* eslint-disable sonarjs/no-duplicate-string */
+
 import type { PixManager } from "../adapters/pix-manager";
 import type { TopicManager } from "../adapters/topic-manager";
 import type { ProductEntity, ProductRepository } from "../models/product";
@@ -15,8 +17,11 @@ import type {
 	ProcessPaymentSaleInput,
 } from "../models/sale";
 
+import { CustomError } from "../utils/error";
+
 import { PaymentMethodEnum } from "../types/enums/payment-method";
 import { SalesStatusEnum } from "../types/enums/sale-status";
+import { StatusCodeEnum } from "../types/enums/status-code";
 
 export class SaleUseCaseImplementation implements SaleUseCase {
 	public constructor(
@@ -35,7 +40,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		);
 
 		if (productsData.length !== products.length) {
-			throw new Error("PRODUCT_NOT_FOUND");
+			throw new CustomError("Product not found", StatusCodeEnum.NOT_FOUND);
 		}
 
 		const saleProducts = productsData.map(product => {
@@ -61,15 +66,18 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		const sale = await this.saleRepository.getById({ saleId });
 
 		if (!sale) {
-			throw new Error("SALE_NOT_FOUND");
+			throw new CustomError("Sale not found", StatusCodeEnum.NOT_FOUND);
 		}
 
 		if (sale.clientId !== clientId) {
-			throw new Error("UNAUTHORIZED");
+			throw new CustomError("Unauthorized", StatusCodeEnum.UNAUTHORIZED);
 		}
 
 		if (sale.status !== SalesStatusEnum.IN_CART) {
-			throw new Error("SALE_ALREADY_IN_PROGRESS");
+			throw new CustomError(
+				"Sale already in progress",
+				StatusCodeEnum.CONFLICT,
+			);
 		}
 
 		const productAlreadyExists = sale.products.find(
@@ -79,7 +87,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		);
 
 		if (productAlreadyExists) {
-			throw new Error("DUPLICATED_PRODUCT");
+			throw new CustomError("Product already in cart", StatusCodeEnum.CONFLICT);
 		}
 
 		const productData = await this.productRepository.getById({
@@ -88,7 +96,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		});
 
 		if (!productData) {
-			throw new Error("PRODUCT_NOT_FOUND");
+			throw new CustomError("Product not found", StatusCodeEnum.NOT_FOUND);
 		}
 
 		return this.saleRepository.edit({
@@ -108,15 +116,18 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		const sale = await this.saleRepository.getById({ saleId });
 
 		if (!sale) {
-			throw new Error("SALE_NOT_FOUND");
+			throw new CustomError("Sale not found", StatusCodeEnum.NOT_FOUND);
 		}
 
 		if (sale.clientId !== clientId) {
-			throw new Error("UNAUTHORIZED");
+			throw new CustomError("Unauthorized", StatusCodeEnum.UNAUTHORIZED);
 		}
 
 		if (sale.status !== SalesStatusEnum.IN_CART) {
-			throw new Error("INVALID_SALE_STATUS");
+			throw new CustomError(
+				"Sale already in progress",
+				StatusCodeEnum.CONFLICT,
+			);
 		}
 
 		await this.saleRepository.edit({
@@ -134,7 +145,10 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 				};
 
 			default:
-				throw new Error("INVALID_PAYMENT_METHOD");
+				throw new CustomError(
+					"Invalid payment method",
+					StatusCodeEnum.BAD_REQUEST,
+				);
 		}
 	}
 
@@ -142,11 +156,14 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		const sale = await this.saleRepository.getById({ saleId });
 
 		if (!sale) {
-			throw new Error("SALE_NOT_FOUND");
+			throw new CustomError("Sale not found", StatusCodeEnum.NOT_FOUND);
 		}
 
 		if (sale.status !== SalesStatusEnum.PENDING) {
-			throw new Error("INVALID_SALE_STATUS");
+			throw new CustomError(
+				"Sale already in progress",
+				StatusCodeEnum.CONFLICT,
+			);
 		}
 
 		await this.saleRepository.edit({
@@ -164,7 +181,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		const sale = await this.saleRepository.getById(p);
 
 		if (!sale) {
-			throw new Error("SALE_NOT_FOUND");
+			throw new CustomError("Sale not found", StatusCodeEnum.NOT_FOUND);
 		}
 
 		return sale;
@@ -185,7 +202,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		{ productId, variationId }: AddProductSaleInput["product"],
 	): SaleProduct {
 		if (product.variations && product.variations.length > 0 && !variationId) {
-			throw new Error("MISSING_VARIATION");
+			throw new CustomError("Missing variation", StatusCodeEnum.BAD_REQUEST);
 		}
 
 		return {

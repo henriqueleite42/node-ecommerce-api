@@ -87,11 +87,13 @@ export class AccountRepositoryDynamoDB
 
 	// Mappers
 
-	protected entityToTable(entity: AccountEntity): AccountTable {
+	protected entityToTable(
+		entity: Partial<AccountEntity>,
+	): Partial<AccountTable> {
 		return cleanObj({
-			accountId: `ACCOUNT#${entity.accountId}`,
-			discordId: `DISCORD#${entity.discordId}`,
-			createdAt: entity.createdAt.toISOString(),
+			accountId: entity.accountId ? `ACCOUNT#${entity.accountId}` : undefined,
+			discordId: entity.discordId ? `DISCORD#${entity.discordId}` : undefined,
+			createdAt: entity.createdAt?.toISOString(),
 		});
 	}
 

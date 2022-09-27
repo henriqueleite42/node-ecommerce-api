@@ -2,7 +2,6 @@
 
 import axios from "axios";
 import type { ReadStream } from "fs";
-import { v4 } from "uuid";
 
 import type { FileManager } from "../../adapters/file-manager";
 import type { QueueManager } from "../../adapters/queue-manager";
@@ -11,12 +10,6 @@ import type { UploadManager, UploadFromUrlInput } from "../upload-manager";
 import { MediaTypeEnum } from "../../types/enums/media-type";
 
 export class UploadManagerProvider implements UploadManager {
-	private readonly folders: Record<MediaTypeEnum, string> = {
-		[MediaTypeEnum.IMAGE]: "images",
-		[MediaTypeEnum.VIDEO]: "videos",
-		[MediaTypeEnum.AUDIO]: "audios",
-	};
-
 	public constructor(
 		private readonly queueManager: QueueManager,
 		private readonly fileManager: FileManager,
@@ -27,35 +20,46 @@ export class UploadManagerProvider implements UploadManager {
 			to: process.env.UPLOAD_FROM_URL_QUEUE_URL!,
 			message: p,
 			metadata: {
-				type: p.type,
 				mediaType: p.mediaType,
 			},
 		});
 	}
 
 	public async uploadFromUrl({
-		type,
+		folder,
 		id,
+		fileName,
 		mediaUrl,
 		mediaType,
 		queueToNotify,
 	}: UploadFromUrlInput) {
 		try {
-			const ext = await axios
+			const mediaTypeFromUrl = await axios
 				.head(mediaUrl)
-				.then(r => r.headers["content-type"] as string | undefined);
+				.then(r => r.headers["content-type"] || "");
 
-			if (mediaType === MediaTypeEnum.IMAGE && !ext?.startsWith("image/")) {
+			if (
+				mediaType === MediaTypeEnum.IMAGE &&
+				!mediaTypeFromUrl?.startsWith("image/")
+			) {
 				throw new Error("Invalid image");
 			}
 
-			if (mediaType === MediaTypeEnum.VIDEO && !ext?.startsWith("video/")) {
+			if (
+				mediaType === MediaTypeEnum.VIDEO &&
+				!mediaTypeFromUrl?.startsWith("video/")
+			) {
 				throw new Error("Invalid video");
 			}
 
-			if (mediaType === MediaTypeEnum.AUDIO && !ext?.startsWith("audio/")) {
+			if (
+				mediaType === MediaTypeEnum.AUDIO &&
+				!mediaTypeFromUrl?.startsWith("audio/")
+			) {
 				throw new Error("Invalid audio");
 			}
+
+			const ext = this.getExt(mediaTypeFromUrl);
 
 			const readStream = await axios
 				.get(mediaUrl, {
@@ -63,20 +67,17 @@ export class UploadManagerProvider implements UploadManager {
 				})
 				.then(r => r.data as ReadStream);
 
-			const { fileUrl } = await this.fileManager.saveFile({
-				folder: this.folders[mediaType],
+			const { filePath } = await this.fileManager.saveFile({
+				folder,
 				file: readStream,
-				name: v4(),
-				metadata: {
-					type,
-					...id,
-				},
+				name: `${fileName}.${ext}`,
+				metadata: id,
 			});
 
 			await this.queueManager.sendMsg({
 				to: queueToNotify,
 				message: {
-					fileUrl,
+					filePath,
 					id,
 				},
 			});
@@ -87,6 +88,15 @@ export class UploadManagerProvider implements UploadManager {
 					error: err.message,
 				},
 			});
+		}
+	}
+
+	protected getExt(mediaTypeFromUrl: string) {
+		switch (true) {
+			case mediaTypeFromUrl.startsWith("image/"):
+				return mediaTypeFromUrl.replace("image/", "");
+			default:
+				return mediaTypeFromUrl.split("/").pop()!;
 		}
 	}
 }

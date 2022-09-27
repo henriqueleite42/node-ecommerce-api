@@ -9,6 +9,9 @@ import type {
 	AddWWMPixInput,
 } from "../models/wallet";
 
+import { CustomError } from "../utils/error";
+
+import { StatusCodeEnum } from "../types/enums/status-code";
 import { WithdrawalMethodEnum } from "../types/enums/withdrawal-method";
 
 export class WalletUseCaseImplementation implements WalletUseCase {
@@ -18,7 +21,10 @@ export class WalletUseCaseImplementation implements WalletUseCase {
 		const wallet = await this.walletRepository.getById(p);
 
 		if (wallet) {
-			throw new Error("ACCOUNT_ALREADY_HAS_WALLET");
+			throw new CustomError(
+				"Account already has a wallet",
+				StatusCodeEnum.NOT_FOUND,
+			);
 		}
 
 		return this.walletRepository.create(p);
@@ -52,7 +58,7 @@ export class WalletUseCaseImplementation implements WalletUseCase {
 		const wallet = await this.walletRepository.getById({ accountId });
 
 		if (!wallet || wallet.balance < amount) {
-			throw new Error("NOT_ENOUGH_FUNDS");
+			throw new CustomError("Not enough funds", StatusCodeEnum.NOT_ACCEPTABLE);
 		}
 
 		await Promise.all([
@@ -71,7 +77,7 @@ export class WalletUseCaseImplementation implements WalletUseCase {
 		const wallet = await this.walletRepository.getById({ accountId });
 
 		if (!wallet) {
-			throw new Error("WALLET_NOT_FOUND");
+			throw new CustomError("Wallet not found", StatusCodeEnum.NOT_FOUND);
 		}
 
 		const type = WithdrawalMethodEnum.PIX;
@@ -81,7 +87,7 @@ export class WalletUseCaseImplementation implements WalletUseCase {
 		);
 
 		if (isDuplicatedWWM) {
-			throw new Error("DUPLICATED_WWM");
+			throw new CustomError("Duplicated WWM", StatusCodeEnum.CONFLICT);
 		}
 
 		await this.walletRepository.addWWM({

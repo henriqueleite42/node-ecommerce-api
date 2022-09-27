@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { S3Client } from "@aws-sdk/client-s3";
+import { Upload } from "@aws-sdk/lib-storage";
 
 import type { FileManager, SaveFileInput } from "../../adapters/file-manager";
 
@@ -20,8 +21,6 @@ export class S3Adapter implements FileManager {
 	}
 
 	public async saveFile({ folder, file, name, metadata }: SaveFileInput) {
-		const proxyUrl = this.getProxyUrl(folder);
-
 		const formattedMetadata: Record<string, string> = {};
 
 		if (metadata) {
@@ -30,26 +29,20 @@ export class S3Adapter implements FileManager {
 			});
 		}
 
-		await this.s3.send(
-			new PutObjectCommand({
+		const upload = new Upload({
+			client: this.s3,
+			params: {
 				Bucket: folder,
 				Key: name,
 				Body: file,
 				Metadata: metadata ? formattedMetadata : undefined,
-			}),
-		);
+			},
+		});
+
+		await upload.done();
 
 		return {
-			fileUrl: `${proxyUrl}/${name}`,
+			filePath: name,
 		};
-	}
-
-	private getProxyUrl(folder: string) {
-		switch (folder) {
-			case "products":
-				return "";
-			default:
-				throw new Error("INVALID_FOLDER");
-		}
 	}
 }

@@ -22,8 +22,8 @@ export interface StoreTable {
 	name: string;
 	description?: string;
 	color?: string;
-	bannerUrl?: string;
-	avatarUrl?: string;
+	bannerPath?: string;
+	avatarPath?: string;
 	createdAt: string;
 }
 
@@ -131,16 +131,16 @@ export class StoreRepositoryDynamoDB
 
 	// Mappers
 
-	protected entityToTable(entity: StoreEntity): StoreTable {
-		return cleanObj({
-			storeId: `STORE#${entity.storeId}`,
-			accountId: `ACCOUNT#${entity.accountId}`,
-			name: `NAME#${entity.name}`,
+	protected entityToTable(entity: Partial<StoreEntity>): Partial<StoreTable> {
+		return cleanObj<Partial<StoreTable>>({
+			storeId: entity.storeId ? `STORE#${entity.storeId}` : undefined,
+			accountId: entity.accountId ? `ACCOUNT#${entity.accountId}` : undefined,
+			name: entity.name ? `NAME#${entity.name}` : undefined,
 			description: entity.description,
 			color: entity.color,
-			bannerUrl: entity.bannerUrl,
-			avatarUrl: entity.avatarUrl,
-			createdAt: entity.createdAt.toISOString(),
+			bannerPath: entity.bannerUrl,
+			avatarPath: entity.avatarUrl,
+			createdAt: entity.createdAt?.toISOString(),
 		});
 	}
 
@@ -151,8 +151,12 @@ export class StoreRepositoryDynamoDB
 			name: table.name.replace("NAME#", ""),
 			description: table.description,
 			color: table.color,
-			bannerUrl: table.bannerUrl,
-			avatarUrl: table.avatarUrl,
+			avatarUrl: table.avatarPath
+				? `${process.env.IMAGES_PREFIX_URL}/${table.avatarPath}`
+				: undefined,
+			bannerUrl: table.bannerPath
+				? `${process.env.IMAGES_PREFIX_URL}/${table.bannerPath}`
+				: undefined,
 			createdAt: new Date(table.createdAt),
 		};
 	}

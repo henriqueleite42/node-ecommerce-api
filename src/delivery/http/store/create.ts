@@ -40,7 +40,7 @@ const httpManager = new LambdaProvider<StoreUseCase, CreateInput>({
 			{
 				key: "description",
 				loc: "body",
-				validations: [Validations.maxLength(500)],
+				validations: [Validations.string, Validations.maxLength(500)],
 				transform: [Transform.trim],
 			},
 			{

@@ -119,11 +119,17 @@ export class ContentRepositoryDynamoDB
 
 	// Mappers
 
-	protected entityToTable(entity: ContentEntity): ContentTable {
-		const contentId = `CONTENT#${entity.contentId}`;
-		const productId = `PRODUCT#${entity.productId}`;
-		const storeId = `STORE#${entity.storeId}`;
-		const createdAt = entity.createdAt.toISOString();
+	protected entityToTable(
+		entity: Partial<ContentEntity>,
+	): Partial<ContentTable> {
+		const contentId = entity.contentId
+			? `CONTENT#${entity.contentId}`
+			: undefined;
+		const productId = entity.productId
+			? `PRODUCT#${entity.productId}`
+			: undefined;
+		const storeId = entity.storeId ? `STORE#${entity.storeId}` : undefined;
+		const createdAt = entity.createdAt?.toISOString();
 
 		return cleanObj({
 			contentId,
@@ -134,9 +140,14 @@ export class ContentRepositoryDynamoDB
 			processedContentPath: entity.processedContentPath,
 			createdAt,
 
-			storeId_productId: `${storeId}#${productId}`,
-			createdAt_contentId: `${createdAt}#${contentId}`,
-			storeId_productId_contentId: `${storeId}#${productId}#${contentId}`,
+			storeId_productId:
+				storeId && productId ? `${storeId}#${productId}` : undefined,
+			createdAt_contentId:
+				createdAt && contentId ? `${createdAt}#${contentId}` : undefined,
+			storeId_productId_contentId:
+				storeId && productId && contentId
+					? `${storeId}#${productId}#${contentId}`
+					: undefined,
 		});
 	}
 

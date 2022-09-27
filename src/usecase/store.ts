@@ -9,30 +9,69 @@ import type {
 	StoreRepository,
 	StoreUseCase,
 } from "../models/store";
+import type { UploadManager } from "../providers/upload-manager";
+
+import { CustomError } from "../utils/error";
+
+import { MediaTypeEnum } from "../types/enums/media-type";
+import { StatusCodeEnum } from "../types/enums/status-code";
 
 export class StoreUseCaseImplementation implements StoreUseCase {
 	public constructor(
 		private readonly storeRepository: StoreRepository,
 		private readonly counterRepository: CounterRepository,
 		private readonly topicManager: TopicManager,
+		private readonly uploadManager: UploadManager,
 	) {}
 
-	public async create(p: CreateInput) {
+	public async create({ avatarUrl, bannerUrl, ...p }: CreateInput) {
 		const accountAlreadyHasStore = await this.storeRepository.getById({
 			storeId: p.accountId,
 		});
 
 		if (accountAlreadyHasStore) {
-			throw new Error("ALREADY_HAS_STORE");
+			throw new CustomError(
+				"User already has a store",
+				StatusCodeEnum.CONFLICT,
+			);
 		}
 
 		const storeWithSameName = await this.storeRepository.getByName(p);
 
 		if (storeWithSameName) {
-			throw new Error("DUPLICATED_NAME");
+			throw new CustomError(
+				"A store with the same name already exists",
+				StatusCodeEnum.CONFLICT,
+			);
 		}
 
 		const store = await this.storeRepository.create(p);
+
+		if (avatarUrl) {
+			await this.uploadManager.uploadFromUrlBackground({
+				folder: process.env.MEDIA_BUCKET_NAME!,
+				fileName: `avatars/${store.storeId}`,
+				id: {
+					storeId: store.storeId,
+				},
+				mediaUrl: avatarUrl,
+				mediaType: MediaTypeEnum.IMAGE,
+				queueToNotify: process.env.UPDATE_AVATAR_QUEUE_URL!,
+			});
+		}
+
+		if (bannerUrl) {
+			await this.uploadManager.uploadFromUrlBackground({
+				folder: process.env.MEDIA_BUCKET_NAME!,
+				fileName: `banners/${store.storeId}`,
+				id: {
+					storeId: store.storeId,
+				},
+				mediaUrl: bannerUrl,
+				mediaType: MediaTypeEnum.IMAGE,
+				queueToNotify: process.env.UPDATE_BANNER_QUEUE_URL!,
+			});
+		}
 
 		await this.topicManager.sendMsg({
 			to: process.env.STORE_CREATED_TOPIC_ARN!,
@@ -46,7 +85,7 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 		const store = await this.storeRepository.edit(p);
 
 		if (!store) {
-			throw new Error("NOT_FOUND");
+			throw new CustomError("Store not found", StatusCodeEnum.NOT_FOUND);
 		}
 
 		return store;
@@ -56,7 +95,7 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 		const store = await this.storeRepository.getByName(p);
 
 		if (!store) {
-			throw new Error("NOT_FOUND");
+			throw new CustomError("Store not found", StatusCodeEnum.NOT_FOUND);
 		}
 
 		return store;

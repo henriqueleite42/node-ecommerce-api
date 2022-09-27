@@ -7,6 +7,11 @@ const PROVISIONED_THROUGHPUT_STORES = {
 
 export const resourcesStore: AWS["resources"] = {
 	Resources: {
+		/**
+		 *
+		 * Database
+		 *
+		 */
 		StoreDynamoDBTable: {
 			DeletionPolicy: "Retain",
 			UpdateReplacePolicy: "Retain",
@@ -32,7 +37,7 @@ export const resourcesStore: AWS["resources"] = {
 				],
 				GlobalSecondaryIndexes: [
 					{
-						IndexName: "StoreIdCreatedAtProductId",
+						IndexName: "Name",
 						KeySchema: [
 							{
 								AttributeName: "name",
@@ -45,6 +50,134 @@ export const resourcesStore: AWS["resources"] = {
 						ProvisionedThroughput: PROVISIONED_THROUGHPUT_STORES,
 					},
 				],
+			},
+		},
+		/**
+		 *
+		 * Storage
+		 *
+		 */
+		MediaStorage: {
+			Type: "AWS::S3::Bucket",
+			Properties: {
+				BucketName: "monetizzer-${self:service}-${opt:stage, 'dev'}-media",
+				PublicAccessBlockConfiguration: {
+					BlockPublicAcls : true,
+					BlockPublicPolicy : true,
+					IgnorePublicAcls : true,
+					RestrictPublicBuckets : true,
+				},
+			},
+		},
+		MediaStorageOriginAccessIdentity: {
+			Type: "AWS::CloudFront::CloudFrontOriginAccessIdentity",
+			Properties: {
+				CloudFrontOriginAccessIdentityConfig: {
+					Comment: {
+						"Fn::Sub": "access-identity-${MediaStorage}",
+					},
+				},
+			},
+		},
+		MediaStoragePolicy: {
+			Type: "AWS::S3::BucketPolicy",
+			Properties: {
+				Bucket: {
+					Ref: "MediaStorage",
+				},
+				PolicyDocument: {
+					Version: "2012-10-17",
+					Statement: [
+						{
+							Effect: "Allow",
+							Principal: {
+								CanonicalUser: {
+									"Fn::GetAtt": ["MediaStorageOriginAccessIdentity", "S3CanonicalUserId"]
+								},
+							},
+							Action: "s3:GetObject",
+							Resource: {
+								"Fn::Sub": "${MediaStorage.Arn}/*"
+							}
+						}
+					]
+				}
+			},
+		},
+		MediaStorageCloudFront: {
+			Type: "AWS::CloudFront::Distribution",
+			Properties: {
+				DistributionConfig: {
+					Origins: [
+						{
+							DomainName: {
+								"Fn::Sub": "${MediaStorage}.s3.${AWS::Region}.amazonaws.com",
+							},
+							Id: "storeMediaS3Origin",
+							S3OriginConfig: {
+								OriginAccessIdentity: {
+									"Fn::Sub":
+										"origin-access-identity/cloudfront/${MediaStorageOriginAccessIdentity}",
+								},
+							},
+						},
+					],
+					Enabled: true,
+					DefaultCacheBehavior: {
+						AllowedMethods: ["GET", "HEAD"],
+						Compress: true,
+						MaxTTL: 0,
+						MinTTL: 0,
+						ViewerProtocolPolicy: "redirect-to-https",
+						DefaultTTL: 0,
+						TargetOriginId: "storeMediaS3Origin",
+						ForwardedValues: {
+							QueryString: false,
+							Cookies: {
+								Forward: "none",
+							},
+							Headers: [
+								"Origin",
+								"Access-Control-Request-Method",
+								"Access-Control-Request-Headers",
+							],
+						},
+					},
+					PriceClass: "PriceClass_100",
+					ViewerCertificate: {
+						CloudFrontDefaultCertificate: true,
+					},
+				},
+			},
+			Metadata: {
+				cfn_nag: {
+					rules_to_suppress: [
+						{
+							id: "W70",
+							reason:
+								"CloudFront automatically sets the security policy to TLSv1 when the distribution uses the CloudFront domain name (CloudFrontDefaultCertificate=true)",
+						},
+					],
+				},
+			},
+		},
+		/**
+		 *
+		 * Queues And Topics
+		 *
+		 */
+		UpdateAvatarQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'local'}-update-avatar",
+			},
+		},
+		UpdateBannerQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'local'}-update-banner",
 			},
 		},
 		StoreCreatedTopic: {
@@ -132,6 +265,25 @@ export const resourcesStore: AWS["resources"] = {
 					],
 				},
 			}
-		}
+		},
+		MediaStorageCloudFrontUrl: {
+			Description: "CloudFront Products",
+			Value: {
+				"Fn::GetAtt": ["MediaStorageCloudFront", "DomainName"],
+			},
+			Export: {
+				Name: {
+					"Fn::Join": [
+						":",
+						[
+							{
+								Ref: "AWS::StackName",
+							},
+							"MediaStorageCloudFrontUrl",
+						],
+					],
+				},
+			},
+		},
 	}
 };

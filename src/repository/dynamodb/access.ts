@@ -121,14 +121,22 @@ export class AccessRepositoryDynamoDB
 
 	// Mappers
 
-	protected entityToTable(entity: AccessEntity): AccessTable {
-		const accountId = `ACCOUNT#${entity.accountId}`;
-		const storeId = `STORE#${entity.storeId}`;
-		const productId = `PRODUCT#${entity.productId}`;
-		const variationId = `VARIATION#${entity.variationId || ""}`;
-		const createdAt = entity.createdAt.toISOString();
+	protected entityToTable(entity: Partial<AccessEntity>): Partial<AccessTable> {
+		const accountId = entity.accountId
+			? `ACCOUNT#${entity.accountId}`
+			: undefined;
+		const storeId = entity.storeId ? `STORE#${entity.storeId}` : undefined;
+		const productId = entity.productId
+			? `PRODUCT#${entity.productId}`
+			: undefined;
+		const variationId = entity.variationId
+			? `VARIATION#${entity.variationId}`
+			: undefined;
+		const createdAt = entity.createdAt?.toISOString();
 
-		const primaryKey = `${accountId}#${storeId}#${productId}#${variationId}`;
+		const primaryKey = [accountId, storeId, productId, variationId]
+			.filter(Boolean)
+			.join("#");
 
 		return cleanObj({
 			accountId,
@@ -138,9 +146,13 @@ export class AccessRepositoryDynamoDB
 			createdAt,
 			expiresAt: entity.expiresAt?.toISOString(),
 
-			accountId_storeId_productId_variationId: primaryKey,
-			accountId_storeId: `${accountId}#${storeId}`,
-			createdAt_productId_variationId: `${createdAt}#${primaryKey}#${variationId}`,
+			accountId_storeId_productId_variationId: primaryKey || undefined,
+			accountId_storeId:
+				accountId && storeId ? `${accountId}#${storeId}` : undefined,
+			createdAt_productId_variationId:
+				createdAt && productId && variationId
+					? `${createdAt}#${productId}#${variationId}`
+					: undefined,
 		});
 	}
 

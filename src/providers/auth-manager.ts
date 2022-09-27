@@ -1,5 +1,4 @@
 type AllowedAuthTypes = "BOT" | "REST";
-type AllowedAdmAuthTypes = "BOT_ADM" | "REST_ADM";
 
 interface AuthData {
 	accountId?: string;
@@ -7,9 +6,8 @@ interface AuthData {
 
 export abstract class AuthManager {
 	public constructor(
-		protected readonly allowedAuthTypes:
-			| Array<AllowedAdmAuthTypes>
-			| Array<AllowedAuthTypes>,
+		protected readonly allowedAuthTypes: Array<AllowedAuthTypes>,
+		protected readonly adminOnly?: boolean,
 	) {}
 
 	public abstract isAuthorized(authHeader: string): Promise<boolean> | boolean;

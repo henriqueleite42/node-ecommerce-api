@@ -27,7 +27,7 @@ export const func = sqsManager
 		await service.updateImg({
 			storeId: data.id.storeId,
 			productId: data.id.productId,
-			imageUrl: data.fileUrl,
+			imageUrl: data.filePath,
 		});
 	})
 	.getFunc();

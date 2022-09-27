@@ -29,7 +29,7 @@ export interface ProductTable {
 	description: string;
 	color?: string;
 	price?: number;
-	imageUrl?: string;
+	imagePath?: string;
 	variations: Array<{
 		id: string;
 		name: string;
@@ -168,27 +168,36 @@ export class ProductRepositoryDynamoDB
 
 	// Mappers
 
-	protected entityToTable(entity: ProductEntity): ProductTable {
-		const productId = `PRODUCT#${entity.productId}`;
-		const storeId = `STORE#${entity.storeId}`;
-		const type = `TYPE#${entity.type}`;
-		const createdAt = entity.createdAt.toISOString();
+	protected entityToTable(
+		entity: Partial<ProductEntity>,
+	): Partial<ProductTable> {
+		const productId = entity.productId
+			? `PRODUCT#${entity.productId}`
+			: undefined;
+		const storeId = entity.storeId ? `STORE#${entity.storeId}` : undefined;
+		const type = entity.type
+			? (`TYPE#${entity.type}` as ProductTypeEnum)
+			: undefined;
+		const createdAt = entity.createdAt?.toISOString();
 
 		return cleanObj({
 			productId,
 			storeId,
-			type: type as ProductTypeEnum,
+			type,
 			name: entity.name,
 			description: entity.description,
 			color: entity.color,
 			price: entity.price,
 			variations: entity.variations,
 			deliveryMethod: entity.deliveryMethod,
+			imagePath: entity.imageUrl,
 			createdAt,
 
-			storeId_type: `${storeId}#${type}`,
-			storeId_productId: `${storeId}#${productId}`,
-			createdAt_productId: `${createdAt}#${productId}`,
+			storeId_type: storeId && type ? `${storeId}#${type}` : undefined,
+			storeId_productId:
+				storeId && productId ? `${storeId}#${productId}` : undefined,
+			createdAt_productId:
+				createdAt && productId ? `${createdAt}#${productId}` : undefined,
 		});
 	}
 
@@ -201,6 +210,9 @@ export class ProductRepositoryDynamoDB
 			description: table.description,
 			color: table.color,
 			price: table.price,
+			imageUrl: table.imagePath
+				? `${process.env.IMAGES_PREFIX_URL}/${table.imagePath}`
+				: undefined,
 			variations: table.variations,
 			deliveryMethod: table.deliveryMethod,
 			createdAt: new Date(table.createdAt),

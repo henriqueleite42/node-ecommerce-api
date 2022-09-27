@@ -3,6 +3,8 @@
 import type { AuthManager } from "../../providers/auth-manager";
 import { HttpManager } from "../../providers/http-manager";
 
+import { CustomError } from "../../utils/error";
+
 import { StatusCodeEnum } from "../../types/enums/status-code";
 
 export class LambdaProvider<U, I> extends HttpManager<U, I> {
@@ -15,17 +17,21 @@ export class LambdaProvider<U, I> extends HttpManager<U, I> {
 	public setFunc(func: keyof U) {
 		this.func = async event => {
 			try {
+				const authHeader = this.getAuthHeader(event.headers);
+
 				if (this.authManager) {
-					this.authManager.isAuthorized(event?.headers?.authorization || "");
+					this.authManager.isAuthorized(authHeader);
 				}
 
-				const validatedData = await this.validationManager.validate({
+				const params = {
 					body: event.body ? JSON.parse(event.body) : undefined,
 					query: event.queryStringParameters,
 					headers: event.headers,
 					path: event.pathParameters,
-					auth: this.authManager.getAuthData(event.headers?.authorization),
-				});
+					auth: this.authManager.getAuthData(authHeader),
+				};
+
+				const validatedData = await this.validationManager.validate(params);
 
 				const serviceInstance = this.service.getInstance();
 
@@ -36,6 +42,13 @@ export class LambdaProvider<U, I> extends HttpManager<U, I> {
 					body: result ? JSON.stringify(result) : undefined,
 				};
 			} catch (err: any) {
+				if (err instanceof CustomError) {
+					return {
+						statusCode: err.statusCode,
+						body: err.getBody(),
+					};
+				}
+
 				switch (err.message) {
 					case "NOT_ENOUGH_FUNDS":
 						return {

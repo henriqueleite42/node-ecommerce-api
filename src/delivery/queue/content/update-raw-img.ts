@@ -28,8 +28,8 @@ export const func = sqsManager
 			storeId: data.id.storeId,
 			productId: data.id.productId,
 			contentId: data.id.contentId,
-			rawContentPath: data.fileUrl,
-			processedContentPath: data.fileUrl, // Temporary
+			rawContentPath: data.filePath,
+			processedContentPath: data.filePath, // Temporary
 		});
 	})
 	.getFunc();

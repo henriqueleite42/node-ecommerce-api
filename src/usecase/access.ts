@@ -6,6 +6,10 @@ import type {
 	CreateManyInput,
 } from "../models/access";
 
+import { CustomError } from "../utils/error";
+
+import { StatusCodeEnum } from "../types/enums/status-code";
+
 export class AccessUseCaseImplementation implements AccessUseCase {
 	public constructor(
 		private readonly accessRepository: AccessRepository,
@@ -25,7 +29,10 @@ export class AccessUseCaseImplementation implements AccessUseCase {
 		const access = await this.accessRepository.get(p);
 
 		if (!access) {
-			throw new Error("User doesn't have access to this content");
+			throw new CustomError(
+				"User doesn't have access to this content",
+				StatusCodeEnum.UNAUTHORIZED,
+			);
 		}
 
 		return access;

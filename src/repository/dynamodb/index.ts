@@ -123,7 +123,9 @@ export abstract class DynamodbRepository<TableType, EntityType> {
 		const expressionAttributeNames = {} as Record<string, string>;
 		const expressionAttributeValues = {} as Record<string, any>;
 
-		Object.entries(d).forEach(([key, value]) => {
+		const tableData = this.entityToTable(d as any);
+
+		Object.entries(tableData as any).forEach(([key, value]) => {
 			// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 			const randomKey = uid(4);
 			updateExpression.push(`#${randomKey} = :${randomKey}`);
@@ -149,7 +151,7 @@ export abstract class DynamodbRepository<TableType, EntityType> {
 
 	// Abstract Methods
 
-	protected abstract entityToTable(i: EntityType): TableType;
+	protected abstract entityToTable(i: Partial<EntityType>): Partial<TableType>;
 
 	protected abstract tableToEntity(i: TableType): EntityType;
 }

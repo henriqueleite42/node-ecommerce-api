@@ -7,9 +7,9 @@ import { QueueManager } from "../../providers/queue-manager";
 
 export class SQSProvider<D, U> extends QueueManager<D, U> {
 	public setFunc(func: SetFunc<D, U>) {
-		this.func = async ({ event }) => {
+		this.func = async event => {
 			try {
-				const data = this.getSnsMessage(event);
+				const data = this.getData(event);
 
 				const serviceInstance = this.service?.getInstance();
 
@@ -18,7 +18,7 @@ export class SQSProvider<D, U> extends QueueManager<D, U> {
 					service: serviceInstance,
 				});
 			} catch (err: any) {
-				//
+				console.error(err);
 			}
 		};
 
@@ -57,7 +57,7 @@ export class SQSProvider<D, U> extends QueueManager<D, U> {
 
 		const parsedJson = JSON.parse(event.Records[0].body);
 
-		return JSON.parse(parsedJson) as D;
+		return parsedJson as D;
 	}
 
 	protected getSnsMessage(event?: SQSEvent) {

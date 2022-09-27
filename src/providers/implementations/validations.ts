@@ -15,15 +15,32 @@ import type { Validations as ValidationsType } from "../../providers/validator";
 
 import { ValidatorProvider } from "./validator";
 
+import { CustomError } from "../../utils/error";
+
 import { DeliveryMethodEnum } from "../../types/enums/delivery-method";
 import { MediaTypeEnum } from "../../types/enums/media-type";
 import { PaymentMethodEnum } from "../../types/enums/payment-method";
 import { ProductTypeEnum } from "../../types/enums/product-type";
+import { StatusCodeEnum } from "../../types/enums/status-code";
 
 export class Validations {
 	public static required(key: string, p?: any) {
 		if (!p) {
-			throw new Error(`${key} is a required field`);
+			throw new CustomError(
+				`${key} is a required field`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+	}
+
+	public static string(key: string, p?: any) {
+		if (!p) return p;
+
+		if (typeof p !== "string") {
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 	}
 
@@ -31,7 +48,10 @@ export class Validations {
 		if (!p) return;
 
 		if (p < 1 || p > 100) {
-			throw new Error(`${key} must be between 1 and 100`);
+			throw new CustomError(
+				`${key} must be between 1 and 100`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 	}
 
@@ -39,7 +59,10 @@ export class Validations {
 		if (!p) return;
 
 		if (!/^{.*}$/.test(p)) {
-			throw new Error(`${key} must be a valid cursor`);
+			throw new CustomError(
+				`${key} must be a valid cursor`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 	}
 
@@ -48,7 +71,10 @@ export class Validations {
 			if (!p) return;
 
 			if (p.length < minLength) {
-				throw new Error(`${key} must have a length of at least ${minLength}`);
+				throw new CustomError(
+					`${key} must have a length of at least ${minLength}`,
+					StatusCodeEnum.BAD_REQUEST,
+				);
 			}
 		};
 	}
@@ -58,7 +84,10 @@ export class Validations {
 			if (!p) return;
 
 			if (p.length > maxLength) {
-				throw new Error(`${key} must have a length of at least ${maxLength}`);
+				throw new CustomError(
+					`${key} must have a length of at least ${maxLength}`,
+					StatusCodeEnum.BAD_REQUEST,
+				);
 			}
 		};
 	}
@@ -67,7 +96,10 @@ export class Validations {
 		if (!p) return;
 
 		if (!Array.isArray(p)) {
-			throw new Error(`${key} must be an array`);
+			throw new CustomError(
+				`${key} must be an array`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 	}
 
@@ -82,7 +114,10 @@ export class Validations {
 					validator.validate(v);
 				});
 			} catch (err: any) {
-				throw new Error(`${key}.${err.message}`);
+				throw new CustomError(
+					`${key}.${err.message}`,
+					StatusCodeEnum.BAD_REQUEST,
+				);
 			}
 		};
 	}
@@ -94,7 +129,10 @@ export class Validations {
 			try {
 				new ValidatorProvider(vArr as any).validate(p);
 			} catch (err: any) {
-				throw new Error(`${key}.${err.message}`);
+				throw new CustomError(
+					`${key}.${err.message}`,
+					StatusCodeEnum.BAD_REQUEST,
+				);
 			}
 		};
 	}
@@ -106,10 +144,11 @@ export class Validations {
 			const values = prop ? p?.map((v: any) => v?.[prop]) : p;
 
 			if (getArrayUniqueValues(values).length !== p?.length) {
-				throw new Error(
+				throw new CustomError(
 					prop
 						? `${key}.${prop} must have unique values`
 						: `${key} must have unique values`,
+					StatusCodeEnum.BAD_REQUEST,
 				);
 			}
 		};
@@ -121,11 +160,17 @@ export class Validations {
 		if (!p) return;
 
 		if (typeof p !== "string") {
-			throw new Error(`${key} must be a string`);
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 
 		if (!/^\d{18}$/.test(p)) {
-			throw new Error(`${key} must be a string`);
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 	}
 
@@ -135,11 +180,17 @@ export class Validations {
 		if (!p) return;
 
 		if (typeof p !== "string") {
-			throw new Error(`${key} must be a string`);
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 
 		if (!/^[a-z0-9-]{1,16}$/i.test(p)) {
-			throw new Error(`${key} must be a valid code`);
+			throw new CustomError(
+				`${key} must be a valid code`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 	}
 
@@ -147,11 +198,17 @@ export class Validations {
 		if (!p) return;
 
 		if (typeof p !== "string") {
-			throw new Error(`${key} must be a string`);
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 
 		if (!/^a-z0-9{6}$/i.test(p)) {
-			throw new Error(`${key} must be a valid code`);
+			throw new CustomError(
+				`${key} must be a valid code`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 	}
 
@@ -159,13 +216,19 @@ export class Validations {
 		if (!p) return;
 
 		if (typeof p !== "string") {
-			throw new Error(`${key} must be a string`);
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 
 		const values = getEnumValues(DeliveryMethodEnum);
 
 		if (!values.includes(p)) {
-			throw new Error(`${key} must be in: ${values.map(v => `'${v}'`)}`);
+			throw new CustomError(
+				`${key} must be in: ${values.map(v => `'${v}'`)}`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 	}
 
@@ -173,13 +236,19 @@ export class Validations {
 		if (!p) return;
 
 		if (typeof p !== "string") {
-			throw new Error(`${key} must be a string`);
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 
 		const values = getEnumValues(ProductTypeEnum);
 
 		if (!values.includes(p)) {
-			throw new Error(`${key} must be in: ${values.map(v => `'${v}'`)}`);
+			throw new CustomError(
+				`${key} must be in: ${values.map(v => `'${v}'`)}`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 	}
 
@@ -187,11 +256,17 @@ export class Validations {
 		if (!p) return;
 
 		if (typeof p !== "string") {
-			throw new Error(`${key} must be a string`);
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 
 		if (p.length < 1 || p.length > 100) {
-			throw new Error(`${key} must have a length between 1 and 100`);
+			throw new CustomError(
+				`${key} must have a length between 1 and 100`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 	}
 
@@ -199,11 +274,17 @@ export class Validations {
 		if (!p) return;
 
 		if (typeof p !== "string") {
-			throw new Error(`${key} must be a string`);
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 
 		if (p.length < 1 || p.length > 1000) {
-			throw new Error(`${key} must have a length between 1 and 100`);
+			throw new CustomError(
+				`${key} must have a length between 1 and 100`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 	}
 
@@ -211,11 +292,17 @@ export class Validations {
 		if (!p) return;
 
 		if (typeof p !== "string") {
-			throw new Error(`${key} must be a string`);
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 
 		if (p.length < 1 || p.length > 50) {
-			throw new Error(`${key} must have a length between 1 and 100`);
+			throw new CustomError(
+				`${key} must have a length between 1 and 100`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 	}
 
@@ -223,11 +310,17 @@ export class Validations {
 		if (!p) return;
 
 		if (typeof p !== "string") {
-			throw new Error(`${key} must be a string`);
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 
 		if (p.length < 1 || p.length > 500) {
-			throw new Error(`${key} must have a length between 1 and 100`);
+			throw new CustomError(
+				`${key} must have a length between 1 and 100`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 	}
 
@@ -235,13 +328,19 @@ export class Validations {
 		if (!p) return;
 
 		if (typeof p !== "string") {
-			throw new Error(`${key} must be a string`);
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 
 		const values = getEnumValues(MediaTypeEnum);
 
 		if (!values.includes(p)) {
-			throw new Error(`${key} must be in: ${values.map(v => `'${v}'`)}`);
+			throw new CustomError(
+				`${key} must be in: ${values.map(v => `'${v}'`)}`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 	}
 
@@ -249,13 +348,19 @@ export class Validations {
 		if (!p) return;
 
 		if (typeof p !== "string") {
-			throw new Error(`${key} must be a string`);
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 
 		const values = getEnumValues(PaymentMethodEnum);
 
 		if (!values.includes(p)) {
-			throw new Error(`${key} must be in: ${values.map(v => `'${v}'`)}`);
+			throw new CustomError(
+				`${key} must be in: ${values.map(v => `'${v}'`)}`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 	}
 
@@ -263,11 +368,17 @@ export class Validations {
 		if (!p) return;
 
 		if (typeof p !== "string") {
-			throw new Error(`${key} must be a string`);
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 
 		if (!isCpf(p) && !isCnpj(p) && !isEmail(p) && !isBrazilianPhone(p)) {
-			throw new Error(`${key} must be a valid pix key`);
+			throw new CustomError(
+				`${key} must be a valid pix key`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 	}
 
@@ -275,11 +386,17 @@ export class Validations {
 		if (!p) return;
 
 		if (typeof p !== "string") {
-			throw new Error(`${key} must be a string`);
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 
 		if (!p.startsWith("DISCORD#")) {
-			throw new Error(`${key} must be a valid origin`);
+			throw new CustomError(
+				`${key} must be a valid origin`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 	}
 	// Diversified
@@ -288,11 +405,17 @@ export class Validations {
 		if (!p) return;
 
 		if (typeof p !== "string") {
-			throw new Error(`${key} must be a string`);
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 
 		if (!validate(p)) {
-			throw new Error(`${key} must be a valid uuid`);
+			throw new CustomError(
+				`${key} must be a valid uuid`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 	}
 
@@ -300,11 +423,17 @@ export class Validations {
 		if (!p) return;
 
 		if (typeof p !== "string") {
-			throw new Error(`${key} must be a string`);
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 
-		if (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(p)) {
-			throw new Error(`${key} must be a valid hex color`);
+		if (!/^#[A-Fa-f0-9]{6}$/.test(p)) {
+			throw new CustomError(
+				`${key} must be a valid hex color`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 	}
 
@@ -312,11 +441,17 @@ export class Validations {
 		if (!p) return;
 
 		if (typeof p !== "string") {
-			throw new Error(`${key} must be a string`);
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 
 		if (!isUrl(p)) {
-			throw new Error(`${key} must be a valid url`);
+			throw new CustomError(
+				`${key} must be a valid url`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 	}
 
@@ -324,7 +459,10 @@ export class Validations {
 		if (!p) return;
 
 		if (typeof p !== "number") {
-			throw new Error(`${key} must be a number`);
+			throw new CustomError(
+				`${key} must be a number`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 
 		const priceText = p.toFixed(2);
@@ -333,7 +471,10 @@ export class Validations {
 
 		// Validates if the number has more than 2 decimal
 		if (isNaN(nbrFloat) || nbrFloat !== p) {
-			throw new Error(`${key} must be a valid money amount`);
+			throw new CustomError(
+				`${key} must be a valid money amount`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 	}
 
@@ -344,11 +485,17 @@ export class Validations {
 			if (!p) return;
 
 			if (typeof p !== "number") {
-				throw new Error(`${key} must be a number`);
+				throw new CustomError(
+					`${key} must be a number`,
+					StatusCodeEnum.BAD_REQUEST,
+				);
 			}
 
 			if (p < min) {
-				throw new Error(`${key} must be at least ${min}`);
+				throw new CustomError(
+					`${key} must be at least ${min}`,
+					StatusCodeEnum.BAD_REQUEST,
+				);
 			}
 		};
 	}
@@ -358,11 +505,17 @@ export class Validations {
 			if (!p) return;
 
 			if (typeof p !== "number") {
-				throw new Error(`${key} must be a number`);
+				throw new CustomError(
+					`${key} must be a number`,
+					StatusCodeEnum.BAD_REQUEST,
+				);
 			}
 
 			if (p > max) {
-				throw new Error(`${key} must be at most ${max}`);
+				throw new CustomError(
+					`${key} must be at most ${max}`,
+					StatusCodeEnum.BAD_REQUEST,
+				);
 			}
 		};
 	}

@@ -34,8 +34,8 @@ export class SQSAdapter implements QueueManager {
 
 		await this.sqs.send(
 			new SendMessageCommand({
-				QueueUrl: "",
-				MessageBody: JSON.stringify(p),
+				QueueUrl: p.to,
+				MessageBody: JSON.stringify(p.message),
 				MessageAttributes: p.metadata ? metadata : undefined,
 			}),
 		);

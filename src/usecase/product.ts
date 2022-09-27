@@ -13,9 +13,12 @@ import type {
 } from "../models/product";
 import type { UploadManager } from "../providers/upload-manager";
 
+import { CustomError } from "../utils/error";
+
 import { isAutomaticDelivery } from "../types/enums/delivery-method";
 import { MediaTypeEnum } from "../types/enums/media-type";
 import { isPreMadeProduct } from "../types/enums/product-type";
+import { StatusCodeEnum } from "../types/enums/status-code";
 
 export class ProductUseCaseImplementation implements ProductUseCase {
 	public constructor(
@@ -27,11 +30,17 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 
 	public async create({ imageUrl, ...p }: CreateProductInput) {
 		if (p.variations && p.price) {
-			throw new Error("PRICE_CONFLICT");
+			throw new CustomError(
+				"The product cannot have a prive if it has variations",
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 
 		if (!isPreMadeProduct(p.type) && isAutomaticDelivery(p.deliveryMethod)) {
-			throw new Error("INVALID_DELIVERY_METHOD");
+			throw new CustomError(
+				"A custom product cannot have an automatic delivery method",
+				StatusCodeEnum.BAD_REQUEST,
+			);
 		}
 
 		const product = await this.productRepository.create(p);
@@ -39,7 +48,8 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 		if (imageUrl) {
 			await this.uploadManager.uploadFromUrl({
 				queueToNotify: process.env.UPDATE_IMG_QUEUE_URL!,
-				type: "PRODUCT",
+				folder: process.env.MEDIA_BUCKET_NAME!,
+				fileName: `${p.storeId}/${product.productId}`,
 				id: {
 					storeId: product.storeId,
 					productId: product.productId,
@@ -66,13 +76,14 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 			: this.productRepository.edit(p));
 
 		if (!product) {
-			throw new Error("NOT_FOUND");
+			throw new CustomError("Not found", StatusCodeEnum.NOT_FOUND);
 		}
 
 		if (imageUrl) {
 			await this.uploadManager.uploadFromUrlBackground({
 				queueToNotify: process.env.UPDATE_IMG_QUEUE_URL!,
-				type: "PRODUCT",
+				folder: process.env.MEDIA_BUCKET_NAME!,
+				fileName: `${p.storeId}/${p.productId}`,
 				id: {
 					storeId: p.storeId,
 					productId: p.productId,
@@ -93,7 +104,7 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 		const store = await this.productRepository.getById(p);
 
 		if (!store) {
-			throw new Error("NOT_FOUND");
+			throw new CustomError("Not found", StatusCodeEnum.NOT_FOUND);
 		}
 
 		return store;

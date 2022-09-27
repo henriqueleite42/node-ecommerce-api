@@ -2,15 +2,13 @@ import type { Callback, Context, SQSEvent } from "aws-lambda";
 
 import { DeliveryManager } from "./delivery-manager";
 
-interface RouteInput {
-	event: SQSEvent;
-	context: Context;
-	callback: Callback;
-}
-
 type RouteOutput = void;
 
-type Func = (p: RouteInput) => RouteOutput;
+type Func = (
+	event: SQSEvent,
+	context: Context,
+	callback: Callback,
+) => RouteOutput;
 
 interface Config {
 	from: "QUEUE" | "TOPIC";

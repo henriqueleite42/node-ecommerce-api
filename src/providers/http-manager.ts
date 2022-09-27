@@ -40,5 +40,9 @@ export abstract class HttpManager<U, I> extends DeliveryManager<
 		return this;
 	}
 
+	protected getAuthHeader(headers?: Record<string, any>) {
+		return headers?.authorization || headers?.Authorization || "";
+	}
+
 	public abstract setFunc(p: keyof U): this;
 }

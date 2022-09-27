@@ -117,6 +117,9 @@ const contentConfig = {
 			UPDATE_RAW_IMG_QUEUE_URL: {
 				Ref: "UpdateRawImgQueue"
 			},
+			RAW_MEDIA_BUCKET_NAME: {
+				Ref: "RawMediaStorage"
+			},
 		}
 	},
 	resources: resourcesContent,
@@ -144,6 +147,20 @@ const productConfig = {
 			},
 			UPDATE_IMG_QUEUE_URL: {
 				Ref: "UpdateImgQueue"
+			},
+			IMAGES_PREFIX_URL: {
+				"Fn::Join": [
+					"",
+					[
+						"https://",
+						{
+							"Fn::GetAtt": ["MediaStorageCloudFront", "DomainName"],
+						}
+					]
+				]
+			},
+			MEDIA_BUCKET_NAME: {
+				Ref: "MediaStorage"
 			},
 		}
 	},
@@ -179,8 +196,31 @@ const storeConfig = {
 	],
 	provider: {
 		environment: {
+			UPLOAD_FROM_URL_QUEUE_URL: {
+				"Fn::ImportValue": "upload-${opt:stage, 'local'}:UploadFromUrlQueueUrl",
+			},
 			STORE_CREATED_TOPIC_ARN: {
 				Ref: "StoreCreatedTopic"
+			},
+			UPDATE_AVATAR_QUEUE_URL: {
+				Ref: "UpdateAvatarQueue"
+			},
+			UPDATE_BANNER_QUEUE_URL: {
+				Ref: "UpdateBannerQueue"
+			},
+			IMAGES_PREFIX_URL: {
+				"Fn::Join": [
+					"",
+					[
+						"https://",
+						{
+							"Fn::GetAtt": ["MediaStorageCloudFront", "DomainName"],
+						}
+					]
+				]
+			},
+			MEDIA_BUCKET_NAME: {
+				Ref: "MediaStorage"
 			},
 		}
 	},

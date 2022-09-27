@@ -19,7 +19,8 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 			contents.map((c, idx) =>
 				this.uploadManager.uploadFromUrlBackground({
 					queueToNotify: process.env.UPDATE_RAW_IMG_QUEUE_URL!,
-					type: "CONTENT",
+					folder: process.env.RAW_MEDIA_BUCKET_NAME!,
+					fileName: `${c.storeId}/${c.productId}/${c.contentId}`,
 					id: {
 						storeId: c.storeId,
 						productId: c.productId,

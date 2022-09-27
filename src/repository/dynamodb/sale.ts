@@ -151,20 +151,23 @@ export class SaleRepositoryDynamoDB
 
 	// Mappers
 
-	protected entityToTable(entity: SaleEntity): SaleTable {
+	protected entityToTable(entity: Partial<SaleEntity>): Partial<SaleTable> {
 		return cleanObj({
-			saleId: `SALE#${entity.saleId}`,
-			storeId: `ACCOUNT#${entity.storeId}`,
-			clientId: `ACCOUNT#${entity.clientId}`,
+			saleId: entity.saleId ? `SALE#${entity.saleId}` : undefined,
+			storeId: entity.storeId ? `ACCOUNT#${entity.storeId}` : undefined,
+			clientId: entity.clientId ? `ACCOUNT#${entity.clientId}` : undefined,
 			origin: entity.origin,
 			status: entity.status,
 			products: entity.products,
 			finalPrice: entity.finalPrice,
-			createdAt: entity.createdAt.toISOString(),
+			createdAt: entity.createdAt?.toISOString(),
 
-			status_createdAt: `STATUS#${
-				entity.status
-			}#CREATED_AT#${entity.createdAt.toISOString()}`,
+			status_createdAt:
+				entity.status && entity.createdAt
+					? `STATUS#${
+							entity.status
+					  }#CREATED_AT#${entity.createdAt.toISOString()}`
+					: undefined,
 		});
 	}
 

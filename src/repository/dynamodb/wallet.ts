@@ -124,9 +124,9 @@ export class WalletRepositoryDynamoDB
 
 	// Mappers
 
-	protected entityToTable(entity: WalletEntity): WalletTable {
+	protected entityToTable(entity: Partial<WalletEntity>): Partial<WalletTable> {
 		return cleanObj({
-			accountId: `ACCOUNT#${entity.accountId}`,
+			accountId: entity.accountId ? `ACCOUNT#${entity.accountId}` : undefined,
 			balance: entity.balance,
 			withdrawalMethods: entity.withdrawalMethods,
 		});

@@ -8,7 +8,7 @@ export interface SaveFileInput {
 }
 
 export interface SaveFileOutput {
-	fileUrl: string;
+	filePath: string;
 }
 
 export interface FileManager {

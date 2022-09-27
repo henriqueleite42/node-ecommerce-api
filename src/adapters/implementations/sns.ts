@@ -34,8 +34,8 @@ export class SNSAdapter implements TopicManager {
 
 		await this.sns.send(
 			new PublishCommand({
-				TopicArn: "",
-				Message: JSON.stringify(p),
+				TopicArn: p.to,
+				Message: JSON.stringify(p.message),
 				MessageAttributes: p.metadata ? metadata : undefined,
 			}),
 		);
