@@ -7,17 +7,14 @@
  */
 
 import { AccountService } from "../../../factories/account";
-import type {
-	AccountUseCase,
-	GetByDiscordIdOutput,
-} from "../../../models/account";
+import type { AccountUseCase, AccountEntity } from "../../../models/account";
 import { AuthManagerProvider } from "../../../providers/implementations/auth-manager";
 import { LambdaProvider } from "../../../providers/implementations/lambda";
 import { Validations } from "../../../providers/implementations/validations";
 import { ValidatorProvider } from "../../../providers/implementations/validator";
 
-const httpManager = new LambdaProvider<AccountUseCase, GetByDiscordIdOutput>({
-	method: "POST",
+const httpManager = new LambdaProvider<AccountUseCase, AccountEntity>({
+	method: "GET",
 	path: "accounts/discord/{discordId}",
 })
 	.setAuth(new AuthManagerProvider(["BOT"]))
@@ -25,7 +22,7 @@ const httpManager = new LambdaProvider<AccountUseCase, GetByDiscordIdOutput>({
 		new ValidatorProvider([
 			{
 				key: "discordId",
-				loc: "query",
+				loc: "path",
 				validations: [Validations.required, Validations.discordId],
 			},
 		]),

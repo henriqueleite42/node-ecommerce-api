@@ -3,7 +3,6 @@ import type { CounterRepository } from "../models/counters";
 import type {
 	CreateInput,
 	EditInput,
-	GetAllFromAccountInput,
 	GetByNameInput,
 	IncreaseSalesCountInput,
 	IncreaseTotalBilledInput,
@@ -51,10 +50,6 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 		}
 
 		return store;
-	}
-
-	public getAllFromAccount(p: GetAllFromAccountInput) {
-		return this.storeRepository.getAllFromAccount(p);
 	}
 
 	public async getByName(p: GetByNameInput) {

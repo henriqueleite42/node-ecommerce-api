@@ -29,11 +29,6 @@ const httpManager = new LambdaProvider<StoreUseCase, EditInput>({
 				validations: [Validations.required, Validations.uuid],
 			},
 			{
-				key: "accountId",
-				loc: "auth",
-				validations: [Validations.required, Validations.uuid],
-			},
-			{
 				key: "description",
 				loc: "body",
 				validations: [Validations.maxLength(500)],

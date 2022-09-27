@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import type { AxiosInstance } from "axios";
+import {
+	SecretsManagerClient,
+	GetSecretValueCommand,
+} from "@aws-sdk/client-secrets-manager";
 import axios from "axios";
 import { Agent } from "https";
 
@@ -40,7 +43,9 @@ interface ApiQrCodeResponse {
 }
 
 export class GerenciarnetManager implements PixManager {
-	private readonly gerencianet: AxiosInstance;
+	private httpsAgent: Agent;
+
+	private secrets: Record<string, string>;
 
 	private readonly credentials: {
 		accessToken: string;
@@ -49,38 +54,49 @@ export class GerenciarnetManager implements PixManager {
 
 	private readonly pixExpirationInSeconds = 900;
 
-	public constructor() {
-		const httpsAgent = new Agent({
-			rejectUnauthorized: true,
-			cert: process.env.GERENCIANET_CERTIFICATE_CERT,
-			key: process.env.GERENCIANET_CERTIFICATE_KEY,
-		});
-
-		this.gerencianet = axios.create({
-			baseURL: process.env.GERENCIANET_URL,
-			httpsAgent,
-			headers: {
-				"Content-Type": "application/json",
-			},
-		});
-	}
-
 	private async getCredentials() {
+		if (!this.httpsAgent) {
+			const secretManager = new SecretsManagerClient({});
+
+			this.secrets = await secretManager
+				.send(
+					new GetSecretValueCommand({
+						SecretId: "monetizzer/Gerencianet",
+					}),
+				)
+				.then(r => JSON.parse(r.SecretString!));
+
+			this.httpsAgent = new Agent({
+				rejectUnauthorized: true,
+				cert: this.secrets.GERENCIANET_CERTIFICATE_CERT,
+				key: this.secrets.GERENCIANET_CERTIFICATE_KEY,
+			});
+		}
+
 		if (new Date().getTime() < this.credentials.expiresAt) {
-			return this.credentials.accessToken;
+			return axios.create({
+				baseURL: this.secrets.GERENCIANET_URL,
+				httpsAgent: this.httpsAgent,
+				headers: {
+					"Content-Type": "application/json",
+					"Authorization": `Bearer ${this.credentials.accessToken}`,
+				},
+			});
 		}
 
 		const auth = Buffer.from(
-			`${process.env.GERENCIANET_CLIENT_ID}:${process.env.GERENCIANET_CLIENT_SECRET}`,
+			`${this.secrets.GERENCIANET_CLIENT_ID}:${this.secrets.GERENCIANET_CLIENT_SECRET}`,
 		).toString("base64");
 
-		const response = await this.gerencianet
+		const response = await axios
 			.post<ApiCredentialsResponse>(
 				"/oauth/token",
 				{
 					grant_type: "client_credentials",
 				},
 				{
+					baseURL: this.secrets.GERENCIANET_URL,
+					httpsAgent: this.httpsAgent,
 					headers: {
 						Authorization: `Basic ${auth}`,
 					},
@@ -92,45 +108,37 @@ export class GerenciarnetManager implements PixManager {
 		this.credentials.expiresAt =
 			new Date().getTime() + response.expires_in - 150;
 
-		return this.credentials.accessToken;
+		return axios.create({
+			baseURL: this.secrets.GERENCIANET_URL,
+			httpsAgent: this.httpsAgent,
+			headers: {
+				"Content-Type": "application/json",
+				"Authorization": `Bearer ${this.credentials.accessToken}`,
+			},
+		});
 	}
 
 	public async createPix({ value, saleId }: CreatePixInput) {
-		const accessToken = await this.getCredentials();
+		const instance = await this.getCredentials();
 
 		const valueString = String(value).includes(".")
 			? String(value)
 			: `${value}.00`;
 
-		const responseCob = await this.gerencianet
-			.put<ApiCobResponse>(
-				`/v2/cob/${saleId.replace(/-/g, "")}`,
-				{
-					calendario: {
-						expiracao: this.pixExpirationInSeconds,
-					},
-					valor: {
-						original: valueString,
-					},
-					chave: process.env.GERENCIANET_PIX_KEY,
+		const responseCob = await instance
+			.put<ApiCobResponse>(`/v2/cob/${saleId.replace(/-/g, "")}`, {
+				calendario: {
+					expiracao: this.pixExpirationInSeconds,
 				},
-				{
-					headers: {
-						Authorization: `Bearer ${accessToken}`,
-					},
+				valor: {
+					original: valueString,
 				},
-			)
+				chave: this.secrets.GERENCIANET_PIX_KEY,
+			})
 			.then(r => r.data);
 
 		const responseQrCode = await axios
-			.get<ApiQrCodeResponse>(
-				`${process.env.GERENCIANET_URL!}/v2/loc/${responseCob.loc.id}/qrcode`,
-				{
-					headers: {
-						Authorization: `Bearer ${accessToken}`,
-					},
-				},
-			)
+			.get<ApiQrCodeResponse>(`/v2/loc/${responseCob.loc.id}/qrcode`)
 			.then(r => r.data);
 
 		return {

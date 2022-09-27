@@ -1,5 +1,3 @@
-import type { PaginatedItems } from "./types";
-
 export interface StoreEntity {
 	storeId: string; // Same as accountId
 	accountId: string;
@@ -19,15 +17,13 @@ export interface StoreEntity {
  *
  */
 
-export type CreateInput = Omit<StoreEntity, "createdAt" | "storeId">;
+export interface CreateInput
+	extends Omit<StoreEntity, "createdAt" | "storeId"> {
+	accountId: string;
+}
 
 export type EditInput = Partial<Omit<StoreEntity, "createdAt" | "name">> &
-	Pick<StoreEntity, "accountId" | "storeId">;
-
-export interface GetAllFromAccountInput extends Pick<StoreEntity, "accountId"> {
-	limit: number;
-	continueFrom?: string;
-}
+	Pick<StoreEntity, "storeId">;
 
 export type GetByIdInput = Pick<StoreEntity, "storeId">;
 
@@ -39,10 +35,6 @@ export interface StoreRepository {
 	create: (p: CreateInput) => Promise<StoreEntity>;
 
 	edit: (p: EditInput) => Promise<StoreEntity | null>;
-
-	getAllFromAccount: (
-		p: GetAllFromAccountInput,
-	) => Promise<PaginatedItems<StoreEntity>>;
 
 	getById: (p: GetByIdInput) => Promise<StoreEntity | null>;
 
@@ -72,10 +64,6 @@ export interface StoreUseCase {
 	create: (p: CreateInput) => Promise<StoreEntity>;
 
 	edit: (p: EditInput) => Promise<StoreEntity>;
-
-	getAllFromAccount: (
-		p: GetAllFromAccountInput,
-	) => Promise<PaginatedItems<StoreEntity>>;
 
 	getByName: (p: GetByNameInput) => Promise<StoreEntity>;
 

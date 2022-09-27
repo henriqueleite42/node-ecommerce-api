@@ -1,5 +1,3 @@
-import type { StoreEntity } from "./store";
-
 export interface AccountEntity {
 	accountId: string;
 	discordId: string;
@@ -32,12 +30,12 @@ export interface AccountRepository {
  *
  */
 
-export interface GetByDiscordIdOutput extends AccountEntity {
-	stores: Array<StoreEntity>;
+export interface GetByDiscordIdInput {
+	discordId: string;
 }
 
 export interface AccountUseCase {
 	createWithDiscordId: (p: CreateWithDiscordIdInput) => Promise<AccountEntity>;
 
-	getByDiscordId: (discordId: string) => Promise<GetByDiscordIdOutput>;
+	getByDiscordId: (p: GetByDiscordIdInput) => Promise<AccountEntity>;
 }

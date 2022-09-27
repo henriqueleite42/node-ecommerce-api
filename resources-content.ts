@@ -1,5 +1,10 @@
 import type { AWS } from "@serverless/typescript";
 
+const PROVISIONED_THROUGHPUT_CONTENTS = {
+	ReadCapacityUnits: 3,
+	WriteCapacityUnits: 1,
+};
+
 export const resourcesContent: AWS["resources"] = {
 	Resources: {
 		ContentDynamoDBTable: {
@@ -8,10 +13,7 @@ export const resourcesContent: AWS["resources"] = {
 			Type: "AWS::DynamoDB::Table",
 			Properties: {
 				TableName: "contents",
-				ProvisionedThroughput: {
-					ReadCapacityUnits: 3,
-					WriteCapacityUnits: 1,
-				},
+				ProvisionedThroughput: PROVISIONED_THROUGHPUT_CONTENTS,
 				AttributeDefinitions: [
 					{
 						AttributeName: "storeId_productId_contentId",
@@ -42,9 +44,13 @@ export const resourcesContent: AWS["resources"] = {
 							},
 							{
 								AttributeName: "createdAt_contentId",
-								KeyType: "SORT",
+								KeyType: "RANGE",
 							},
 						],
+						Projection: {
+							ProjectionType: "ALL"
+						},
+						ProvisionedThroughput: PROVISIONED_THROUGHPUT_CONTENTS,
 					},
 				],
 			},
@@ -53,7 +59,7 @@ export const resourcesContent: AWS["resources"] = {
 			Type: "AWS::SQS::Queue",
 			Properties: {
 				QueueName:
-					"${self:service}-${opt:stage, 'dev'}-update-raw-img",
+					"${self:service}-${opt:stage, 'local'}-update-raw-img",
 			},
 		},
 	},

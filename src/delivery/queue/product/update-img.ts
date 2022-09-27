@@ -13,7 +13,7 @@ import type { FileUploadedMsg } from "../../../providers/upload-manager";
 
 const sqsManager = new SQSProvider<FileUploadedMsg, ProductUseCase>({
 	from: "QUEUE",
-	queue: "UpdateImage",
+	queue: "UpdateImg",
 }).setService(new ProductService());
 
 /**

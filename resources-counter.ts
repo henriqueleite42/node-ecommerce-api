@@ -1,5 +1,10 @@
 import type { AWS } from "@serverless/typescript";
 
+const PROVISIONED_THROUGHPUT_COUNTERS = {
+	ReadCapacityUnits: 3,
+	WriteCapacityUnits: 1,
+};
+
 export const resourcesCounter: AWS["resources"] = {
 	Resources: {
 		CounterDynamoDBTable: {
@@ -8,10 +13,7 @@ export const resourcesCounter: AWS["resources"] = {
 			Type: "AWS::DynamoDB::Table",
 			Properties: {
 				TableName: "counters",
-				ProvisionedThroughput: {
-					ReadCapacityUnits: 3,
-					WriteCapacityUnits: 1,
-				},
+				ProvisionedThroughput: PROVISIONED_THROUGHPUT_COUNTERS,
 				AttributeDefinitions: [
 					{
 						AttributeName: "pk",
@@ -38,9 +40,13 @@ export const resourcesCounter: AWS["resources"] = {
 							},
 							{
 								AttributeName: "counter",
-								KeyType: "SORT",
+								KeyType: "RANGE",
 							},
 						],
+						Projection: {
+							ProjectionType: "ALL"
+						},
+						ProvisionedThroughput: PROVISIONED_THROUGHPUT_COUNTERS,
 					},
 				],
 			},

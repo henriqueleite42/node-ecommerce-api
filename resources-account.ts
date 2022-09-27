@@ -1,5 +1,10 @@
 import type { AWS } from "@serverless/typescript";
 
+const PROVISIONED_THROUGHPUT_ACCOUNTS = {
+	ReadCapacityUnits: 3,
+	WriteCapacityUnits: 1,
+};
+
 export const resourcesAccount: AWS["resources"] = {
 	Resources: {
 		AccountDynamoDBTable: {
@@ -8,10 +13,7 @@ export const resourcesAccount: AWS["resources"] = {
 			Type: "AWS::DynamoDB::Table",
 			Properties: {
 				TableName: "accounts",
-				ProvisionedThroughput: {
-					ReadCapacityUnits: 3,
-					WriteCapacityUnits: 1,
-				},
+				ProvisionedThroughput: PROVISIONED_THROUGHPUT_ACCOUNTS,
 				AttributeDefinitions: [
 					{
 						AttributeName: "accountId",
@@ -30,13 +32,17 @@ export const resourcesAccount: AWS["resources"] = {
 				],
 				GlobalSecondaryIndexes: [
 					{
-						IndexName: "discordId",
+						IndexName: "DiscordId",
 						KeySchema: [
 							{
 								AttributeName: "discordId",
 								KeyType: "HASH",
 							},
 						],
+						Projection: {
+							ProjectionType: "ALL"
+						},
+						ProvisionedThroughput: PROVISIONED_THROUGHPUT_ACCOUNTS,
 					}
 				],
 			},

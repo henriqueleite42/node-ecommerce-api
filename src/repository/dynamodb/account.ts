@@ -47,14 +47,15 @@ export class AccountRepositoryDynamoDB
 	}
 
 	public getByDiscordId(discordId: string) {
-		return this.getSingleItem(this.indexDiscordId({ discordId }));
+		const index = this.indexDiscordId({ discordId });
+
+		return this.getSingleItem(index);
 	}
 
 	// Keys
 
 	private indexAccountId({ accountId }: Pick<AccountEntity, "accountId">) {
 		return {
-			IndexName: "AccountId",
 			KeyConditionExpression: "#accountId = :accountId",
 			ExpressionAttributeNames: {
 				"#accountId": "accountId",

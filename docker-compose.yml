@@ -21,7 +21,7 @@ services:
       - "127.0.0.1:4510-4559:4510-4559" # external services port range
     environment:
       AWS_DEFAULT_REGION: us-east-1
-      SERVICES: lambda,cloudformation,apigateway,iam,s3,sqs,sns,ssm,dynamodb
+      SERVICES: lambda,cloudformation,apigateway,iam,s3,sqs,sns,ssm,dynamodb,sts
       DATA_DIR: /var/lib/localstack/data
       LAMBDA_EXECUTOR: docker
       DOCKER_HOST: unix:///var/run/docker.sock
@@ -29,7 +29,7 @@ services:
       EDGE_PORT: 4566
       DEBUG: 1
     volumes:
-      - "./tmp:/var/lib/localstack"
+      - localstack:/var/lib/localstack
       - "/var/run/docker.sock:/var/run/docker.sock"
     networks:
       - maite-api_network
@@ -53,6 +53,7 @@ services:
 volumes:
   database-data:
   nodemodules:
+  localstack:
 
 networks:
   maite-api_network:

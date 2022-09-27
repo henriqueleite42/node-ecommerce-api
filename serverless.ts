@@ -22,16 +22,12 @@ import { upload } from "./src/delivery/upload";
 import { wallet } from "./src/delivery/wallet";
 
 // You need to change this if you changed the one at docker-events-listener-build/listen-docker-events.sh
-const SERVICE_NAME = "monetizzer"
+const SERVICE_NAME = "monetizzer";
 
 config();
 
 const baseConfig: Partial<AWS> = {
 	configValidationMode: "error",
-	plugins: [
-		"serverless-webpack",
-		"serverless-localstack",
-	],
 	frameworkVersion: "3",
 	useDotenv: true,
 	package: {
@@ -50,7 +46,7 @@ const baseConfig: Partial<AWS> = {
 	},
 	provider: {
 		name: "aws",
-		region: "${self:custom.region.${opt:stage, 'dev'}}" as any,
+		region: "${self:custom.region.${opt:stage, 'local'}}" as any,
 		runtime: "nodejs16.x",
 		memorySize: 512,
 		timeout: 5,
@@ -60,12 +56,11 @@ const baseConfig: Partial<AWS> = {
 			shouldStartNameWithService: false,
 		},
 		environment: {
-			STACK_NAME: "${self:service}-${opt:stage, 'dev'}",
+			STACK_NAME: "${self:service}-${opt:stage, 'local'}",
 			AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
-			NODE_PATH: "./:/opt/node_modules",
-			NODE_ENV: "${opt:stage, 'dev'}",
+			NODE_ENV: "${opt:stage, 'local'}",
 			CLOUD_REGION: "${self:provider.region}",
-			API_BOT_TOKEN: `\${ssm:${SERVICE_NAME}-\${opt:stage, 'dev'}-apiBotToken}`,
+			API_BOT_TOKEN: `\${ssm:${SERVICE_NAME}-\${opt:stage, 'local'}-apiBotToken}`,
 		},
 		iam: {
 			role: {
@@ -88,26 +83,37 @@ const baseConfig: Partial<AWS> = {
 			}
 		},
 		tags: {
-			costs: "${self:service}-${opt:stage, 'dev'}",
-			environment: "${opt:stage, 'dev'}",
+			costs: "${self:service}-${opt:stage, 'local'}",
+			environment: "${opt:stage, 'local'}",
 		},
 		stackTags: {
-			costs: "${self:service}-${opt:stage, 'dev'}",
-			environment: "${opt:stage, 'dev'}",
+			costs: "${self:service}-${opt:stage, 'local'}",
+			environment: "${opt:stage, 'local'}",
 		},
 	},
 };
 
 const accountConfig = {
 	service: "account",
+	plugins: [
+		"serverless-webpack",
+		"serverless-localstack",
+	],
 	resources: resourcesAccount,
 	functions: account,
 };
 
 const contentConfig = {
 	service: "content",
+	plugins: [
+		"serverless-webpack",
+		"serverless-localstack",
+	],
 	provider: {
 		environment: {
+			UPLOAD_FROM_URL_QUEUE_URL: {
+				"Fn::ImportValue": "upload-${opt:stage, 'local'}:UploadFromUrlQueueUrl",
+			},
 			UPDATE_RAW_IMG_QUEUE_URL: {
 				Ref: "UpdateRawImgQueue"
 			},
@@ -119,13 +125,23 @@ const contentConfig = {
 
 const counterConfig = {
 	service: "counter",
+	plugins: [
+		"serverless-localstack",
+	],
 	resources: resourcesCounter,
 };
 
 const productConfig = {
 	service: "product",
+	plugins: [
+		"serverless-webpack",
+		"serverless-localstack",
+	],
 	provider: {
 		environment: {
+			UPLOAD_FROM_URL_QUEUE_URL: {
+				"Fn::ImportValue": "upload-${opt:stage, 'local'}:UploadFromUrlQueueUrl",
+			},
 			UPDATE_IMG_QUEUE_URL: {
 				Ref: "UpdateImgQueue"
 			},
@@ -137,19 +153,17 @@ const productConfig = {
 
 const saleConfig = {
 	service: "sale",
+	plugins: [
+		"serverless-webpack",
+		"serverless-localstack",
+	],
 	provider: {
 		environment: {
-			GERENCIANET_CERTIFICATE_CERT: `\${ssm:${SERVICE_NAME}-\${opt:stage, 'dev'}-gerencianetCertificateCert}`,
-			GERENCIANET_CERTIFICATE_KEY: `\${ssm:${SERVICE_NAME}-\${opt:stage, 'dev'}-gerencianetCertificateKey}`,
-			GERENCIANET_URL: `\${ssm:${SERVICE_NAME}-\${opt:stage, 'dev'}-gerencianetUrl}`,
-			GERENCIANET_CLIENT_ID: `\${ssm:${SERVICE_NAME}-\${opt:stage, 'dev'}-gerencianetClientId}`,
-			GERENCIANET_CLIENT_SECRET: `\${ssm:${SERVICE_NAME}-\${opt:stage, 'dev'}-gerencianetClientSecret}`,
-			GERENCIANET_PIX_KEY: `\${ssm:${SERVICE_NAME}-\${opt:stage, 'dev'}-gerencianetPixKey}`,
 			SALE_CREATED_TOPIC_ARN: {
-				Ref: "SaleCreatedTopicArn"
+				Ref: "SaleCreatedTopic"
 			},
 			PAYMENT_PROCESSED_TOPIC_ARN: {
-				Ref: "PaymentProcessedTopicArn"
+				Ref: "PaymentProcessedTopic"
 			},
 		},
 	},
@@ -159,10 +173,14 @@ const saleConfig = {
 
 const storeConfig = {
 	service: "store",
+	plugins: [
+		"serverless-webpack",
+		"serverless-localstack",
+	],
 	provider: {
 		environment: {
 			STORE_CREATED_TOPIC_ARN: {
-				Ref: "StoreCreatedTopicArn"
+				Ref: "StoreCreatedTopic"
 			},
 		}
 	},
@@ -172,6 +190,10 @@ const storeConfig = {
 
 const uploadConfig = {
 	service: "upload",
+	plugins: [
+		"serverless-webpack",
+		"serverless-localstack",
+	],
 	provider: {
 		environment: {
 			UPLOAD_FROM_URL_QUEUE_URL: {
@@ -185,6 +207,10 @@ const uploadConfig = {
 
 const walletConfig = {
 	service: "wallet",
+	plugins: [
+		"serverless-webpack",
+		"serverless-localstack",
+	],
 	resources: resourcesWallet,
 	functions: wallet,
 };
@@ -216,7 +242,7 @@ const getConfig = () => {
 			return merge(baseConfig, walletConfig);
 
 		default:
-			throw new Error("Missing API_MODULE env var")
+			throw new Error("Missing API_MODULE env var");
 	}
 };
 

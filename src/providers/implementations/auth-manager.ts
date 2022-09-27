@@ -1,8 +1,8 @@
 import { AuthManager } from "../../providers/auth-manager";
 
 export class AuthManagerProvider extends AuthManager {
-	public isAuthorized(authHeader: string) {
-		const [authType, credentials] = authHeader.split(" ");
+	public isAuthorized(authHeader?: string) {
+		const [authType, credentials] = authHeader?.split(" ") || [];
 
 		if (!authType || !credentials) {
 			return false;
@@ -22,8 +22,8 @@ export class AuthManagerProvider extends AuthManager {
 		}
 	}
 
-	public getAuthData(authHeader: string) {
-		const [authType, credentials] = authHeader.split(" ");
+	public getAuthData(authHeader?: string) {
+		const [authType, credentials] = authHeader?.split(" ") || [];
 
 		switch (authType) {
 			case "BOT":

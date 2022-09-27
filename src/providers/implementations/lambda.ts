@@ -13,7 +13,7 @@ export class LambdaProvider<U, I> extends HttpManager<U, I> {
 	}
 
 	public setFunc(func: keyof U) {
-		this.func = async ({ event }) => {
+		this.func = async event => {
 			try {
 				if (this.authManager) {
 					this.authManager.isAuthorized(event?.headers?.authorization || "");
@@ -23,6 +23,7 @@ export class LambdaProvider<U, I> extends HttpManager<U, I> {
 					body: event.body ? JSON.parse(event.body) : undefined,
 					query: event.queryStringParameters,
 					headers: event.headers,
+					path: event.pathParameters,
 					auth: this.authManager.getAuthData(event.headers?.authorization),
 				});
 
@@ -51,7 +52,7 @@ export class LambdaProvider<U, I> extends HttpManager<U, I> {
 								message: "An store with the same name already exists",
 							}),
 						};
-					case "DUPLICATED_DISCORDID":
+					case "DUPLICATED_DISCORD_ID":
 						return {
 							statusCode: StatusCodeEnum.CONFLICT,
 							body: JSON.stringify({

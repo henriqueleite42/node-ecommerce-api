@@ -6,18 +6,16 @@ import type { Validator } from "./validator";
 
 import type { StatusCodeEnum } from "../types/enums/status-code";
 
-interface RouteInput {
-	event: APIGatewayEvent;
-	context: Context;
-	callback: Callback;
-}
-
 interface RouteOutput {
 	statusCode: StatusCodeEnum;
 	body?: string;
 }
 
-type Func = (p: RouteInput) => Promise<RouteOutput>;
+type Func = (
+	event: APIGatewayEvent,
+	context: Context,
+	callback: Callback,
+) => Promise<RouteOutput>;
 
 interface Config {
 	method: "DELETE" | "GET" | "PATCH" | "POST" | "PUT";

@@ -1,7 +1,6 @@
 const path = require('path');
 const slsw = require('serverless-webpack');
 // const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const nodeExternals = require('webpack-node-externals');
 const TerserPlugin = require('terser-webpack-plugin');
 
 const isLocal = process.env.NODE_ENV !== "production";
@@ -42,7 +41,6 @@ module.exports = {
   // Node's native modules will also be available.
   externals: [
 		'aws-sdk',
-		nodeExternals()
 	],
 	optimization: {
 		minimize: true,

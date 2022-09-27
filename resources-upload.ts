@@ -6,7 +6,7 @@ export const resourcesUpload: AWS["resources"] = {
 			Type: "AWS::SQS::Queue",
 			Properties: {
 				QueueName:
-					"${self:service}-${opt:stage, 'dev'}-upload-from-url",
+					"${self:service}-${opt:stage, 'local'}-upload-from-url",
 			},
 		},
 	},

@@ -1,5 +1,10 @@
 import type { AWS } from "@serverless/typescript";
 
+const PROVISIONED_THROUGHPUT_WALLETS = {
+	ReadCapacityUnits: 3,
+	WriteCapacityUnits: 1,
+};
+
 export const resourcesWallet: AWS["resources"] = {
 	Resources: {
 		WalletDynamoDBTable: {
@@ -8,10 +13,7 @@ export const resourcesWallet: AWS["resources"] = {
 			Type: "AWS::DynamoDB::Table",
 			Properties: {
 				TableName: "wallets",
-				ProvisionedThroughput: {
-					ReadCapacityUnits: 3,
-					WriteCapacityUnits: 1,
-				},
+				ProvisionedThroughput: PROVISIONED_THROUGHPUT_WALLETS,
 				AttributeDefinitions: [
 					{
 						AttributeName: "accountId",
@@ -30,7 +32,7 @@ export const resourcesWallet: AWS["resources"] = {
 			Type: "AWS::SQS::Queue",
 			Properties: {
 				QueueName:
-					"${self:service}-${opt:stage, 'dev'}-create-wallet",
+					"${self:service}-${opt:stage, 'local'}-create-wallet",
 			},
 		},
 		CreateWalletSubscription: {
@@ -40,9 +42,9 @@ export const resourcesWallet: AWS["resources"] = {
 				Endpoint: {
 					"Fn::GetAtt": ["CreateWalletQueue", "Arn"],
 				},
-				Region: "${self:custom.region.${opt:stage, 'dev'}}",
+				Region: "${self:custom.region.${opt:stage, 'local'}}",
 				TopicArn: {
-					"Fn::ImportValue": "store-${opt:stage, 'dev'}:StoreCreatedTopicArn"
+					"Fn::ImportValue": "store-${opt:stage, 'local'}:StoreCreatedTopicArn"
 				},
 			},
 		},
@@ -50,7 +52,7 @@ export const resourcesWallet: AWS["resources"] = {
 			Type: "AWS::SQS::Queue",
 			Properties: {
 				QueueName:
-					"${self:service}-${opt:stage, 'dev'}-increment-balance",
+					"${self:service}-${opt:stage, 'local'}-increment-balance",
 			},
 		},
 		IncrementBalanceSubscription: {
@@ -60,9 +62,9 @@ export const resourcesWallet: AWS["resources"] = {
 				Endpoint: {
 					"Fn::GetAtt": ["IncrementBalanceQueue", "Arn"],
 				},
-				Region: "${self:custom.region.${opt:stage, 'dev'}}",
+				Region: "${self:custom.region.${opt:stage, 'local'}}",
 				TopicArn: {
-					"Fn::ImportValue": "sale-${opt:stage, 'dev'}:PaymentProcessedTopicArn"
+					"Fn::ImportValue": "sale-${opt:stage, 'local'}:PaymentProcessedTopicArn"
 				},
 			},
 		},

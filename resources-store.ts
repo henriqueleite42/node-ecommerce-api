@@ -1,5 +1,10 @@
 import type { AWS } from "@serverless/typescript";
 
+const PROVISIONED_THROUGHPUT_STORES = {
+	ReadCapacityUnits: 3,
+	WriteCapacityUnits: 1,
+};
+
 export const resourcesStore: AWS["resources"] = {
 	Resources: {
 		StoreDynamoDBTable: {
@@ -8,31 +13,20 @@ export const resourcesStore: AWS["resources"] = {
 			Type: "AWS::DynamoDB::Table",
 			Properties: {
 				TableName: "stores",
-				ProvisionedThroughput: {
-					ReadCapacityUnits: 3,
-					WriteCapacityUnits: 1,
-				},
+				ProvisionedThroughput: PROVISIONED_THROUGHPUT_STORES,
 				AttributeDefinitions: [
-					{
-						AttributeName: "storeId_productId",
-						AttributeType: "S",
-					},
 					{
 						AttributeName: "storeId",
 						AttributeType: "S",
 					},
 					{
-						AttributeName: "createdAt_productId",
-						AttributeType: "S",
-					},
-					{
-						AttributeName: "storeId_type",
+						AttributeName: "name",
 						AttributeType: "S",
 					},
 				],
 				KeySchema: [
 					{
-						AttributeName: "storeId_productId",
+						AttributeName: "storeId",
 						KeyType: "HASH",
 					},
 				],
@@ -41,42 +35,29 @@ export const resourcesStore: AWS["resources"] = {
 						IndexName: "StoreIdCreatedAtProductId",
 						KeySchema: [
 							{
-								AttributeName: "storeId",
+								AttributeName: "name",
 								KeyType: "HASH",
 							},
-							{
-								AttributeName: "createdAt_productId",
-								KeyType: "SORT",
-							},
 						],
+						Projection: {
+							ProjectionType: "ALL"
+						},
+						ProvisionedThroughput: PROVISIONED_THROUGHPUT_STORES,
 					},
-					{
-						IndexName: "StoreIdTypeCreatedAtProductId",
-						KeySchema: [
-							{
-								AttributeName: "storeId_type",
-								KeyType: "HASH",
-							},
-							{
-								AttributeName: "createdAt_productId",
-								KeyType: "SORT",
-							},
-						],
-					}
 				],
 			},
 		},
 		StoreCreatedTopic: {
 			Type: "AWS::SNS::Topic",
 			Properties: {
-				TopicName: "${self:service}-${opt:stage, 'dev'}-store-created",
+				TopicName: "${self:service}-${opt:stage, 'local'}-store-created",
 			},
 		},
 		IncrementStoresCountQueue: {
 			Type: "AWS::SQS::Queue",
 			Properties: {
 				QueueName:
-					"${self:service}-${opt:stage, 'dev'}-increment-stores-count",
+					"${self:service}-${opt:stage, 'local'}-increment-stores-count",
 			},
 		},
 		IncrementStoresCountSubscription: {
@@ -86,9 +67,9 @@ export const resourcesStore: AWS["resources"] = {
 				Endpoint: {
 					"Fn::GetAtt": ["IncrementStoresCountQueue", "Arn"],
 				},
-				Region: "${self:custom.region.${opt:stage, 'dev'}}",
+				Region: "${self:custom.region.${opt:stage, 'local'}}",
 				TopicArn: {
-					Ref: "SaleCreatedTopic"
+					"Fn::ImportValue": "sale-${opt:stage, 'local'}:SaleCreatedTopicArn",
 				},
 			},
 		},
@@ -96,7 +77,7 @@ export const resourcesStore: AWS["resources"] = {
 			Type: "AWS::SQS::Queue",
 			Properties: {
 				QueueName:
-					"${self:service}-${opt:stage, 'dev'}-increment-sales-count",
+					"${self:service}-${opt:stage, 'local'}-increment-sales-count",
 			},
 		},
 		IncrementSalesCountSubscription: {
@@ -106,9 +87,9 @@ export const resourcesStore: AWS["resources"] = {
 				Endpoint: {
 					"Fn::GetAtt": ["IncrementSalesCountQueue", "Arn"],
 				},
-				Region: "${self:custom.region.${opt:stage, 'dev'}}",
+				Region: "${self:custom.region.${opt:stage, 'local'}}",
 				TopicArn: {
-					"Fn::ImportValue": "sale-${opt:stage, 'dev'}:PaymentProcessedTopicArn"
+					"Fn::ImportValue": "sale-${opt:stage, 'local'}:PaymentProcessedTopicArn"
 				},
 			},
 		},
@@ -116,7 +97,7 @@ export const resourcesStore: AWS["resources"] = {
 			Type: "AWS::SQS::Queue",
 			Properties: {
 				QueueName:
-					"${self:service}-${opt:stage, 'dev'}-increment-total-billed",
+					"${self:service}-${opt:stage, 'local'}-increment-total-billed",
 			},
 		},
 		IncrementTotalBilledSubscription: {
@@ -126,9 +107,9 @@ export const resourcesStore: AWS["resources"] = {
 				Endpoint: {
 					"Fn::GetAtt": ["IncrementTotalBilledQueue", "Arn"],
 				},
-				Region: "${self:custom.region.${opt:stage, 'dev'}}",
+				Region: "${self:custom.region.${opt:stage, 'local'}}",
 				TopicArn: {
-					"Fn::ImportValue": "sale-${opt:stage, 'dev'}:PaymentProcessedTopicArn"
+					"Fn::ImportValue": "sale-${opt:stage, 'local'}:PaymentProcessedTopicArn"
 				},
 			},
 		},

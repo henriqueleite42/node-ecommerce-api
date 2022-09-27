@@ -1,5 +1,6 @@
 export interface ValidateInput {
 	auth?: Record<string, any> | null;
+	path?: Record<string, any> | null;
 	body?: Record<string, any> | null;
 	headers?: Record<string, any> | null;
 	query?: Record<string, any> | null;

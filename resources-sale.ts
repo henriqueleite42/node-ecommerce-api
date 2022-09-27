@@ -1,5 +1,10 @@
 import type { AWS } from "@serverless/typescript";
 
+const PROVISIONED_THROUGHPUT_SALES = {
+	ReadCapacityUnits: 3,
+	WriteCapacityUnits: 1,
+};
+
 export const resourcesSale: AWS["resources"] = {
 	Resources: {
 		SaleDynamoDBTable: {
@@ -8,10 +13,7 @@ export const resourcesSale: AWS["resources"] = {
 			Type: "AWS::DynamoDB::Table",
 			Properties: {
 				TableName: "sales",
-				ProvisionedThroughput: {
-					ReadCapacityUnits: 3,
-					WriteCapacityUnits: 1,
-				},
+				ProvisionedThroughput: PROVISIONED_THROUGHPUT_SALES,
 				AttributeDefinitions: [
 					{
 						AttributeName: "saleId",
@@ -54,9 +56,13 @@ export const resourcesSale: AWS["resources"] = {
 							},
 							{
 								AttributeName: "createdAt_saleId",
-								KeyType: "SORT",
+								KeyType: "RANGE",
 							},
 						],
+						Projection: {
+							ProjectionType: "ALL"
+						},
+						ProvisionedThroughput: PROVISIONED_THROUGHPUT_SALES,
 					},
 					{
 						IndexName: "StoreIdStatusCreatedAtSaleId",
@@ -67,9 +73,13 @@ export const resourcesSale: AWS["resources"] = {
 							},
 							{
 								AttributeName: "status_createdAt_saleId",
-								KeyType: "SORT",
+								KeyType: "RANGE",
 							},
 						],
+						Projection: {
+							ProjectionType: "ALL"
+						},
+						ProvisionedThroughput: PROVISIONED_THROUGHPUT_SALES,
 					},
 					{
 						IndexName: "ClientIdCreatedAtSaleId",
@@ -80,9 +90,13 @@ export const resourcesSale: AWS["resources"] = {
 							},
 							{
 								AttributeName: "createdAt_saleId",
-								KeyType: "SORT",
+								KeyType: "RANGE",
 							},
 						],
+						Projection: {
+							ProjectionType: "ALL"
+						},
+						ProvisionedThroughput: PROVISIONED_THROUGHPUT_SALES,
 					},
 					{
 						IndexName: "ClientIdStatusCreatedAtSaleId",
@@ -93,9 +107,13 @@ export const resourcesSale: AWS["resources"] = {
 							},
 							{
 								AttributeName: "status_createdAt_saleId",
-								KeyType: "SORT",
+								KeyType: "RANGE",
 							},
 						],
+						Projection: {
+							ProjectionType: "ALL"
+						},
+						ProvisionedThroughput: PROVISIONED_THROUGHPUT_SALES,
 					},
 					{
 						IndexName: "StoreIdClientIdCreatedAtSaleId",
@@ -106,9 +124,13 @@ export const resourcesSale: AWS["resources"] = {
 							},
 							{
 								AttributeName: "createdAt_saleId",
-								KeyType: "SORT",
+								KeyType: "RANGE",
 							},
 						],
+						Projection: {
+							ProjectionType: "ALL"
+						},
+						ProvisionedThroughput: PROVISIONED_THROUGHPUT_SALES,
 					},
 				],
 			},
@@ -116,24 +138,42 @@ export const resourcesSale: AWS["resources"] = {
 		SaleCreatedTopic: {
 			Type: "AWS::SNS::Topic",
 			Properties: {
-				TopicName: "${self:service}-${opt:stage, 'dev'}-sale-created",
+				TopicName: "${self:service}-${opt:stage, 'local'}-sale-created",
 			},
 		},
 		ProcessPaymentQueue: {
 			Type: "AWS::SQS::Queue",
 			Properties: {
 				QueueName:
-					"${self:service}-${opt:stage, 'dev'}-process-payment",
+					"${self:service}-${opt:stage, 'local'}-process-payment",
 			},
 		},
 		PaymentProcessedTopic: {
 			Type: "AWS::SNS::Topic",
 			Properties: {
-				TopicName: "${self:service}-${opt:stage, 'dev'}-payment-processed",
+				TopicName: "${self:service}-${opt:stage, 'local'}-payment-processed",
 			},
 		},
 	},
 	Outputs: {
+		ProcessPaymentQueueUrl: {
+			Value: {
+				Ref: "ProcessPaymentQueue"
+			},
+			Export: {
+				Name: {
+					"Fn::Join": [
+						":",
+						[
+							{
+								Ref: "AWS::StackName",
+							},
+							"ProcessPaymentQueueUrl",
+						],
+					],
+				},
+			}
+		},
 		SaleCreatedTopicArn: {
 			Value: {
 				Ref: "SaleCreatedTopic"

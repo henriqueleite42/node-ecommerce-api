@@ -1,5 +1,10 @@
 import type { AWS } from "@serverless/typescript";
 
+const PROVISIONED_THROUGHPUT_PRODUCTS = {
+	ReadCapacityUnits: 3,
+	WriteCapacityUnits: 1,
+};
+
 export const resourcesProduct: AWS["resources"] = {
 	Resources: {
 		ProductDynamoDBTable: {
@@ -8,10 +13,7 @@ export const resourcesProduct: AWS["resources"] = {
 			Type: "AWS::DynamoDB::Table",
 			Properties: {
 				TableName: "products",
-				ProvisionedThroughput: {
-					ReadCapacityUnits: 3,
-					WriteCapacityUnits: 1,
-				},
+				ProvisionedThroughput: PROVISIONED_THROUGHPUT_PRODUCTS,
 				AttributeDefinitions: [
 					{
 						AttributeName: "storeId_productId",
@@ -46,9 +48,13 @@ export const resourcesProduct: AWS["resources"] = {
 							},
 							{
 								AttributeName: "createdAt_productId",
-								KeyType: "SORT",
+								KeyType: "RANGE",
 							},
 						],
+						Projection: {
+							ProjectionType: "ALL"
+						},
+						ProvisionedThroughput: PROVISIONED_THROUGHPUT_PRODUCTS,
 					},
 					{
 						IndexName: "StoreIdTypeCreatedAtProductId",
@@ -59,9 +65,13 @@ export const resourcesProduct: AWS["resources"] = {
 							},
 							{
 								AttributeName: "createdAt_productId",
-								KeyType: "SORT",
+								KeyType: "RANGE",
 							},
 						],
+						Projection: {
+							ProjectionType: "ALL"
+						},
+						ProvisionedThroughput: PROVISIONED_THROUGHPUT_PRODUCTS,
 					},
 				],
 			},
@@ -70,14 +80,14 @@ export const resourcesProduct: AWS["resources"] = {
 			Type: "AWS::SQS::Queue",
 			Properties: {
 				QueueName:
-					"${self:service}-${opt:stage, 'dev'}-update-img",
+					"${self:service}-${opt:stage, 'local'}-update-img",
 			},
 		},
 		IncrementSalesCountQueue: {
 			Type: "AWS::SQS::Queue",
 			Properties: {
 				QueueName:
-					"${self:service}-${opt:stage, 'dev'}-increment-sales-count",
+					"${self:service}-${opt:stage, 'local'}-increment-sales-count",
 			},
 		},
 		IncrementSalesCountSubscription: {
@@ -87,9 +97,9 @@ export const resourcesProduct: AWS["resources"] = {
 				Endpoint: {
 					"Fn::GetAtt": ["IncrementSalesCountQueue", "Arn"],
 				},
-				Region: "${self:custom.region.${opt:stage, 'dev'}}",
+				Region: "${self:custom.region.${opt:stage, 'local'}}",
 				TopicArn: {
-					"Fn::ImportValue": "sale-${opt:stage, 'dev'}:PaymentProcessedTopicArn"
+					"Fn::ImportValue": "sale-${opt:stage, 'local'}:PaymentProcessedTopicArn"
 				},
 			},
 		},
@@ -97,7 +107,7 @@ export const resourcesProduct: AWS["resources"] = {
 			Type: "AWS::SQS::Queue",
 			Properties: {
 				QueueName:
-					"${self:service}-${opt:stage, 'dev'}-increment-total-billed",
+					"${self:service}-${opt:stage, 'local'}-increment-total-billed",
 			},
 		},
 		IncrementTotalBilledSubscription: {
@@ -107,9 +117,9 @@ export const resourcesProduct: AWS["resources"] = {
 				Endpoint: {
 					"Fn::GetAtt": ["IncrementTotalBilledQueue", "Arn"],
 				},
-				Region: "${self:custom.region.${opt:stage, 'dev'}}",
+				Region: "${self:custom.region.${opt:stage, 'local'}}",
 				TopicArn: {
-					"Fn::ImportValue": "sale-${opt:stage, 'dev'}:PaymentProcessedTopicArn"
+					"Fn::ImportValue": "sale-${opt:stage, 'local'}:PaymentProcessedTopicArn"
 				},
 			},
 		},

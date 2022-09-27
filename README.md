@@ -26,3 +26,14 @@ API_MODULE=<module> yarn deploy:<env>
   - **local**: The LOCAL environment, to develop and test new features
   - **dev**: The HOMOLOGATION environment, a cloud environment to test it before it goes to production
   - **production**: Production
+
+## Deploy order
+
+1 - Upload
+2 - Account
+3 - Sale
+4 - Store
+5 - Product
+6 - Wallet
+7 - Content
+8 - Counter

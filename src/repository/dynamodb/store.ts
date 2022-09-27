@@ -7,17 +7,17 @@ import { cleanObj } from "@techmmunity/utils";
 import type {
 	CreateInput,
 	EditInput,
-	GetAllFromAccountInput,
 	GetByIdInput,
 	GetByNameInput,
 	GetManyByIdInput,
 	StoreEntity,
+	StoreRepository,
 } from "../../models/store";
 
 import { DynamodbRepository } from ".";
 
 export interface StoreTable {
-	storeId: string;
+	storeId: string; // Same as AccountId
 	accountId: string;
 	name: string;
 	description?: string;
@@ -25,13 +25,11 @@ export interface StoreTable {
 	bannerUrl?: string;
 	avatarUrl?: string;
 	createdAt: string;
-
-	accountId_storeId: string;
 }
 
 export class StoreRepositoryDynamoDB
 	extends DynamodbRepository<StoreTable, StoreEntity>
-	implements StoreRepositoryDynamoDB
+	implements StoreRepository
 {
 	protected readonly tableName = "stores";
 
@@ -65,7 +63,6 @@ export class StoreRepositoryDynamoDB
 	}
 
 	public edit({
-		accountId,
 		storeId,
 		description,
 		color,
@@ -73,8 +70,7 @@ export class StoreRepositoryDynamoDB
 		avatarUrl,
 	}: EditInput) {
 		return this.update(
-			this.indexAccountIdStoreId({
-				accountId,
+			this.indexStoreId({
 				storeId,
 			}).Key,
 			{
@@ -83,18 +79,6 @@ export class StoreRepositoryDynamoDB
 				bannerUrl,
 				avatarUrl,
 			},
-		);
-	}
-
-	public getAllFromAccount({
-		limit,
-		continueFrom,
-		...keys
-	}: GetAllFromAccountInput) {
-		return this.getMultipleItems(
-			this.indexAccountIdStoreId(keys),
-			limit,
-			continueFrom,
 		);
 	}
 
@@ -129,46 +113,6 @@ export class StoreRepositoryDynamoDB
 		};
 	}
 
-	private indexAccountIdStoreId({
-		accountId,
-		storeId,
-	}: {
-		accountId: StoreEntity["accountId"];
-		storeId?: StoreEntity["storeId"];
-	}) {
-		return {
-			IndexName: "AccountIdStoreId",
-			KeyConditionExpression: [
-				"#accountId = :accountId",
-				storeId ? "#storeId = :storeId" : undefined,
-			]
-				.filter(Boolean)
-				.join(", "),
-			ExpressionAttributeNames: {
-				"#accountId": "accountId",
-				...(storeId
-					? {
-							"#storeId": "storeId",
-					  }
-					: {}),
-			},
-			ExpressionAttributeValues: marshall({
-				":accountId": `ACCOUNT#${accountId}`,
-				...(storeId
-					? {
-							":storeId": `STORE#${storeId}`,
-					  }
-					: {}),
-			}),
-			Key: marshall(
-				cleanObj({
-					accountId: `ACCOUNT#${accountId}`,
-					storeId: storeId ? `STORE#${storeId}` : undefined,
-				}),
-			),
-		};
-	}
-
 	private indexName(entity: Pick<StoreEntity, "name">) {
 		return {
 			IndexName: "Name",
@@ -188,20 +132,15 @@ export class StoreRepositoryDynamoDB
 	// Mappers
 
 	protected entityToTable(entity: StoreEntity): StoreTable {
-		const storeId = `STORE#${entity.storeId}`;
-		const accountId = `ACCOUNT#${entity.accountId}`;
-
 		return cleanObj({
-			storeId,
-			accountId,
+			storeId: `STORE#${entity.storeId}`,
+			accountId: `ACCOUNT#${entity.accountId}`,
 			name: `NAME#${entity.name}`,
 			description: entity.description,
 			color: entity.color,
 			bannerUrl: entity.bannerUrl,
 			avatarUrl: entity.avatarUrl,
 			createdAt: entity.createdAt.toISOString(),
-
-			accountId_storeId: `${accountId}#${storeId}`,
 		});
 	}
 

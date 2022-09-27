@@ -33,7 +33,7 @@ export class SQSProvider<D, U> extends QueueManager<D, U> {
 					sqs: {
 						arn: {
 							// eslint-disable-next-line @typescript-eslint/naming-convention
-							Ref: `${this.config.queue}Queue`,
+							"Fn::GetAtt": [`${this.config.queue}Queue`, "Arn"],
 						},
 					},
 				},
