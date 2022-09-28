@@ -31,7 +31,7 @@ export class LambdaProvider<U, I> extends HttpManager<U, I> {
 					auth: this.authManager.getAuthData(authHeader),
 				};
 
-				const validatedData = await this.validationManager.validate(params);
+				const validatedData = await this.validationManager?.validate(params);
 
 				const serviceInstance = this.service.getInstance();
 
@@ -49,64 +49,11 @@ export class LambdaProvider<U, I> extends HttpManager<U, I> {
 					};
 				}
 
-				switch (err.message) {
-					case "NOT_ENOUGH_FUNDS":
-						return {
-							statusCode: StatusCodeEnum.NOT_ACCEPTABLE,
-						};
-					case "NOT_FOUND":
-						return {
-							statusCode: StatusCodeEnum.NOT_FOUND,
-						};
-					case "DUPLICATED_NAME":
-						return {
-							statusCode: StatusCodeEnum.CONFLICT,
-							body: JSON.stringify({
-								message: "An store with the same name already exists",
-							}),
-						};
-					case "DUPLICATED_DISCORD_ID":
-						return {
-							statusCode: StatusCodeEnum.CONFLICT,
-							body: JSON.stringify({
-								message: "An account with the same discordId already exists",
-							}),
-						};
-					case "SALE_NOT_FOUND":
-						return {
-							statusCode: StatusCodeEnum.BAD_REQUEST,
-							body: JSON.stringify({
-								message: "Sale not found",
-							}),
-						};
-					case "SALE_ALREADY_IN_PROGRESS":
-						return {
-							statusCode: StatusCodeEnum.BAD_REQUEST,
-							body: JSON.stringify({
-								message: "Sale already in progress",
-							}),
-						};
-					case "DUPLICATED_PRODUCT":
-						return {
-							statusCode: StatusCodeEnum.BAD_REQUEST,
-							body: JSON.stringify({
-								message: "Duplicated product",
-							}),
-						};
-					case "PRODUCT_NOT_FOUND":
-						return {
-							statusCode: StatusCodeEnum.BAD_REQUEST,
-							body: JSON.stringify({
-								message: "Product not found",
-							}),
-						};
-					default:
-						console.error(err);
+				console.error(err);
 
-						return {
-							statusCode: StatusCodeEnum.INTERNAL,
-						};
-				}
+				return {
+					statusCode: StatusCodeEnum.INTERNAL,
+				};
 			}
 		};
 

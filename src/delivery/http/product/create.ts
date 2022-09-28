@@ -62,7 +62,7 @@ const httpManager = new LambdaProvider<ProductUseCase, CreateProductInput>({
 			{
 				key: "price",
 				loc: "body",
-				validations: [Validations.money],
+				validations: [Validations.productPrice],
 			},
 			{
 				key: "imageUrl",
@@ -73,7 +73,6 @@ const httpManager = new LambdaProvider<ProductUseCase, CreateProductInput>({
 				key: "variations",
 				loc: "body",
 				validations: [
-					Validations.array,
 					Validations.minLength(1),
 					Validations.maxLength(2),
 					Validations.arrOfObj([
@@ -90,7 +89,7 @@ const httpManager = new LambdaProvider<ProductUseCase, CreateProductInput>({
 						},
 						{
 							key: "price",
-							validations: [Validations.required, Validations.money],
+							validations: [Validations.required, Validations.productPrice],
 						},
 					]),
 					Validations.arrayUnique("name"),
@@ -100,7 +99,6 @@ const httpManager = new LambdaProvider<ProductUseCase, CreateProductInput>({
 				key: "contents",
 				loc: "body",
 				validations: [
-					Validations.array,
 					Validations.minLength(1),
 					Validations.maxLength(500),
 					Validations.arrOfObj([

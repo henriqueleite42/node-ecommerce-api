@@ -51,7 +51,7 @@ const httpManager = new LambdaProvider<ProductUseCase, EditInput>({
 			{
 				key: "price",
 				loc: "body",
-				validations: [Validations.money],
+				validations: [Validations.productPrice],
 			},
 			{
 				key: "imageUrl",

@@ -20,7 +20,11 @@ export const resourcesCounter: AWS["resources"] = {
 						AttributeType: "S",
 					},
 					{
-						AttributeName: "counter",
+						AttributeName: "sk",
+						AttributeType: "S",
+					},
+					{
+						AttributeName: "count",
 						AttributeType: "N",
 					},
 				],
@@ -28,6 +32,10 @@ export const resourcesCounter: AWS["resources"] = {
 					{
 						AttributeName: "pk",
 						KeyType: "HASH",
+					},
+					{
+						AttributeName: "sk",
+						KeyType: "RANGE",
 					},
 				],
 				GlobalSecondaryIndexes: [
@@ -39,7 +47,7 @@ export const resourcesCounter: AWS["resources"] = {
 								KeyType: "HASH",
 							},
 							{
-								AttributeName: "counter",
+								AttributeName: "count",
 								KeyType: "RANGE",
 							},
 						],

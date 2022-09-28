@@ -15,6 +15,7 @@ import type {
 } from "../../../models/product";
 import { AuthManagerProvider } from "../../../providers/implementations/auth-manager";
 import { LambdaProvider } from "../../../providers/implementations/lambda";
+import { Transform } from "../../../providers/implementations/transform";
 import { Validations } from "../../../providers/implementations/validations";
 import { ValidatorProvider } from "../../../providers/implementations/validator";
 
@@ -39,11 +40,12 @@ const httpManager = new LambdaProvider<ProductUseCase, GetProductsByTypeInput>({
 				key: "limit",
 				loc: "query",
 				validations: [Validations.required, Validations.limit],
+				transform: [Transform.int],
 			},
 			{
 				key: "continueFrom",
 				loc: "query",
-				validations: [Validations.required, Validations.cursor],
+				validations: [Validations.cursor],
 			},
 		]),
 	)

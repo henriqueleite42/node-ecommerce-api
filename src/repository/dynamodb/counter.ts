@@ -1,3 +1,4 @@
+/* eslint-disable capitalized-comments */
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import {
@@ -8,7 +9,6 @@ import {
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 
 import type {
-	CounterEntity,
 	CounterRepository,
 	GetTopProductsOutput,
 	GetTopStoresOutput,
@@ -19,6 +19,27 @@ import type {
 
 import { DynamodbRepository } from ".";
 
+/**
+ * pk: SOLD_AMOUNT#STORE
+ * sk: STORE#{storeId}
+ * count
+ *
+ * pk: TOTAL_BILLED#STORE
+ * sk: STORE#{storeId}
+ * count
+ *
+ * pk: SOLD_AMOUNT#PRODUCT
+ * sk: PRODUCT#{productId}#STORE#{storeId}
+ * count
+ *
+ * pk: TOTAL_BILLED#PRODUCT
+ * sk: PRODUCT#{productId}#STORE#{storeId}
+ * count
+ *
+ * pk: TOTAL
+ * sk: STORES
+ * count
+ */
 export interface CounterTable {
 	pk: string;
 	sk: string;
@@ -26,7 +47,7 @@ export interface CounterTable {
 }
 
 export class CounterRepositoryDynamoDB
-	extends DynamodbRepository<CounterTable, CounterEntity>
+	extends DynamodbRepository<CounterTable, undefined>
 	implements CounterRepository
 {
 	protected readonly tableName = "counters";
@@ -39,7 +60,8 @@ export class CounterRepositoryDynamoDB
 				TableName: this.tableName,
 				...this.updateExpression(qtd),
 				Key: marshall({
-					pk: `${type}#STORE#${storeId}`,
+					pk: `${type}#STORE`,
+					sk: `STORE#${storeId}`,
 				}),
 			}),
 		);
@@ -56,7 +78,8 @@ export class CounterRepositoryDynamoDB
 				TableName: this.tableName,
 				...this.updateExpression(qtd),
 				Key: marshall({
-					pk: `${type}#PRODUCT#${productId}#STORE#${storeId}`,
+					pk: `${type}#PRODUCT`,
+					sk: `PRODUCT#${productId}#STORE#${storeId}`,
 				}),
 			}),
 		);
@@ -69,7 +92,8 @@ export class CounterRepositoryDynamoDB
 				// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 				...this.updateExpression(1),
 				Key: marshall({
-					pk: `TOTAL#${type}`,
+					pk: "TOTAL",
+					sk: type,
 				}),
 			}),
 		);
@@ -80,7 +104,8 @@ export class CounterRepositoryDynamoDB
 			new GetItemCommand({
 				TableName: this.tableName,
 				Key: marshall({
-					pk: `TOTAL#${type}`,
+					pk: "TOTAL",
+					sk: type,
 				}),
 			}),
 		);
@@ -121,17 +146,14 @@ export class CounterRepositoryDynamoDB
 	private indexTopStores() {
 		return {
 			TableName: this.tableName,
-			IndexName: "PkCount",
+			IndexName: "PkCounter",
 			Limit: this.topLength,
 			KeyConditionExpression: "#pk = :pk",
 			ExpressionAttributeNames: {
 				"#pk": "pk",
 			},
 			ExpressionAttributeValues: marshall({
-				":pk": "TOTAL_RECEIVED#STORE#",
-			}),
-			Key: marshall({
-				pk: "TOTAL_RECEIVED#STORE#",
+				":pk": "TOTAL_BILLED#STORE",
 			}),
 		};
 	}
@@ -139,17 +161,14 @@ export class CounterRepositoryDynamoDB
 	private indexTopProducts() {
 		return {
 			TableName: this.tableName,
-			IndexName: "PkCount",
+			IndexName: "PkCounter",
 			Limit: this.topLength,
 			KeyConditionExpression: "#pk = :pk",
 			ExpressionAttributeNames: {
 				"#pk": "pk",
 			},
 			ExpressionAttributeValues: marshall({
-				":pk": "TOTAL_RECEIVED#PRODUCT#",
-			}),
-			Key: marshall({
-				pk: "TOTAL_RECEIVED#PRODUCT#",
+				":pk": "TOTAL_BILLED#PRODUCT",
 			}),
 		};
 	}
@@ -169,7 +188,7 @@ export class CounterRepositoryDynamoDB
 	// Mappers
 
 	protected tableToStore(table: CounterTable): GetTopStoresOutput {
-		const [, , storeId] = table.pk.split("#");
+		const [, storeId] = table.sk.split("#");
 
 		return {
 			storeId,
@@ -178,7 +197,7 @@ export class CounterRepositoryDynamoDB
 	}
 
 	protected tableToProduct(table: CounterTable): GetTopProductsOutput {
-		const [, , productId, , storeId] = table.pk.split("#");
+		const [, productId, , storeId] = table.sk.split("#");
 
 		return {
 			productId,
@@ -191,7 +210,7 @@ export class CounterRepositoryDynamoDB
 		throw new Error("NOT_IMPLEMENTED");
 	}
 
-	protected tableToEntity(): CounterEntity {
+	protected tableToEntity(): undefined {
 		throw new Error("NOT_IMPLEMENTED");
 	}
 }

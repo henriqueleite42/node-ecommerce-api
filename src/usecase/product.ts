@@ -113,6 +113,10 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 	public async getTop() {
 		const topProducts = await this.counterRepository.getTopProducts();
 
+		if (topProducts.length === 0) {
+			return [];
+		}
+
 		return this.productRepository.getManyById(topProducts);
 	}
 

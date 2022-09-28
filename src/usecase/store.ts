@@ -81,11 +81,37 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 		return store;
 	}
 
-	public async edit(p: EditInput) {
+	public async edit({ avatarUrl, bannerUrl, ...p }: EditInput) {
 		const store = await this.storeRepository.edit(p);
 
 		if (!store) {
 			throw new CustomError("Store not found", StatusCodeEnum.NOT_FOUND);
+		}
+
+		if (avatarUrl) {
+			await this.uploadManager.uploadFromUrlBackground({
+				folder: process.env.MEDIA_BUCKET_NAME!,
+				fileName: `avatars/${store.storeId}`,
+				id: {
+					storeId: store.storeId,
+				},
+				mediaUrl: avatarUrl,
+				mediaType: MediaTypeEnum.IMAGE,
+				queueToNotify: process.env.UPDATE_AVATAR_QUEUE_URL!,
+			});
+		}
+
+		if (bannerUrl) {
+			await this.uploadManager.uploadFromUrlBackground({
+				folder: process.env.MEDIA_BUCKET_NAME!,
+				fileName: `banners/${store.storeId}`,
+				id: {
+					storeId: store.storeId,
+				},
+				mediaUrl: bannerUrl,
+				mediaType: MediaTypeEnum.IMAGE,
+				queueToNotify: process.env.UPDATE_BANNER_QUEUE_URL!,
+			});
 		}
 
 		return store;
@@ -104,11 +130,19 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 	public async getTop() {
 		const topStores = await this.counterRepository.getTopStores();
 
+		if (topStores.length === 0) {
+			return [];
+		}
+
 		return this.storeRepository.getManyById(topStores);
 	}
 
-	public getStoresCount() {
-		return this.counterRepository.getTotal("STORES");
+	public async getStoresCount() {
+		const count = await this.counterRepository.getTotal("STORES");
+
+		return {
+			total: count,
+		};
 	}
 
 	public async increaseStoresCount() {

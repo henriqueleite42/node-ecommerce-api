@@ -60,6 +60,10 @@ export interface IncreaseTotalBilledInput {
 	amount: number;
 }
 
+export interface GetStoresCountOutput {
+	total: number;
+}
+
 export interface StoreUseCase {
 	create: (p: CreateInput) => Promise<StoreEntity>;
 
@@ -69,7 +73,7 @@ export interface StoreUseCase {
 
 	getTop: () => Promise<Array<StoreEntity>>;
 
-	getStoresCount: () => Promise<number>;
+	getStoresCount: () => Promise<GetStoresCountOutput>;
 
 	increaseStoresCount: () => Promise<void>;
 

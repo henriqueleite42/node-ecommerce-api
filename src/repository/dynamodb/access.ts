@@ -59,7 +59,7 @@ export class AccessRepositoryDynamoDB
 			}),
 		);
 
-		if ((result.UnprocessedItems?.[this.tableName].length || 0) > 0) {
+		if ((result.UnprocessedItems?.[this.tableName]?.length || 0) > 0) {
 			await this.dynamodb.send(
 				new BatchWriteItemCommand({
 					RequestItems: {

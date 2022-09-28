@@ -25,7 +25,7 @@ import { StatusCodeEnum } from "../../types/enums/status-code";
 
 export class Validations {
 	public static required(key: string, p?: any) {
-		if (!p) {
+		if (p === undefined || p === null) {
 			throw new CustomError(
 				`${key} is a required field`,
 				StatusCodeEnum.BAD_REQUEST,
@@ -107,18 +107,34 @@ export class Validations {
 		return (key: string, p?: any) => {
 			if (!p) return;
 
-			try {
-				const validator = new ValidatorProvider(vArr as any);
-
-				p.forEach((v: any) => {
-					validator.validate(v);
-				});
-			} catch (err: any) {
+			if (!Array.isArray(p)) {
 				throw new CustomError(
-					`${key}.${err.message}`,
+					`${key} must be an array`,
 					StatusCodeEnum.BAD_REQUEST,
 				);
 			}
+
+			const validator = new ValidatorProvider(vArr as any);
+
+			p.forEach((v: any, idx) => {
+				try {
+					validator.validate(v);
+				} catch (err: any) {
+					if (err instanceof CustomError) {
+						const { message } = JSON.parse(err.getBody());
+
+						throw new CustomError(
+							`${key}[${idx}].${message}`,
+							StatusCodeEnum.BAD_REQUEST,
+						);
+					} else {
+						throw new CustomError(
+							`${key}[${idx}].??? ${err.message}`,
+							StatusCodeEnum.BAD_REQUEST,
+						);
+					}
+				}
+			});
 		};
 	}
 
@@ -129,10 +145,19 @@ export class Validations {
 			try {
 				new ValidatorProvider(vArr as any).validate(p);
 			} catch (err: any) {
-				throw new CustomError(
-					`${key}.${err.message}`,
-					StatusCodeEnum.BAD_REQUEST,
-				);
+				if (err instanceof CustomError) {
+					const { message } = JSON.parse(err.getBody());
+
+					throw new CustomError(
+						`${key}.${message}`,
+						StatusCodeEnum.BAD_REQUEST,
+					);
+				} else {
+					throw new CustomError(
+						`${key}.??? ${err.message}`,
+						StatusCodeEnum.BAD_REQUEST,
+					);
+				}
 			}
 		};
 	}
@@ -204,7 +229,7 @@ export class Validations {
 			);
 		}
 
-		if (!/^a-z0-9{6}$/i.test(p)) {
+		if (!/^[a-z0-9]{6}$/i.test(p)) {
 			throw new CustomError(
 				`${key} must be a valid code`,
 				StatusCodeEnum.BAD_REQUEST,
@@ -286,6 +311,21 @@ export class Validations {
 				StatusCodeEnum.BAD_REQUEST,
 			);
 		}
+	}
+
+	public static productPrice(key: string, p?: any) {
+		if (!p) return;
+
+		if (typeof p !== "number") {
+			throw new CustomError(
+				`${key} must be a number`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+
+		Validations.min(5)(key, p);
+
+		Validations.money(key, p);
 	}
 
 	public static variationName(key: string, p?: any) {

@@ -42,6 +42,7 @@ const httpManager = new LambdaProvider<SaleUseCase, GetByClientIdStatusInput>({
 				key: "limit",
 				loc: "query",
 				validations: [Validations.required, Validations.limit],
+				transform: [Transform.int],
 			},
 			{
 				key: "continueFrom",

@@ -64,7 +64,7 @@ export abstract class DynamodbRepository<TableType, EntityType> {
 		if (!result.Items) {
 			return {
 				items: [],
-				prevPage: continueFrom,
+				curPage: continueFrom,
 			};
 		}
 
@@ -72,7 +72,7 @@ export abstract class DynamodbRepository<TableType, EntityType> {
 			items: result.Items.map(i =>
 				this.tableToEntity(unmarshall(i) as TableType),
 			),
-			prevPage: continueFrom,
+			curPage: continueFrom,
 			nextPage: result.LastEvaluatedKey
 				? JSON.stringify(unmarshall(result.LastEvaluatedKey))
 				: undefined,

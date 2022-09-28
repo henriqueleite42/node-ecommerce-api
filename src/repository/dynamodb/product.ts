@@ -133,7 +133,6 @@ export class ProductRepositoryDynamoDB
 		productId,
 	}: Pick<ProductEntity, "productId" | "storeId">) {
 		return {
-			IndexName: "StoreIdProductId",
 			KeyConditionExpression: "#storeId_productId = :storeId_productId",
 			ExpressionAttributeNames: {
 				"#storeId_productId": "storeId_productId",
@@ -152,7 +151,7 @@ export class ProductRepositoryDynamoDB
 		type,
 	}: Pick<ProductEntity, "storeId" | "type">) {
 		return {
-			IndexName: "StoreIdType",
+			IndexName: "StoreIdTypeCreatedAtProductId",
 			KeyConditionExpression: "#storeId_type = :storeId_type",
 			ExpressionAttributeNames: {
 				"#storeId_type": "storeId_type",

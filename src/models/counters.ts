@@ -1,9 +1,3 @@
-export interface CounterEntity {
-	pk: string;
-	sk: string;
-	count: number;
-}
-
 /**
  *
  *

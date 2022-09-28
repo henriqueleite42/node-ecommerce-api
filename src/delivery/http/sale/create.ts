@@ -46,7 +46,6 @@ const httpManager = new LambdaProvider<SaleUseCase, CreateSaleInput>({
 				loc: "body",
 				validations: [
 					Validations.required,
-					Validations.array,
 					Validations.minLength(1),
 					Validations.maxLength(1),
 					Validations.arrOfObj([

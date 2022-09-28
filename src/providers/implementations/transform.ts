@@ -16,4 +16,12 @@ export class Transform {
 	public static trim(value: string) {
 		return value.trim();
 	}
+
+	public static int(value: string) {
+		return parseInt(value, 10);
+	}
+
+	public static float(value: string) {
+		return parseFloat(value);
+	}
 }

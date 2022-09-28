@@ -1,5 +1,5 @@
 export interface PaginatedItems<Item> {
 	items: Array<Item>;
-	prevPage?: string;
+	curPage?: string;
 	nextPage?: string;
 }
