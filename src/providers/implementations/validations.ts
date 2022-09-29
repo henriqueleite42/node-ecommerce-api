@@ -60,7 +60,16 @@ export class Validations {
 
 		if (!/^{.*}$/.test(p)) {
 			throw new CustomError(
-				`${key} must be a valid cursor`,
+				`${key} must be a valid json`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+
+		try {
+			JSON.parse(p);
+		} catch (err: any) {
+			throw new CustomError(
+				`${key} must be a valid json`,
 				StatusCodeEnum.BAD_REQUEST,
 			);
 		}
@@ -121,7 +130,7 @@ export class Validations {
 					validator.validate(v);
 				} catch (err: any) {
 					if (err instanceof CustomError) {
-						const { message } = JSON.parse(err.getBody());
+						const { message } = JSON.parse(err.getBodyString());
 
 						throw new CustomError(
 							`${key}[${idx}].${message}`,
@@ -146,7 +155,7 @@ export class Validations {
 				new ValidatorProvider(vArr as any).validate(p);
 			} catch (err: any) {
 				if (err instanceof CustomError) {
-					const { message } = JSON.parse(err.getBody());
+					const { message } = JSON.parse(err.getBodyString());
 
 					throw new CustomError(
 						`${key}.${message}`,
@@ -255,6 +264,19 @@ export class Validations {
 				StatusCodeEnum.BAD_REQUEST,
 			);
 		}
+	}
+
+	public static storeDescription(key: string, p?: any) {
+		if (!p) return;
+
+		if (typeof p !== "string") {
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+
+		Validations.maxLength(500)(key, p);
 	}
 
 	public static productType(key: string, p?: any) {

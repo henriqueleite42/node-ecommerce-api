@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import type { APIGatewayEvent, Callback, Context } from "aws-lambda";
 
+import type { Service } from "../factories";
+
 import type { AuthManager } from "./auth-manager";
-import { DeliveryManager } from "./delivery-manager";
 import type { Validator } from "./validator";
 
 import type { StatusCodeEnum } from "../types/enums/status-code";
@@ -23,14 +25,16 @@ interface Config {
 	statusCode?: StatusCodeEnum;
 }
 
-export abstract class HttpManager<U, I> extends DeliveryManager<
-	Config,
-	Func,
-	U
-> {
+export abstract class HttpManager<U, I> {
+	protected func: Func;
+
+	protected service: Service<U>;
+
 	protected authManager: AuthManager;
 
 	protected validationManager: Validator<I>;
+
+	public constructor(protected readonly config: Config) {}
 
 	public abstract setAuth(p: AuthManager): this;
 
@@ -45,4 +49,27 @@ export abstract class HttpManager<U, I> extends DeliveryManager<
 	}
 
 	public abstract setFunc(p: keyof U): this;
+
+	public setService(service: Service<U>) {
+		this.service = service;
+
+		return this;
+	}
+
+	public getFunc() {
+		return this.func;
+	}
+
+	// Protected
+
+	protected getHandlerPath(dirName: string, fileName: string) {
+		const path = `${dirName
+			.split(process.cwd())[1]
+			.substring(1)
+			.replace(/\\/g, "/")}`;
+
+		const funcName = fileName.split("/")!.pop()!.split(".")!.shift()!;
+
+		return `${path}/${funcName}.func`;
+	}
 }

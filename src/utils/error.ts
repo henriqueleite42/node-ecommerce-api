@@ -14,6 +14,10 @@ export class CustomError extends Error {
 	}
 
 	public getBody() {
+		return this.body;
+	}
+
+	public getBodyString() {
 		return JSON.stringify(this.body);
 	}
 }

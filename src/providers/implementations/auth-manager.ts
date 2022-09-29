@@ -1,53 +1,56 @@
+import type { AllowedPrefixes, AuthData } from "../../providers/auth-manager";
 import { AuthManager } from "../../providers/auth-manager";
 
 export class AuthManagerProvider extends AuthManager {
 	public isAuthorized(authHeader?: string) {
-		const [authType, credentials] = authHeader?.split(" ") || [];
+		const [prefix, credentials] = this.getPrefixCredentials(authHeader);
 
-		if (!authType || !credentials) {
+		if (!prefix || !credentials) {
 			return false;
 		}
 
-		if (
-			!(this.allowedAuthTypes as Array<string>).includes(authType.toUpperCase())
-		) {
+		if (!this.allowedAuthTypes.some(this.prefixAuthType[prefix])) {
 			return false;
 		}
 
-		switch (authType) {
-			case "BOT":
-				return this.isBotAuthorized(credentials);
+		switch (prefix) {
+			case "Discord":
+				return this.isDiscordAuthorized(prefix, credentials);
 			default:
 				return false;
 		}
 	}
 
 	public getAuthData(authHeader?: string) {
-		const [authType, credentials] = authHeader?.split(" ") || [];
+		const [prefix, credentials] = this.getPrefixCredentials(authHeader);
 
-		switch (authType) {
-			case "Bot":
-				return this.getBotData(credentials);
+		switch (prefix) {
+			case "Discord":
+				return this.getDiscordData(credentials);
 			default:
 				return {};
 		}
 	}
 
-	private isBotAuthorized(credentials: string) {
+	private isDiscordAuthorized(prefix: AllowedPrefixes, credentials: string) {
 		const [, token] = credentials.split("#");
 
 		if (token !== process.env.API_BOT_TOKEN) return false;
 
-		if (this.adminOnly) {
-			const { admin } = this.getBotData(credentials);
+		const { accountId, admin } = this.getDiscordData(credentials);
 
+		if (prefix.endsWith("USER")) {
+			return Boolean(accountId);
+		}
+
+		if (prefix.endsWith("ADMIN")) {
 			return Boolean(admin);
 		}
 
 		return true;
 	}
 
-	private getBotData(credentials?: string) {
+	private getDiscordData(credentials?: string): AuthData {
 		if (!credentials) return {};
 
 		const [dataString] = credentials.split("#");

@@ -45,7 +45,7 @@ export class LambdaProvider<U, I> extends HttpManager<U, I> {
 				if (err instanceof CustomError) {
 					return {
 						statusCode: err.statusCode,
-						body: err.getBody(),
+						body: err.getBodyString(),
 					};
 				}
 

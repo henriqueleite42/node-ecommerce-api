@@ -10,6 +10,7 @@ import type {
 	UpdateImgInput,
 	IncreaseSalesCountInput,
 	IncreaseTotalBilledInput,
+	DeleteInput,
 } from "../models/product";
 import type { UploadManager } from "../providers/upload-manager";
 
@@ -96,6 +97,10 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 		return product;
 	}
 
+	public delete(p: DeleteInput) {
+		return this.productRepository.delete(p);
+	}
+
 	public getProductsByType(p: GetProductsByTypeInput) {
 		return this.productRepository.getProductsByType(p);
 	}
@@ -120,12 +125,24 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 		return this.productRepository.getManyById(topProducts);
 	}
 
+	public async getProductsCount() {
+		const count = await this.counterRepository.getTotal("PRODUCTS");
+
+		return {
+			total: count,
+		};
+	}
+
 	public async updateImg({ storeId, productId, imageUrl }: UpdateImgInput) {
 		await this.productRepository.edit({
 			storeId,
 			productId,
 			imageUrl,
 		});
+	}
+
+	public async increaseProductsCount() {
+		await this.counterRepository.incrementTotal("PRODUCTS");
 	}
 
 	public async increaseSalesCount({

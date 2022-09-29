@@ -4,13 +4,5 @@
 		"@techmmunity/eslint-config/common",
 		"@techmmunity/eslint-config/jest",
 		"@techmmunity/eslint-config/typescript"
-	],
-	"overrides": [
-		{
-			"files": ["**/seeds/**/*.ts"],
-			"rules": {
-				"filenames/match-regex": "off"
-			}
-		}
 	]
 }

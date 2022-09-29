@@ -1,37 +1,20 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
-/**
- *
- *
- * This file CANNOT use absolute paths!
- *
- *
- */
-
 import { ProductService } from "../../../factories/product";
-import type { ProductUseCase } from "../../../models/product";
+import type { DeliveryManager } from "../../../providers/delivery-manager";
 import { AuthManagerProvider } from "../../../providers/implementations/auth-manager";
-import { LambdaProvider } from "../../../providers/implementations/lambda";
 
-const httpManager = new LambdaProvider<ProductUseCase, undefined>({
-	method: "GET",
-	path: "products/top",
-})
-	.setAuth(new AuthManagerProvider(["BOT"]))
-	.setService(new ProductService());
+export const top = (server: DeliveryManager) => {
+	server.addRoute<undefined>(
+		{
+			method: "GET",
+			path: "products/top",
+		},
+		route =>
+			route.setAuth(new AuthManagerProvider(["DISCORD"])).setFunc(() => {
+				const service = new ProductService().getInstance();
 
-/**
- *
- * Func
- *
- */
-
-export const func = httpManager.setFunc("getTop").getFunc();
-
-/**
- *
- * Handler
- *
- */
-
-export const top = httpManager.getHandler(__dirname, __filename);
+				return service.getTop();
+			}),
+	);
+};

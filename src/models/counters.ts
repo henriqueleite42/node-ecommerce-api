@@ -23,7 +23,7 @@ export interface IncrementStoreInput {
 	type: StoreCounterTypes;
 }
 
-export type TotalCounterTypes = "STORES";
+export type TotalCounterTypes = "PRODUCTS" | "STORES";
 
 export interface GetTopStoresOutput {
 	storeId: string;

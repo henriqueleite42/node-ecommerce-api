@@ -46,6 +46,11 @@ export type EditInput = Partial<
 > &
 	Pick<ProductEntity, "productId" | "storeId">;
 
+export interface DeleteInput {
+	storeId: string;
+	productId: string;
+}
+
 export interface GetProductsByTypeInput
 	extends Pick<ProductEntity, "storeId" | "type"> {
 	limit: number;
@@ -62,6 +67,8 @@ export interface ProductRepository {
 	create: (p: CreateInput) => Promise<ProductEntity>;
 
 	edit: (p: EditInput) => Promise<ProductEntity | null>;
+
+	delete: (p: DeleteInput) => Promise<void>;
 
 	getProductsByType: (
 		p: GetProductsByTypeInput,
@@ -105,10 +112,16 @@ export interface IncreaseTotalBilledInput {
 	amount: number;
 }
 
+export interface GetProductsCountOutput {
+	total: number;
+}
+
 export interface ProductUseCase {
 	create: (p: CreateProductInput) => Promise<ProductEntity>;
 
 	edit: (p: EditInput) => Promise<ProductEntity>;
+
+	delete: (p: DeleteInput) => Promise<void>;
 
 	getProductsByType: (
 		p: GetProductsByTypeInput,
@@ -118,9 +131,13 @@ export interface ProductUseCase {
 
 	updateImg: (p: UpdateImgInput) => Promise<void>;
 
+	increaseProductsCount: () => Promise<void>;
+
 	increaseSalesCount: (p: IncreaseSalesCountInput) => Promise<void>;
 
 	increaseTotalBilled: (p: IncreaseTotalBilledInput) => Promise<void>;
 
 	getTop: () => Promise<Array<ProductEntity>>;
+
+	getProductsCount: () => Promise<GetProductsCountOutput>;
 }

@@ -1,70 +1,53 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
-/**
- *
- *
- * This file CANNOT use absolute paths!
- *
- *
- */
-
 import { SaleService } from "../../../factories/sale";
-import type {
-	GetByClientIdStatusInput,
-	SaleUseCase,
-} from "../../../models/sale";
+import type { GetByClientIdStatusInput } from "../../../models/sale";
+import type { DeliveryManager } from "../../../providers/delivery-manager";
 import { AuthManagerProvider } from "../../../providers/implementations/auth-manager";
-import { LambdaProvider } from "../../../providers/implementations/lambda";
 import { Transform } from "../../../providers/implementations/transform";
 import { Validations } from "../../../providers/implementations/validations";
 import { ValidatorProvider } from "../../../providers/implementations/validator";
 
 import { SalesStatusEnum } from "../../../types/enums/sale-status";
 
-const httpManager = new LambdaProvider<SaleUseCase, GetByClientIdStatusInput>({
-	method: "GET",
-	path: "sales/cart",
-})
-	.setAuth(new AuthManagerProvider(["BOT"]))
-	.setValidation(
-		new ValidatorProvider([
-			{
-				key: "clientId",
-				as: "accountId",
-				loc: "auth",
-				validations: [Validations.required, Validations.uuid],
-			},
-			{
-				key: "status",
-				transform: [Transform.default(SalesStatusEnum.IN_CART)],
-			},
-			{
-				key: "limit",
-				loc: "query",
-				validations: [Validations.required, Validations.limit],
-				transform: [Transform.int],
-			},
-			{
-				key: "continueFrom",
-				loc: "query",
-				validations: [Validations.required, Validations.cursor],
-			},
-		]),
-	)
-	.setService(new SaleService());
+export const seeCart = (server: DeliveryManager) => {
+	server.addRoute<GetByClientIdStatusInput>(
+		{
+			method: "GET",
+			path: "sales/cart",
+		},
+		route =>
+			route
+				.setAuth(new AuthManagerProvider(["DISCORD_USER"]))
+				.setValidator(
+					new ValidatorProvider([
+						{
+							key: "clientId",
+							as: "accountId",
+							loc: "auth",
+							validations: [Validations.required, Validations.uuid],
+						},
+						{
+							key: "status",
+							transform: [Transform.default(SalesStatusEnum.IN_CART)],
+						},
+						{
+							key: "limit",
+							loc: "query",
+							validations: [Validations.required, Validations.limit],
+							transform: [Transform.int],
+						},
+						{
+							key: "continueFrom",
+							loc: "query",
+							validations: [Validations.required, Validations.cursor],
+						},
+					]),
+				)
+				.setFunc(p => {
+					const service = new SaleService().getInstance();
 
-/**
- *
- * Func
- *
- */
-
-export const func = httpManager.setFunc("getByClientIdStatus").getFunc();
-
-/**
- *
- * Handler
- *
- */
-
-export const seeCart = httpManager.getHandler(__dirname, __filename);
+					return service.getByClientIdStatus(p);
+				}),
+	);
+};

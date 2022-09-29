@@ -1,50 +1,34 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
-
-/**
- *
- *
- * This file CANNOT use absolute paths!
- *
- *
- */
-
 import { StoreService } from "../../../factories/store";
-import type { GetByNameInput, StoreUseCase } from "../../../models/store";
+import type { GetByNameInput } from "../../../models/store";
+import type { DeliveryManager } from "../../../providers/delivery-manager";
 import { AuthManagerProvider } from "../../../providers/implementations/auth-manager";
-import { LambdaProvider } from "../../../providers/implementations/lambda";
 import { Transform } from "../../../providers/implementations/transform";
 import { Validations } from "../../../providers/implementations/validations";
 import { ValidatorProvider } from "../../../providers/implementations/validator";
 
-const httpManager = new LambdaProvider<StoreUseCase, GetByNameInput>({
-	method: "GET",
-	path: "stores",
-})
-	.setAuth(new AuthManagerProvider(["BOT"]))
-	.setValidation(
-		new ValidatorProvider([
-			{
-				key: "name",
-				loc: "query",
-				validations: [Validations.required, Validations.username],
-				transform: [Transform.lowercase],
-			},
-		]),
-	)
-	.setService(new StoreService());
+export const getByName = (server: DeliveryManager) => {
+	server.addRoute<GetByNameInput>(
+		{
+			method: "GET",
+			path: "stores",
+		},
+		route =>
+			route
+				.setAuth(new AuthManagerProvider(["DISCORD"]))
+				.setValidator(
+					new ValidatorProvider([
+						{
+							key: "name",
+							loc: "query",
+							validations: [Validations.required, Validations.username],
+							transform: [Transform.lowercase],
+						},
+					]),
+				)
+				.setFunc(p => {
+					const service = new StoreService().getInstance();
 
-/**
- *
- * Func
- *
- */
-
-export const func = httpManager.setFunc("getByName").getFunc();
-
-/**
- *
- * Handler
- *
- */
-
-export const getByName = httpManager.getHandler(__dirname, __filename);
+					return service.getByName(p);
+				}),
+	);
+};

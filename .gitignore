@@ -12,6 +12,7 @@ src/test.ts
 /build
 /node_modules
 /.webpack
+/api
 
 # Logs
 /logs
@@ -36,7 +37,6 @@ lerna-debug.log*
 *.env*
 !.env.example
 !.env.docker.example
-
 
 # Docker
 /docker

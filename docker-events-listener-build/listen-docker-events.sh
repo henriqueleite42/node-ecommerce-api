@@ -19,7 +19,7 @@ do
 
 		echo "Creating Secrets"
 
-		aws --endpoint-url=http://localstack:4566 ssm put-parameter --name "$SERVICE_NAME-local-apiBotToken" --type String --value "$API_BOT_TOKEN" --overwrite
+		aws --endpoint-url=http://localstack:4566 ssm put-parameter --name "$SERVICE_NAME/auth" --type String --value "{\"API_BOT_TOKEN\":\"$API_BOT_TOKEN\"}" --overwrite
 
 		echo "Secrets created"
 

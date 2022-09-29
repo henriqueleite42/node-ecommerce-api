@@ -39,9 +39,21 @@ services:
   api:
     build: "."
     container_name: maite-api_api
-    command: bash -c "sleep 5; yarn deploy:all"
+    command: yarn build:api && yarn start:api
     ports:
       - 3000:3000
+    networks:
+      - maite-api_network
+    environment:
+      API_PORT: 3000
+    volumes:
+      - ./:/api/
+      - nodemodules:/app/node_modules
+
+  lambda:
+    build: "."
+    container_name: maite-api_lambda
+    command: bash -c "sleep 5; yarn deploy:all"
     networks:
       - maite-api_network
     #environment:

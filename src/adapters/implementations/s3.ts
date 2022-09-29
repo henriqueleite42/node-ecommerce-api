@@ -9,15 +9,7 @@ export class S3Adapter implements FileManager {
 	private readonly s3: S3Client;
 
 	public constructor() {
-		const { NODE_ENV } = process.env;
-
-		if (NODE_ENV === "local") {
-			this.s3 = {
-				send: () => {},
-			} as unknown as S3Client;
-		} else {
-			this.s3 = new S3Client({});
-		}
+		this.s3 = new S3Client({});
 	}
 
 	public async saveFile({ folder, file, name, metadata }: SaveFileInput) {

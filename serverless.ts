@@ -13,7 +13,6 @@ import { resourcesStore } from "./resources-store";
 import { resourcesUpload } from "./resources-upload";
 import { resourcesWallet } from "./resources-wallet";
 
-import { account } from "./src/delivery/account";
 import { content } from "./src/delivery/content";
 import { product } from "./src/delivery/product";
 import { sale } from "./src/delivery/sale";
@@ -27,6 +26,9 @@ const SERVICE_NAME = "monetizzer";
 config();
 
 const baseConfig: Partial<AWS> = {
+	plugins: [
+		"serverless-localstack",
+	],
 	configValidationMode: "error",
 	frameworkVersion: "3",
 	useDotenv: true,
@@ -95,19 +97,13 @@ const baseConfig: Partial<AWS> = {
 
 const accountConfig = {
 	service: "account",
-	plugins: [
-		"serverless-webpack",
-		"serverless-localstack",
-	],
 	resources: resourcesAccount,
-	functions: account,
 };
 
 const contentConfig = {
 	service: "content",
 	plugins: [
 		"serverless-webpack",
-		"serverless-localstack",
 	],
 	provider: {
 		environment: {
@@ -128,9 +124,6 @@ const contentConfig = {
 
 const counterConfig = {
 	service: "counter",
-	plugins: [
-		"serverless-localstack",
-	],
 	resources: resourcesCounter,
 };
 
@@ -138,7 +131,6 @@ const productConfig = {
 	service: "product",
 	plugins: [
 		"serverless-webpack",
-		"serverless-localstack",
 	],
 	provider: {
 		environment: {
@@ -172,7 +164,6 @@ const saleConfig = {
 	service: "sale",
 	plugins: [
 		"serverless-webpack",
-		"serverless-localstack",
 	],
 	provider: {
 		environment: {
@@ -192,7 +183,6 @@ const storeConfig = {
 	service: "store",
 	plugins: [
 		"serverless-webpack",
-		"serverless-localstack",
 	],
 	provider: {
 		environment: {
@@ -232,7 +222,6 @@ const uploadConfig = {
 	service: "upload",
 	plugins: [
 		"serverless-webpack",
-		"serverless-localstack",
 	],
 	provider: {
 		environment: {
@@ -249,7 +238,6 @@ const walletConfig = {
 	service: "wallet",
 	plugins: [
 		"serverless-webpack",
-		"serverless-localstack",
 	],
 	resources: resourcesWallet,
 	functions: wallet,

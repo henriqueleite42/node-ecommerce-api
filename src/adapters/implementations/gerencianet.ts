@@ -1,10 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import {
-	SecretsManagerClient,
-	GetSecretValueCommand,
-} from "@aws-sdk/client-secrets-manager";
 import axios from "axios";
 import { Agent } from "https";
 
@@ -45,8 +41,6 @@ interface ApiQrCodeResponse {
 export class GerenciarnetManager implements PixManager {
 	private httpsAgent: Agent;
 
-	private secrets: Record<string, string>;
-
 	private readonly credentials: {
 		accessToken: string;
 		expiresAt: number;
@@ -56,26 +50,16 @@ export class GerenciarnetManager implements PixManager {
 
 	private async getCredentials() {
 		if (!this.httpsAgent) {
-			const secretManager = new SecretsManagerClient({});
-
-			this.secrets = await secretManager
-				.send(
-					new GetSecretValueCommand({
-						SecretId: "monetizzer/Gerencianet",
-					}),
-				)
-				.then(r => JSON.parse(r.SecretString!));
-
 			this.httpsAgent = new Agent({
 				rejectUnauthorized: true,
-				cert: this.secrets.GERENCIANET_CERTIFICATE_CERT,
-				key: this.secrets.GERENCIANET_CERTIFICATE_KEY,
+				cert: process.env.GERENCIANET_CERTIFICATE_CERT,
+				key: process.env.GERENCIANET_CERTIFICATE_KEY,
 			});
 		}
 
 		if (new Date().getTime() < this.credentials.expiresAt) {
 			return axios.create({
-				baseURL: this.secrets.GERENCIANET_URL,
+				baseURL: process.env.GERENCIANET_URL,
 				httpsAgent: this.httpsAgent,
 				headers: {
 					"Content-Type": "application/json",
@@ -85,7 +69,7 @@ export class GerenciarnetManager implements PixManager {
 		}
 
 		const auth = Buffer.from(
-			`${this.secrets.GERENCIANET_CLIENT_ID}:${this.secrets.GERENCIANET_CLIENT_SECRET}`,
+			`${process.env.GERENCIANET_CLIENT_ID}:${process.env.GERENCIANET_CLIENT_SECRET}`,
 		).toString("base64");
 
 		const response = await axios
@@ -95,7 +79,7 @@ export class GerenciarnetManager implements PixManager {
 					grant_type: "client_credentials",
 				},
 				{
-					baseURL: this.secrets.GERENCIANET_URL,
+					baseURL: process.env.GERENCIANET_URL,
 					httpsAgent: this.httpsAgent,
 					headers: {
 						Authorization: `Basic ${auth}`,
@@ -109,7 +93,7 @@ export class GerenciarnetManager implements PixManager {
 			new Date().getTime() + response.expires_in - 150;
 
 		return axios.create({
-			baseURL: this.secrets.GERENCIANET_URL,
+			baseURL: process.env.GERENCIANET_URL,
 			httpsAgent: this.httpsAgent,
 			headers: {
 				"Content-Type": "application/json",
@@ -133,7 +117,7 @@ export class GerenciarnetManager implements PixManager {
 				valor: {
 					original: valueString,
 				},
-				chave: this.secrets.GERENCIANET_PIX_KEY,
+				chave: process.env.GERENCIANET_PIX_KEY,
 			})
 			.then(r => r.data);
 

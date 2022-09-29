@@ -9,15 +9,7 @@ export class SNSAdapter implements TopicManager {
 	private readonly sns: SNSClient;
 
 	public constructor() {
-		const { NODE_ENV } = process.env;
-
-		if (NODE_ENV === "local") {
-			this.sns = {
-				send: () => {},
-			} as unknown as SNSClient;
-		} else {
-			this.sns = new SNSClient({});
-		}
+		this.sns = new SNSClient({});
 	}
 
 	public async sendMsg(p: SendMsgInput) {

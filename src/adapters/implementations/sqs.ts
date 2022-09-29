@@ -9,15 +9,7 @@ export class SQSAdapter implements QueueManager {
 	private readonly sqs: SQSClient;
 
 	public constructor() {
-		const { NODE_ENV } = process.env;
-
-		if (NODE_ENV === "local") {
-			this.sqs = {
-				send: () => {},
-			} as unknown as SQSClient;
-		} else {
-			this.sqs = new SQSClient({});
-		}
+		this.sqs = new SQSClient({});
 	}
 
 	public async sendMsg(p: SendMsgInput) {

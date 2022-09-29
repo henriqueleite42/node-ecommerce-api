@@ -1,44 +1,94 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
-import type { Service } from "../factories";
+import type { SecretManager } from "../adapters/secret-manager";
 
-import type { Lambda } from "../types/aws";
+import type { AuthManager } from "./auth-manager";
+import type { Validator } from "./validator";
 
-export abstract class DeliveryManager<C, F, U> {
-	protected func: F;
+type Func<I> = (
+	p: I,
+) => Promise<Record<string, any>> | Record<string, any> | undefined;
 
-	protected service: Service<U>;
+export type RouteMethods = "DELETE" | "GET" | "PATCH" | "POST" | "PUT";
 
-	public constructor(protected readonly config: C) {}
+export interface ExecFuncInput {
+	body?: Record<string, any>;
+	query?: Record<string, string>;
+	headers?: Record<string, string>;
+	path?: Record<string, string>;
+}
 
-	// Abstract
+export abstract class Route<I> {
+	protected authManager?: AuthManager;
 
-	public abstract setFunc(...p: any): this;
+	protected validatorManager?: Validator<I>;
 
-	public abstract getHandler(dirName: string, fileName: string): Lambda;
+	protected func: Func<I>;
 
-	// Public
-
-	public setService(service: Service<U>) {
-		this.service = service;
+	public setAuth(authManager: AuthManager) {
+		this.authManager = authManager;
 
 		return this;
 	}
 
-	public getFunc() {
-		return this.func;
+	public setValidator(validatorManager: Validator<I>) {
+		this.validatorManager = validatorManager;
+
+		return this;
 	}
 
-	// Protected
+	public setFunc(func: Func<I>) {
+		this.func = func;
 
-	protected getHandlerPath(dirName: string, fileName: string) {
-		const path = `${dirName
-			.split(process.cwd())[1]
-			.substring(1)
-			.replace(/\\/g, "/")}`;
-
-		const funcName = fileName.split("/")!.pop()!.split(".")!.shift()!;
-
-		return `${path}/${funcName}.func`;
+		return this;
 	}
+
+	protected async execFunc(params: ExecFuncInput) {
+		const authHeader = this.getAuthHeader(params.headers);
+
+		if (this.authManager) {
+			this.authManager.isAuthorized(authHeader);
+		}
+
+		const input = {
+			...params,
+			auth: this.authManager?.getAuthData(authHeader) || {},
+		};
+
+		const validatedData = await this.validatorManager?.validate(input);
+
+		return this.func(validatedData as any);
+	}
+
+	// Internal methods
+
+	protected getAuthHeader(headers?: Record<string, any>) {
+		return headers?.authorization || headers?.Authorization || "";
+	}
+}
+
+export abstract class DeliveryManager {
+	protected secretsToBeLoaded = [] as Array<string>;
+
+	protected secretsManager?: SecretManager;
+
+	public setSecretsManager(secretsManager: SecretManager) {
+		this.secretsManager = secretsManager;
+
+		return this;
+	}
+
+	public addSecretsToLoad(secret: string) {
+		if (!this.secretsToBeLoaded.includes(secret)) {
+			this.secretsToBeLoaded.push(secret);
+		}
+	}
+
+	public abstract loadSecrets(): Promise<void>;
+
+	public abstract addRoute<I>(
+		config: any,
+		r: (route: Route<I>) => Route<I>,
+	): this;
 }

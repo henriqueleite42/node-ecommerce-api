@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { PutItemCommand } from "@aws-sdk/client-dynamodb";
+import { DeleteItemCommand, PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { cleanObj } from "@techmmunity/utils";
 
 import type {
 	CreateInput,
+	DeleteInput,
 	EditInput,
 	GetByIdInput,
 	GetManyByIdInput,
@@ -95,6 +96,15 @@ export class ProductRepositoryDynamoDB
 				storeId,
 			}).Key,
 			data,
+		);
+	}
+
+	public async delete(keys: DeleteInput) {
+		await this.dynamodb.send(
+			new DeleteItemCommand({
+				TableName: this.tableName,
+				Key: this.indexStoreIdProductId(keys).Key,
+			}),
 		);
 	}
 

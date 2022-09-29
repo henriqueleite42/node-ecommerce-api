@@ -195,11 +195,37 @@ export const resourcesProduct: AWS["resources"] = {
 		 * Queues And Topics
 		 *
 		 */
+		ProductCreatedTopic: {
+			Type: "AWS::SNS::Topic",
+			Properties: {
+				TopicName: "${self:service}-${opt:stage, 'local'}-product-created",
+			},
+		},
 		UpdateImgQueue: {
 			Type: "AWS::SQS::Queue",
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-update-img",
+			},
+		},
+		IncrementProductsCountQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'local'}-increment-products-count",
+			},
+		},
+		IncrementProductsCountSubscription: {
+			Type: "AWS::SNS::Subscription",
+			Properties: {
+				Protocol: "sqs",
+				Endpoint: {
+					"Fn::GetAtt": ["IncrementProductsCountQueue", "Arn"],
+				},
+				Region: "${self:custom.region.${opt:stage, 'local'}}",
+				TopicArn: {
+					Ref: "ProductCreatedTopic",
+				},
 			},
 		},
 		IncrementSalesCountQueue: {

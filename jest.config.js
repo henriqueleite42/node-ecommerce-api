@@ -5,20 +5,18 @@ module.exports = {
 	transform: {
 		"^.+\\.(t|j)s$": "ts-jest",
 	},
-	collectCoverageFrom: [
-		".",
-	],
+	collectCoverageFrom: ["."],
 	setupFiles: ["./tests/setup.ts"],
 	coverageDirectory: "../coverage",
 	testEnvironment: "node",
 	moduleDirectories: ["node_modules", "src"],
 	resetMocks: true,
 	coverageThreshold: {
-	 	global: {
-	 		statements: 0,
-	 		branches: 0,
-	 		functions: 0,
-	 		lines: 0,
-	 	},
+		global: {
+			statements: 0,
+			branches: 0,
+			functions: 0,
+			lines: 0,
+		},
 	},
 };

@@ -1,69 +1,53 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
-
-/**
- *
- *
- * This file CANNOT use absolute paths!
- *
- *
- */
-
 import { StoreService } from "../../../factories/store";
-import type { EditInput, StoreUseCase } from "../../../models/store";
+import type { EditInput } from "../../../models/store";
+import type { DeliveryManager } from "../../../providers/delivery-manager";
 import { AuthManagerProvider } from "../../../providers/implementations/auth-manager";
-import { LambdaProvider } from "../../../providers/implementations/lambda";
 import { Validations } from "../../../providers/implementations/validations";
 import { ValidatorProvider } from "../../../providers/implementations/validator";
 
-const httpManager = new LambdaProvider<StoreUseCase, EditInput>({
-	method: "PATCH",
-	path: "stores",
-})
-	.setAuth(new AuthManagerProvider(["BOT"]))
-	.setValidation(
-		new ValidatorProvider([
-			{
-				key: "storeId",
-				as: "accountId",
-				loc: "auth",
-				validations: [Validations.required, Validations.uuid],
-			},
-			{
-				key: "description",
-				loc: "body",
-				validations: [Validations.maxLength(500)],
-			},
-			{
-				key: "color",
-				loc: "body",
-				validations: [Validations.color],
-			},
-			{
-				key: "bannerUrl",
-				loc: "body",
-				validations: [Validations.url],
-			},
-			{
-				key: "avatarUrl",
-				loc: "body",
-				validations: [Validations.url],
-			},
-		]),
-	)
-	.setService(new StoreService());
+export const edit = (server: DeliveryManager) => {
+	server.addRoute<EditInput>(
+		{
+			method: "PATCH",
+			path: "stores",
+		},
+		route =>
+			route
+				.setAuth(new AuthManagerProvider(["DISCORD_USER"]))
+				.setValidator(
+					new ValidatorProvider([
+						{
+							key: "storeId",
+							as: "accountId",
+							loc: "auth",
+							validations: [Validations.required, Validations.uuid],
+						},
+						{
+							key: "description",
+							loc: "body",
+							validations: [Validations.storeDescription],
+						},
+						{
+							key: "color",
+							loc: "body",
+							validations: [Validations.color],
+						},
+						{
+							key: "bannerUrl",
+							loc: "body",
+							validations: [Validations.url],
+						},
+						{
+							key: "avatarUrl",
+							loc: "body",
+							validations: [Validations.url],
+						},
+					]),
+				)
+				.setFunc(p => {
+					const service = new StoreService().getInstance();
 
-/**
- *
- * Func
- *
- */
-
-export const func = httpManager.setFunc("edit").getFunc();
-
-/**
- *
- * Handler
- *
- */
-
-export const edit = httpManager.getHandler(__dirname, __filename);
+					return service.edit(p);
+				}),
+	);
+};
