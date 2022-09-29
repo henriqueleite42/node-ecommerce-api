@@ -15,7 +15,6 @@ import type {
 	SaleRepository,
 	SaleUseCase,
 	CheckoutSaleInput,
-	ProcessPaymentSaleInput,
 } from "../models/sale";
 
 import { CustomError } from "../utils/error";
@@ -162,7 +161,9 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		}
 	}
 
-	public async processPayment({ saleId }: ProcessPaymentSaleInput) {
+	public async processPixPayment(p: any) {
+		const { saleId, value } = this.pixManager.getPixPaidData(p);
+
 		const sale = await this.saleRepository.getById({ saleId });
 
 		if (!sale) {
@@ -174,6 +175,10 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 				"Sale already in progress",
 				StatusCodeEnum.CONFLICT,
 			);
+		}
+
+		if (value < sale.finalPrice) {
+			throw new CustomError("Invalid value paid", StatusCodeEnum.BAD_REQUEST);
 		}
 
 		await this.saleRepository.edit({

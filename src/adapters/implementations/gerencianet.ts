@@ -38,6 +38,19 @@ interface ApiQrCodeResponse {
 	imagemQrcode: string; // Base64 image
 }
 
+interface PixBody {
+	pix: [
+		{
+			endToEndId: string; // Pix ID
+			txid: string; // Sale ID (WITHOUT DASHES!!!!)
+			chave: string; // Pix Key
+			valor: string; // Value
+			horario: string; // ISO Date
+			infoPagador: string; // Message
+		},
+	];
+}
+
 export class GerenciarnetManager implements PixManager {
 	private httpsAgent: Agent;
 
@@ -110,7 +123,7 @@ export class GerenciarnetManager implements PixManager {
 			: `${value}.00`;
 
 		const responseCob = await instance
-			.put<ApiCobResponse>(`/v2/cob/${saleId.replace(/-/g, "")}`, {
+			.put<ApiCobResponse>(`/v2/cob/${this.unmaskUuid(saleId)}`, {
 				calendario: {
 					expiracao: this.pixExpirationInSeconds,
 				},
@@ -132,5 +145,30 @@ export class GerenciarnetManager implements PixManager {
 				"",
 			),
 		};
+	}
+
+	public getPixPaidData(p: PixBody) {
+		const pix = p.pix.shift()!;
+		const saleId = this.maskUuid(pix.txid);
+		const value = parseFloat(pix.valor);
+
+		return {
+			saleId,
+			value,
+		};
+	}
+
+	protected unmaskUuid(uuid: string) {
+		return uuid.replace(/-/g, "");
+	}
+
+	protected maskUuid(uuid: string) {
+		return [
+			uuid.slice(0, 8),
+			uuid.slice(8, 12),
+			uuid.slice(12, 16),
+			uuid.slice(16, 20),
+			uuid.slice(20),
+		].join("-");
 	}
 }

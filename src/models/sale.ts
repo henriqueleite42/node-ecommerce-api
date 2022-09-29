@@ -114,10 +114,6 @@ export interface CheckoutSaleOutput {
 	pixData: CreatePixOutput;
 }
 
-export interface ProcessPaymentSaleInput {
-	saleId: string;
-}
-
 export interface SaleUseCase {
 	create: (p: CreateSaleInput) => Promise<SaleEntity>;
 
@@ -125,7 +121,7 @@ export interface SaleUseCase {
 
 	checkout: (p: CheckoutSaleInput) => Promise<CheckoutSaleOutput>;
 
-	processPayment: (p: ProcessPaymentSaleInput) => Promise<void>;
+	processPixPayment: (p: any) => Promise<void>;
 
 	getById: (p: GetByIdInput) => Promise<SaleEntity>;
 

@@ -141,13 +141,6 @@ export const resourcesSale: AWS["resources"] = {
 				TopicName: "${self:service}-${opt:stage, 'local'}-sale-created",
 			},
 		},
-		ProcessPaymentQueue: {
-			Type: "AWS::SQS::Queue",
-			Properties: {
-				QueueName:
-					"${self:service}-${opt:stage, 'local'}-process-payment",
-			},
-		},
 		PaymentProcessedTopic: {
 			Type: "AWS::SNS::Topic",
 			Properties: {
@@ -156,24 +149,6 @@ export const resourcesSale: AWS["resources"] = {
 		},
 	},
 	Outputs: {
-		ProcessPaymentQueueUrl: {
-			Value: {
-				Ref: "ProcessPaymentQueue"
-			},
-			Export: {
-				Name: {
-					"Fn::Join": [
-						":",
-						[
-							{
-								Ref: "AWS::StackName",
-							},
-							"ProcessPaymentQueueUrl",
-						],
-					],
-				},
-			}
-		},
 		SaleCreatedTopicArn: {
 			Value: {
 				Ref: "SaleCreatedTopic"

@@ -3,6 +3,7 @@ import type { DeliveryManager } from "../../providers/delivery-manager";
 import { addProduct } from "./sale/add-product";
 import { checkout } from "./sale/checkout";
 import { create } from "./sale/create";
+import { processPixPayment } from "./sale/process-pix-payment";
 import { seeCart } from "./sale/see-cart";
 
 export const saleDomain = (server: DeliveryManager) => {
@@ -15,5 +16,6 @@ export const saleDomain = (server: DeliveryManager) => {
 	addProduct(server);
 	checkout(server);
 	create(server);
+	processPixPayment(server);
 	seeCart(server);
 };

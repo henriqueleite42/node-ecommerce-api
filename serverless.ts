@@ -16,7 +16,6 @@ import { resourcesWallet } from "./resources-wallet";
 
 import { content } from "./src/delivery/content";
 import { product } from "./src/delivery/product";
-import { sale } from "./src/delivery/sale";
 import { store } from "./src/delivery/store";
 import { upload } from "./src/delivery/upload";
 import { wallet } from "./src/delivery/wallet";
@@ -168,9 +167,6 @@ const productConfig = {
 
 const saleConfig = {
 	service: "sale",
-	plugins: [
-		"serverless-webpack",
-	],
 	provider: {
 		environment: {
 			SALE_CREATED_TOPIC_ARN: {
@@ -182,7 +178,6 @@ const saleConfig = {
 		},
 	},
 	resources: resourcesSale,
-	functions: sale,
 };
 
 const storeConfig = {
