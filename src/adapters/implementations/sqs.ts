@@ -29,6 +29,7 @@ export class SQSAdapter implements QueueManager {
 				QueueUrl: p.to,
 				MessageBody: JSON.stringify(p.message),
 				MessageAttributes: p.metadata ? metadata : undefined,
+				DelaySeconds: p.delayInSeconds,
 			}),
 		);
 	}

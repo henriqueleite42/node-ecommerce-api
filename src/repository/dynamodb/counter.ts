@@ -15,7 +15,7 @@ import type {
 	IncrementProductInput,
 	IncrementStoreInput,
 	TotalCounterTypes,
-} from "../../models/counters";
+} from "../../models/counter";
 
 import { DynamodbRepository } from ".";
 

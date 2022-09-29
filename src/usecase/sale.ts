@@ -222,6 +222,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 
 		return {
 			productId,
+			type: product.type,
 			name: product.name,
 			description: product.description,
 			price:

@@ -7,7 +7,7 @@ const PROVISIONED_THROUGHPUT_COUNTERS = {
 
 export const resourcesBlacklist: AWS["resources"] = {
 	Resources: {
-		CounterDynamoDBTable: {
+		BlacklistDynamoDBTable: {
 			DeletionPolicy: "Retain",
 			UpdateReplacePolicy: "Retain",
 			Type: "AWS::DynamoDB::Table",

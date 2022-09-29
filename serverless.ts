@@ -8,17 +8,19 @@ import { resourcesAccount } from "./resources-account";
 import { resourcesBlacklist } from "./resources-blacklist";
 import { resourcesContent } from "./resources-content";
 import { resourcesCounter } from "./resources-counter";
+import { resourcesEventAlert } from "./resources-event-alert";
 import { resourcesProduct } from "./resources-product";
 import { resourcesSale } from "./resources-sale";
 import { resourcesStore } from "./resources-store";
 import { resourcesUpload } from "./resources-upload";
 import { resourcesWallet } from "./resources-wallet";
 
-import { content } from "./src/delivery/content";
-import { product } from "./src/delivery/product";
-import { store } from "./src/delivery/store";
-import { upload } from "./src/delivery/upload";
-import { wallet } from "./src/delivery/wallet";
+import { content } from "./src/delivery/queue/content";
+import { eventAlert } from "./src/delivery/queue/event-alert";
+import { product } from "./src/delivery/queue/product";
+import { store } from "./src/delivery/queue/store";
+import { upload } from "./src/delivery/queue/upload";
+import { wallet } from "./src/delivery/queue/wallet";
 
 // You need to change this if you changed the one at docker-events-listener-build/listen-docker-events.sh
 const SERVICE_NAME = "monetizzer";
@@ -125,6 +127,15 @@ const contentConfig = {
 const counterConfig = {
 	service: "counter",
 	resources: resourcesCounter,
+};
+
+const eventsAlertsConfig = {
+	service: "event-alert",
+	plugins: [
+		"serverless-webpack",
+	],
+	resources: resourcesEventAlert,
+	functions: eventAlert,
 };
 
 const blacklistConfig = {
@@ -257,6 +268,9 @@ const getConfig = () => {
 
 		case "COUNTER":
 			return merge(baseConfig, counterConfig);
+
+		case "EVENT-ALERT":
+			return merge(baseConfig, eventsAlertsConfig);
 
 		case "PRODUCT":
 			return merge(baseConfig, productConfig);

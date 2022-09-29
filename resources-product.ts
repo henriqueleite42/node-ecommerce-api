@@ -270,6 +270,24 @@ export const resourcesProduct: AWS["resources"] = {
 		},
 	},
 	Outputs: {
+		ProductCreatedTopicArn: {
+			Value: {
+				Ref: "ProductCreatedTopic"
+			},
+			Export: {
+				Name: {
+					"Fn::Join": [
+						":",
+						[
+							{
+								Ref: "AWS::StackName",
+							},
+							"ProductCreatedTopicArn",
+						],
+					],
+				},
+			}
+		},
 		MediaStorageCloudFrontUrl: {
 			Description: "CloudFront Products",
 			Value: {

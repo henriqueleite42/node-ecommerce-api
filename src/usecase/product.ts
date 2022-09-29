@@ -1,5 +1,5 @@
 import type { ContentUseCase } from "../models/content";
-import type { CounterRepository } from "../models/counters";
+import type { CounterRepository } from "../models/counter";
 import type {
 	CreateProductInput,
 	EditInput,

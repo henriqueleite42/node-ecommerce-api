@@ -4,11 +4,13 @@ import type { PaginatedItems } from "./types";
 
 import type { DeliveryMethodEnum } from "../types/enums/delivery-method";
 import type { PaymentMethodEnum } from "../types/enums/payment-method";
+import type { ProductTypeEnum } from "../types/enums/product-type";
 import type { SalesStatusEnum } from "../types/enums/sale-status";
 
 export interface SaleProduct {
 	productId: string;
 	variationId?: string;
+	type: ProductTypeEnum;
 	name: string;
 	description: string;
 	price: number;

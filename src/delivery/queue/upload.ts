@@ -1,4 +1,4 @@
-import { fromUrl } from "./queue/upload/from-url";
+import { fromUrl } from "./upload/from-url";
 
 export const upload = {
 	uploadFromUrl: fromUrl,

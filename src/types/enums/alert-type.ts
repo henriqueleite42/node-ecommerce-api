@@ -1,0 +1,6 @@
+export enum AlertTypeEnum {
+	NEW_STORE = "NEW_STORE",
+	NEW_PRODUCT = "NEW_PRODUCT",
+	NEW_SALE = "NEW_SALE",
+	NEW_FEEDBACK = "NEW_FEEDBACK",
+}

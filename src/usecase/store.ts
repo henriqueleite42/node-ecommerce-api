@@ -1,6 +1,6 @@
 import type { TopicManager } from "../adapters/topic-manager";
 import type { BlacklistRepository } from "../models/blacklist";
-import type { CounterRepository } from "../models/counters";
+import type { CounterRepository } from "../models/counter";
 import type {
 	CreateInput,
 	EditInput,
