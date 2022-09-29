@@ -2,6 +2,7 @@
 
 import type { PixManager } from "../adapters/pix-manager";
 import type { TopicManager } from "../adapters/topic-manager";
+import type { BlacklistRepository } from "../models/blacklist";
 import type { ProductEntity, ProductRepository } from "../models/product";
 import type {
 	AddProductSaleInput,
@@ -26,12 +27,21 @@ import { StatusCodeEnum } from "../types/enums/status-code";
 export class SaleUseCaseImplementation implements SaleUseCase {
 	public constructor(
 		private readonly saleRepository: SaleRepository,
+		private readonly blacklistRepository: BlacklistRepository,
 		private readonly productRepository: ProductRepository,
 		private readonly topicManager: TopicManager,
 		private readonly pixManager: PixManager,
 	) {}
 
 	public async create({ products, ...i }: CreateSaleInput) {
+		const { buying } = await this.blacklistRepository.get({
+			accountId: i.clientId,
+		});
+
+		if (buying) {
+			throw new CustomError("User blacklisted", StatusCodeEnum.FORBIDDEN);
+		}
+
 		const productsData = await this.productRepository.getManyById(
 			products.map(p => ({
 				storeId: i.storeId,

@@ -5,6 +5,7 @@ import { merge } from "lodash";
 import { config } from "dotenv";
 
 import { resourcesAccount } from "./resources-account";
+import { resourcesBlacklist } from "./resources-blacklist";
 import { resourcesContent } from "./resources-content";
 import { resourcesCounter } from "./resources-counter";
 import { resourcesProduct } from "./resources-product";
@@ -127,6 +128,11 @@ const counterConfig = {
 	resources: resourcesCounter,
 };
 
+const blacklistConfig = {
+	service: "blacklist",
+	resources: resourcesBlacklist,
+};
+
 const productConfig = {
 	service: "product",
 	plugins: [
@@ -247,6 +253,9 @@ const getConfig = () => {
 	switch (process.env.API_MODULE) {
 		case "ACCOUNT":
 			return merge(baseConfig, accountConfig);
+
+		case "BLACKLIST":
+			return merge(baseConfig, blacklistConfig);
 
 		case "CONTENT":
 			return merge(baseConfig, contentConfig);

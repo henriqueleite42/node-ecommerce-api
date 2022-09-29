@@ -1,5 +1,6 @@
 import { SSMAdapter } from "./adapters/implementations/ssm";
 import { accountDomain } from "./delivery/http/account";
+import { blacklistDomain } from "./delivery/http/blacklist";
 import { productDomain } from "./delivery/http/product";
 import { saleDomain } from "./delivery/http/sale";
 import { storeDomain } from "./delivery/http/store";
@@ -12,6 +13,7 @@ const bootstrap = async () => {
 	server.setSecretsManager(new SSMAdapter());
 
 	accountDomain(server);
+	blacklistDomain(server);
 	productDomain(server);
 	saleDomain(server);
 	storeDomain(server);

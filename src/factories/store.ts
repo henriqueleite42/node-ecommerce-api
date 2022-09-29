@@ -4,6 +4,7 @@ import { SQSAdapter } from "../adapters/implementations/sqs";
 import type { StoreUseCase } from "../models/store";
 import { UploadManagerProvider } from "../providers/implementations/upload-manager";
 import { getDynamoInstance } from "../repository/dynamodb";
+import { BlacklistRepositoryDynamoDB } from "../repository/dynamodb/blacklist";
 import { CounterRepositoryDynamoDB } from "../repository/dynamodb/counter";
 import { StoreRepositoryDynamoDB } from "../repository/dynamodb/store";
 import { StoreUseCaseImplementation } from "../usecase/store";
@@ -18,12 +19,14 @@ export class StoreService extends Service<StoreUseCase> {
 		const s3 = new S3Adapter();
 
 		const storeRepository = new StoreRepositoryDynamoDB(dynamodb);
+		const blacklistRepository = new BlacklistRepositoryDynamoDB(dynamodb);
 		const counterRepository = new CounterRepositoryDynamoDB(dynamodb);
 
 		const uploadManager = new UploadManagerProvider(sqs, s3);
 
 		return new StoreUseCaseImplementation(
 			storeRepository,
+			blacklistRepository,
 			counterRepository,
 			sns,
 			uploadManager,

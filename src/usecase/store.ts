@@ -1,4 +1,5 @@
 import type { TopicManager } from "../adapters/topic-manager";
+import type { BlacklistRepository } from "../models/blacklist";
 import type { CounterRepository } from "../models/counters";
 import type {
 	CreateInput,
@@ -19,12 +20,21 @@ import { StatusCodeEnum } from "../types/enums/status-code";
 export class StoreUseCaseImplementation implements StoreUseCase {
 	public constructor(
 		private readonly storeRepository: StoreRepository,
+		private readonly blacklistRepository: BlacklistRepository,
 		private readonly counterRepository: CounterRepository,
 		private readonly topicManager: TopicManager,
 		private readonly uploadManager: UploadManager,
 	) {}
 
 	public async create({ avatarUrl, bannerUrl, ...p }: CreateInput) {
+		const { storeCreation } = await this.blacklistRepository.get({
+			accountId: p.accountId,
+		});
+
+		if (storeCreation) {
+			throw new CustomError("User blacklisted", StatusCodeEnum.FORBIDDEN);
+		}
+
 		const accountAlreadyHasStore = await this.storeRepository.getById({
 			storeId: p.accountId,
 		});
