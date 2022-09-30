@@ -17,10 +17,13 @@ import type {
 	CheckoutSaleInput,
 	PaymentProcessedMessage,
 	SaleCreatedMessage,
+	SetAsDeliveredInput,
+	SaleDeliveredMessage,
 } from "../models/sale";
 
 import { CustomError } from "../utils/error";
 
+import { isManualDelivery } from "../types/enums/delivery-method";
 import { PaymentMethodEnum } from "../types/enums/payment-method";
 import { SalesStatusEnum } from "../types/enums/sale-status";
 import { StatusCodeEnum } from "../types/enums/status-code";
@@ -179,7 +182,11 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 			);
 		}
 
-		if (value < sale.finalPrice) {
+		if (value !== sale.finalPrice) {
+			/**
+			 * We should handle refund here!
+			 */
+
 			throw new CustomError("Invalid value paid", StatusCodeEnum.BAD_REQUEST);
 		}
 
@@ -192,6 +199,38 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 			to: process.env.SALE_PAYMENT_PROCESSED_TOPIC_ARN!,
 			message: sale,
 		});
+	}
+
+	public async setAsDelivered({ storeId, saleId }: SetAsDeliveredInput) {
+		const sale = await this.saleRepository.getById({ saleId });
+
+		if (!sale) {
+			throw new CustomError("Sale not found", StatusCodeEnum.NOT_FOUND);
+		}
+
+		if (sale.storeId !== storeId) {
+			throw new CustomError("Unauthorized", StatusCodeEnum.UNAUTHORIZED);
+		}
+
+		if (sale.status !== SalesStatusEnum.PAID) {
+			throw new CustomError("Sale status invalid", StatusCodeEnum.CONFLICT);
+		}
+
+		if (!sale.products.some(p => isManualDelivery(p.deliveryMethod))) {
+			throw new CustomError("Invalid delivery method", StatusCodeEnum.CONFLICT);
+		}
+
+		const saleUpdated = await this.saleRepository.edit({
+			saleId,
+			status: SalesStatusEnum.DELIVERED,
+		});
+
+		await this.topicManager.sendMsg<SaleDeliveredMessage>({
+			to: process.env.SALE_SALE_DELIVERED_TOPIC_ARN!,
+			message: sale,
+		});
+
+		return saleUpdated!;
 	}
 
 	public async getById(p: GetByIdInput) {

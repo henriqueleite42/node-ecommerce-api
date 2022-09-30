@@ -1,7 +1,5 @@
 /**
- *			 		IN_CART -> PENDING -> PAID -> DELIVERED
- * CANCELED   <|-				 <|-				|				 |
- * 										REFUNDED     <|-			<|-
+ * https://miro.com/app/board/uXjVPYY_sok=/
  */
 export enum SalesStatusEnum {
 	IN_CART = "IN_CART",
@@ -10,4 +8,5 @@ export enum SalesStatusEnum {
 	DELIVERED = "DELIVERED",
 	CANCELED = "CANCELED",
 	REFUNDED = "REFUNDED",
+	EXPIRED = "EXPIRED",
 }

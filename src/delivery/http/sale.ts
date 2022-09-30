@@ -1,6 +1,7 @@
 import { addProduct } from "./sale/add-product";
 import { checkout } from "./sale/checkout";
 import { create } from "./sale/create";
+import { deliver } from "./sale/deliver";
 import { processPixPayment } from "./sale/process-pix-payment";
 import { seeCart } from "./sale/see-cart";
 import type { DomainInput } from "./types";
@@ -19,6 +20,7 @@ export const saleDomain = async ({
 	addProduct(server);
 	checkout(server);
 	create(server);
+	deliver(server);
 	processPixPayment(server);
 	seeCart(server);
 };

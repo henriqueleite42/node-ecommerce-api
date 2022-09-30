@@ -147,6 +147,12 @@ export const resourcesSale: AWS["resources"] = {
 				TopicName: "${self:service}-${opt:stage, 'local'}-payment-processed",
 			},
 		},
+		SaleDeliveredTopic: {
+			Type: "AWS::SNS::Topic",
+			Properties: {
+				TopicName: "${self:service}-${opt:stage, 'local'}-sale-delivered",
+			},
+		},
 	},
 	Outputs: {
 		SaleCreatedTopicArn: {
@@ -180,6 +186,24 @@ export const resourcesSale: AWS["resources"] = {
 								Ref: "AWS::StackName",
 							},
 							"PaymentProcessedTopicArn",
+						],
+					],
+				},
+			}
+		},
+		SaleDeliveredTopicArn: {
+			Value: {
+				Ref: "SaleDeliveredTopic"
+			},
+			Export: {
+				Name: {
+					"Fn::Join": [
+						":",
+						[
+							{
+								Ref: "AWS::StackName",
+							},
+							"SaleDeliveredTopicArn",
 						],
 					],
 				},
