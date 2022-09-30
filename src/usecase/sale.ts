@@ -64,7 +64,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		});
 
 		await this.topicManager.sendMsg({
-			to: process.env.SALE_CREATED_TOPIC_ARN!,
+			to: process.env.SALE_SALE_CREATED_TOPIC_ARN!,
 			message: sale,
 		});
 
@@ -187,7 +187,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		});
 
 		await this.topicManager.sendMsg({
-			to: process.env.PAYMENT_PROCESSED_TOPIC_ARN!,
+			to: process.env.SALE_PAYMENT_PROCESSED_TOPIC_ARN!,
 			message: sale,
 		});
 	}

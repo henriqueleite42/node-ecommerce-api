@@ -220,7 +220,7 @@ export class ProductRepositoryDynamoDB
 			color: table.color,
 			price: table.price,
 			imageUrl: table.imagePath
-				? `${process.env.IMAGES_PREFIX_URL}/${table.imagePath}`
+				? `${process.env.PRODUCT_MEDIA_STORAGE_CLOUDFRONT_URL}/${table.imagePath}`
 				: undefined,
 			variations: table.variations,
 			deliveryMethod: table.deliveryMethod,

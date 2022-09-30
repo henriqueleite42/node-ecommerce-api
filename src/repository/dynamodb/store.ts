@@ -152,10 +152,10 @@ export class StoreRepositoryDynamoDB
 			description: table.description,
 			color: table.color,
 			avatarUrl: table.avatarPath
-				? `${process.env.IMAGES_PREFIX_URL}/${table.avatarPath}`
+				? `${process.env.STORE_MEDIA_STORAGE_CLOUDFRONT_URL}/${table.avatarPath}`
 				: undefined,
 			bannerUrl: table.bannerPath
-				? `${process.env.IMAGES_PREFIX_URL}/${table.bannerPath}`
+				? `${process.env.STORE_MEDIA_STORAGE_CLOUDFRONT_URL}/${table.bannerPath}`
 				: undefined,
 			createdAt: new Date(table.createdAt),
 		};

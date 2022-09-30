@@ -266,7 +266,61 @@ export const resourcesStore: AWS["resources"] = {
 				},
 			}
 		},
-		MediaStorageCloudFrontUrl: {
+		UpdateAvatarQueueUrl: {
+			Value: {
+				Ref: "UpdateAvatarQueue"
+			},
+			Export: {
+				Name: {
+					"Fn::Join": [
+						":",
+						[
+							{
+								Ref: "AWS::StackName",
+							},
+							"UpdateAvatarQueueUrl",
+						],
+					],
+				},
+			}
+		},
+		UpdateBannerQueueUrl: {
+			Value: {
+				Ref: "UpdateBannerQueue"
+			},
+			Export: {
+				Name: {
+					"Fn::Join": [
+						":",
+						[
+							{
+								Ref: "AWS::StackName",
+							},
+							"UpdateBannerQueueUrl",
+						],
+					],
+				},
+			}
+		},
+		MediaBucketName: {
+			Value: {
+				Ref: "MediaStorage"
+			},
+			Export: {
+				Name: {
+					"Fn::Join": [
+						":",
+						[
+							{
+								Ref: "AWS::StackName",
+							},
+							"MediaBucketName",
+						],
+					],
+				},
+			}
+		},
+		MediaStorageCloudfrontUrl: {
 			Description: "CloudFront Products",
 			Value: {
 				"Fn::GetAtt": ["MediaStorageCloudFront", "DomainName"],
@@ -279,7 +333,7 @@ export const resourcesStore: AWS["resources"] = {
 							{
 								Ref: "AWS::StackName",
 							},
-							"MediaStorageCloudFrontUrl",
+							"MediaStorageCloudfrontUrl",
 						],
 					],
 				},

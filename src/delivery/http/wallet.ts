@@ -1,11 +1,9 @@
-import type { DeliveryManager } from "../../providers/delivery-manager";
-
+import type { DomainInput } from "./types";
 import { addWWMPix } from "./wallet/add-wwm-pix";
 import { adminWithdrawal } from "./wallet/admin-withdrawal";
 
-export const walletDomain = (server: DeliveryManager) => {
-	server.addSecretsToLoad("monetizzer/auth");
-	server.addSecretsToLoad("monetizzer/wallet");
+export const walletDomain = async ({ server, secretsLoader }: DomainInput) => {
+	await secretsLoader.loadSecrets("monetizzer/auth");
 
 	addWWMPix(server);
 	adminWithdrawal(server);

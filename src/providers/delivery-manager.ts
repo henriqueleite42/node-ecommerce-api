@@ -1,8 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
-import type { SecretManager } from "../adapters/secret-manager";
-
 import type { AuthManager } from "./auth-manager";
 import type { Validator } from "./validator";
 
@@ -70,22 +68,6 @@ export abstract class Route<I> {
 
 export abstract class DeliveryManager {
 	protected secretsToBeLoaded = [] as Array<string>;
-
-	protected secretsManager?: SecretManager;
-
-	public setSecretsManager(secretsManager: SecretManager) {
-		this.secretsManager = secretsManager;
-
-		return this;
-	}
-
-	public addSecretsToLoad(secret: string) {
-		if (!this.secretsToBeLoaded.includes(secret)) {
-			this.secretsToBeLoaded.push(secret);
-		}
-	}
-
-	public abstract loadSecrets(): Promise<void>;
 
 	public abstract addRoute<I>(
 		config: any,

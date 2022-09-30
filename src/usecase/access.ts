@@ -20,7 +20,7 @@ export class AccessUseCaseImplementation implements AccessUseCase {
 		const access = await this.accessRepository.createMany(p);
 
 		await this.topicManager.sendMsg({
-			to: process.env.ACCESS_CREATED_TOPIC_ARN!,
+			to: process.env.ACCESS_ACCESS_CREATED_TOPIC_ARN!,
 			message: access,
 		});
 	}

@@ -1,7 +1,13 @@
-export interface GetSecretsInput {
-	from: string;
-}
+export abstract class SecretManager {
+	private readonly secretsLoaded = [] as Array<string>;
 
-export interface SecretManager {
-	getSecrets: (p: GetSecretsInput) => Promise<Record<string, string>>;
+	public abstract loadSecrets(secretName: string): Promise<void>;
+
+	protected secretLoaded(secretName: string) {
+		this.secretsLoaded.push(secretName);
+	}
+
+	protected isSecretLoaded(secretName: string) {
+		return this.secretsLoaded.includes(secretName);
+	}
 }

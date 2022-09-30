@@ -1,9 +1,11 @@
-import type { DeliveryManager } from "../../providers/delivery-manager";
-
 import { blacklist } from "./blacklist/blacklist";
+import type { DomainInput } from "./types";
 
-export const blacklistDomain = (server: DeliveryManager) => {
-	server.addSecretsToLoad("monetizzer/auth");
+export const blacklistDomain = async ({
+	server,
+	secretsLoader,
+}: DomainInput) => {
+	await secretsLoader.loadSecrets("monetizzer/auth");
 
 	blacklist(server);
 };

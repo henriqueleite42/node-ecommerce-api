@@ -59,32 +59,32 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 
 		if (avatarUrl) {
 			await this.uploadManager.uploadFromUrlBackground({
-				folder: process.env.MEDIA_BUCKET_NAME!,
+				folder: process.env.STORE_MEDIA_BUCKET_NAME!,
 				fileName: `avatars/${store.storeId}`,
 				id: {
 					storeId: store.storeId,
 				},
 				mediaUrl: avatarUrl,
 				mediaType: MediaTypeEnum.IMAGE,
-				queueToNotify: process.env.UPDATE_AVATAR_QUEUE_URL!,
+				queueToNotify: process.env.STORE_UPDATE_AVATAR_QUEUE_URL!,
 			});
 		}
 
 		if (bannerUrl) {
 			await this.uploadManager.uploadFromUrlBackground({
-				folder: process.env.MEDIA_BUCKET_NAME!,
+				folder: process.env.STORE_MEDIA_BUCKET_NAME!,
 				fileName: `banners/${store.storeId}`,
 				id: {
 					storeId: store.storeId,
 				},
 				mediaUrl: bannerUrl,
 				mediaType: MediaTypeEnum.IMAGE,
-				queueToNotify: process.env.UPDATE_BANNER_QUEUE_URL!,
+				queueToNotify: process.env.STORE_UPDATE_BANNER_QUEUE_URL!,
 			});
 		}
 
 		await this.topicManager.sendMsg({
-			to: process.env.STORE_CREATED_TOPIC_ARN!,
+			to: process.env.STORE_STORE_CREATED_TOPIC_ARN!,
 			message: store,
 		});
 
@@ -100,27 +100,27 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 
 		if (avatarUrl) {
 			await this.uploadManager.uploadFromUrlBackground({
-				folder: process.env.MEDIA_BUCKET_NAME!,
+				folder: process.env.STORE_MEDIA_BUCKET_NAME!,
 				fileName: `avatars/${store.storeId}`,
 				id: {
 					storeId: store.storeId,
 				},
 				mediaUrl: avatarUrl,
 				mediaType: MediaTypeEnum.IMAGE,
-				queueToNotify: process.env.UPDATE_AVATAR_QUEUE_URL!,
+				queueToNotify: process.env.STORE_UPDATE_AVATAR_QUEUE_URL!,
 			});
 		}
 
 		if (bannerUrl) {
 			await this.uploadManager.uploadFromUrlBackground({
-				folder: process.env.MEDIA_BUCKET_NAME!,
+				folder: process.env.STORE_MEDIA_BUCKET_NAME!,
 				fileName: `banners/${store.storeId}`,
 				id: {
 					storeId: store.storeId,
 				},
 				mediaUrl: bannerUrl,
 				mediaType: MediaTypeEnum.IMAGE,
-				queueToNotify: process.env.UPDATE_BANNER_QUEUE_URL!,
+				queueToNotify: process.env.STORE_UPDATE_BANNER_QUEUE_URL!,
 			});
 		}
 

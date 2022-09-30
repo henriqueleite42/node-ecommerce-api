@@ -270,6 +270,24 @@ export const resourcesProduct: AWS["resources"] = {
 		},
 	},
 	Outputs: {
+		UpdateImgQueueUrl: {
+			Value: {
+				Ref: "UpdateImgQueue"
+			},
+			Export: {
+				Name: {
+					"Fn::Join": [
+						":",
+						[
+							{
+								Ref: "AWS::StackName",
+							},
+							"UpdateImgQueueUrl",
+						],
+					],
+				},
+			}
+		},
 		ProductCreatedTopicArn: {
 			Value: {
 				Ref: "ProductCreatedTopic"
@@ -288,7 +306,25 @@ export const resourcesProduct: AWS["resources"] = {
 				},
 			}
 		},
-		MediaStorageCloudFrontUrl: {
+		MediaBucketName: {
+			Value: {
+				Ref: "MediaStorage"
+			},
+			Export: {
+				Name: {
+					"Fn::Join": [
+						":",
+						[
+							{
+								Ref: "AWS::StackName",
+							},
+							"MediaBucketName",
+						],
+					],
+				},
+			}
+		},
+		MediaStorageCloudfrontUrl: {
 			Description: "CloudFront Products",
 			Value: {
 				"Fn::GetAtt": ["MediaStorageCloudFront", "DomainName"],
@@ -301,7 +337,7 @@ export const resourcesProduct: AWS["resources"] = {
 							{
 								Ref: "AWS::StackName",
 							},
-							"MediaStorageCloudFrontUrl",
+							"MediaStorageCloudfrontUrl",
 						],
 					],
 				},

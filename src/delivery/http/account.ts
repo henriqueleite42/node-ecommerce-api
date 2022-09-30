@@ -1,11 +1,9 @@
-import type { DeliveryManager } from "../../providers/delivery-manager";
-
 import { createWithDiscordId } from "./account/create-with-discord-id";
 import { getByDiscordId } from "./account/get-by-discord-id";
+import type { DomainInput } from "./types";
 
-export const accountDomain = (server: DeliveryManager) => {
-	server.addSecretsToLoad("monetizzer/auth");
-	server.addSecretsToLoad("monetizzer/account");
+export const accountDomain = async ({ server, secretsLoader }: DomainInput) => {
+	await secretsLoader.loadSecrets("monetizzer/auth");
 
 	createWithDiscordId(server);
 	getByDiscordId(server);

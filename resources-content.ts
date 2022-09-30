@@ -90,4 +90,42 @@ export const resourcesContent: AWS["resources"] = {
 			},
 		},
 	},
+	Outputs: {
+		RawMediaBucketName: {
+			Value: {
+				Ref: "RawMediaStorage"
+			},
+			Export: {
+				Name: {
+					"Fn::Join": [
+						":",
+						[
+							{
+								Ref: "AWS::StackName",
+							},
+							"RawMediaBucketName",
+						],
+					],
+				},
+			}
+		},
+		UpdateRawImgQueueUrl: {
+			Value: {
+				Ref: "UpdateRawImgQueue"
+			},
+			Export: {
+				Name: {
+					"Fn::Join": [
+						":",
+						[
+							{
+								Ref: "AWS::StackName",
+							},
+							"UpdateRawImgQueueUrl",
+						],
+					],
+				},
+			}
+		},
+	}
 };

@@ -82,21 +82,6 @@ export class FastifyHttpProvider extends DeliveryManager {
 		});
 	}
 
-	public async loadSecrets() {
-		if (!this.secretsManager) return;
-
-		for (const secret of this.secretsToBeLoaded) {
-			const newSecrets = await this.secretsManager.getSecrets({
-				from: secret,
-			});
-
-			process.env = {
-				...process.env,
-				...newSecrets,
-			};
-		}
-	}
-
 	public addRoute<I>(
 		config: Config,
 		getRoute: (route: FastifyRoute<I>) => FastifyRoute<I>,

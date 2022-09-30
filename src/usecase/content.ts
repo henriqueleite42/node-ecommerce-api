@@ -18,8 +18,8 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 		await Promise.all(
 			contents.map((c, idx) =>
 				this.uploadManager.uploadFromUrlBackground({
-					queueToNotify: process.env.UPDATE_RAW_IMG_QUEUE_URL!,
-					folder: process.env.RAW_MEDIA_BUCKET_NAME!,
+					queueToNotify: process.env.CONTENT_UPDATE_RAW_IMG_QUEUE_URL!,
+					folder: process.env.CONTENT_RAW_MEDIA_BUCKET_NAME!,
 					fileName: `${c.storeId}/${c.productId}/${c.contentId}`,
 					id: {
 						storeId: c.storeId,

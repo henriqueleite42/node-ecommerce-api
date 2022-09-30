@@ -2,24 +2,32 @@
 
 import { SSMClient, GetParameterCommand } from "@aws-sdk/client-ssm";
 
-import type { SecretManager, GetSecretsInput } from "../secret-manager";
+import { SecretManager } from "../secret-manager";
 
-export class SSMAdapter implements SecretManager {
+export class SSMAdapter extends SecretManager {
 	private readonly ssm: SSMClient;
 
 	public constructor() {
+		super();
 		this.ssm = new SSMClient({});
 	}
 
-	public getSecrets<S>({ from }: GetSecretsInput) {
-		return this.ssm
+	public async loadSecrets(secretName: string) {
+		if (this.isSecretLoaded(secretName)) return;
+
+		const result = await this.ssm
 			.send(
 				new GetParameterCommand({
-					Name: from,
+					Name: secretName,
 				}),
 			)
-			.then(
-				r => (r.Parameter?.Value ? JSON.parse(r.Parameter.Value) : {}) as S,
-			);
+			.then(r => (r.Parameter?.Value ? JSON.parse(r.Parameter.Value) : {}));
+
+		process.env = {
+			...process.env,
+			...result,
+		};
+
+		super.secretLoaded(secretName);
 	}
 }

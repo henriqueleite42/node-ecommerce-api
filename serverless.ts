@@ -2,7 +2,6 @@
 
 import type { AWS } from "@serverless/typescript";
 import { merge } from "lodash";
-import { config } from "dotenv";
 
 import { resourcesAccount } from "./resources-account";
 import { resourcesBlacklist } from "./resources-blacklist";
@@ -25,15 +24,12 @@ import { wallet } from "./src/delivery/queue/wallet";
 // You need to change this if you changed the one at docker-events-listener-build/listen-docker-events.sh
 const SERVICE_NAME = "monetizzer";
 
-config();
-
 const baseConfig: Partial<AWS> = {
 	plugins: [
 		"serverless-localstack",
 	],
 	configValidationMode: "error",
 	frameworkVersion: "3",
-	useDotenv: true,
 	package: {
 		individually: true,
 	},
@@ -107,19 +103,6 @@ const contentConfig = {
 	plugins: [
 		"serverless-webpack",
 	],
-	provider: {
-		environment: {
-			UPLOAD_FROM_URL_QUEUE_URL: {
-				"Fn::ImportValue": "upload-${opt:stage, 'local'}:UploadFromUrlQueueUrl",
-			},
-			UPDATE_RAW_IMG_QUEUE_URL: {
-				Ref: "UpdateRawImgQueue"
-			},
-			RAW_MEDIA_BUCKET_NAME: {
-				Ref: "RawMediaStorage"
-			},
-		}
-	},
 	resources: resourcesContent,
 	functions: content,
 };
@@ -148,46 +131,12 @@ const productConfig = {
 	plugins: [
 		"serverless-webpack",
 	],
-	provider: {
-		environment: {
-			UPLOAD_FROM_URL_QUEUE_URL: {
-				"Fn::ImportValue": "upload-${opt:stage, 'local'}:UploadFromUrlQueueUrl",
-			},
-			UPDATE_IMG_QUEUE_URL: {
-				Ref: "UpdateImgQueue"
-			},
-			IMAGES_PREFIX_URL: {
-				"Fn::Join": [
-					"",
-					[
-						"https://",
-						{
-							"Fn::GetAtt": ["MediaStorageCloudFront", "DomainName"],
-						}
-					]
-				]
-			},
-			MEDIA_BUCKET_NAME: {
-				Ref: "MediaStorage"
-			},
-		}
-	},
 	resources: resourcesProduct,
 	functions: product,
 };
 
 const saleConfig = {
 	service: "sale",
-	provider: {
-		environment: {
-			SALE_CREATED_TOPIC_ARN: {
-				Ref: "SaleCreatedTopic"
-			},
-			PAYMENT_PROCESSED_TOPIC_ARN: {
-				Ref: "PaymentProcessedTopic"
-			},
-		},
-	},
 	resources: resourcesSale,
 };
 
@@ -196,36 +145,6 @@ const storeConfig = {
 	plugins: [
 		"serverless-webpack",
 	],
-	provider: {
-		environment: {
-			UPLOAD_FROM_URL_QUEUE_URL: {
-				"Fn::ImportValue": "upload-${opt:stage, 'local'}:UploadFromUrlQueueUrl",
-			},
-			STORE_CREATED_TOPIC_ARN: {
-				Ref: "StoreCreatedTopic"
-			},
-			UPDATE_AVATAR_QUEUE_URL: {
-				Ref: "UpdateAvatarQueue"
-			},
-			UPDATE_BANNER_QUEUE_URL: {
-				Ref: "UpdateBannerQueue"
-			},
-			IMAGES_PREFIX_URL: {
-				"Fn::Join": [
-					"",
-					[
-						"https://",
-						{
-							"Fn::GetAtt": ["MediaStorageCloudFront", "DomainName"],
-						}
-					]
-				]
-			},
-			MEDIA_BUCKET_NAME: {
-				Ref: "MediaStorage"
-			},
-		}
-	},
 	resources: resourcesStore,
 	functions: store,
 };
@@ -235,13 +154,6 @@ const uploadConfig = {
 	plugins: [
 		"serverless-webpack",
 	],
-	provider: {
-		environment: {
-			UPLOAD_FROM_URL_QUEUE_URL: {
-				Ref: "UploadFromUrlQueue"
-			},
-		}
-	},
 	resources: resourcesUpload,
 	functions: upload,
 };
