@@ -1,6 +1,9 @@
+/* eslint-disable sonarjs/no-duplicate-string */
+
 import type { TopicManager } from "../adapters/topic-manager";
 import type { BlacklistRepository } from "../models/blacklist";
 import type { CounterRepository } from "../models/counter";
+import type { ProductEntity, ProductRepository } from "../models/product";
 import type {
 	CreateInput,
 	EditInput,
@@ -21,6 +24,7 @@ import { StatusCodeEnum } from "../types/enums/status-code";
 export class StoreUseCaseImplementation implements StoreUseCase {
 	public constructor(
 		private readonly storeRepository: StoreRepository,
+		private readonly productRepository: ProductRepository,
 		private readonly blacklistRepository: BlacklistRepository,
 		private readonly counterRepository: CounterRepository,
 		private readonly topicManager: TopicManager,
@@ -130,6 +134,36 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 		}
 
 		return store;
+	}
+
+	public addProductType({ storeId, type }: ProductEntity) {
+		return this.storeRepository.addProductType({
+			storeId,
+			productType: type,
+		});
+	}
+
+	public async removeProductType({ storeId, type }: ProductEntity) {
+		const store = await this.storeRepository.getById({
+			storeId,
+		});
+
+		if (!store) {
+			throw new CustomError("Store not found", StatusCodeEnum.NOT_FOUND);
+		}
+
+		const { items } = await this.productRepository.getProductsByType({
+			storeId,
+			type,
+			limit: 1,
+		});
+
+		if (items.length === 0) {
+			await this.storeRepository.removeProductType({
+				storeId,
+				productType: type,
+			});
+		}
 	}
 
 	public async getByName(p: GetByNameInput) {

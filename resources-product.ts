@@ -201,6 +201,12 @@ export const resourcesProduct: AWS["resources"] = {
 				TopicName: "${self:service}-${opt:stage, 'local'}-product-created",
 			},
 		},
+		ProductDeletedTopic: {
+			Type: "AWS::SNS::Topic",
+			Properties: {
+				TopicName: "${self:service}-${opt:stage, 'local'}-product-deleted",
+			},
+		},
 		UpdateImgQueue: {
 			Type: "AWS::SQS::Queue",
 			Properties: {
@@ -301,6 +307,24 @@ export const resourcesProduct: AWS["resources"] = {
 								Ref: "AWS::StackName",
 							},
 							"ProductCreatedTopicArn",
+						],
+					],
+				},
+			}
+		},
+		ProductDeletedTopicArn: {
+			Value: {
+				Ref: "ProductDeletedTopic"
+			},
+			Export: {
+				Name: {
+					"Fn::Join": [
+						":",
+						[
+							{
+								Ref: "AWS::StackName",
+							},
+							"ProductDeletedTopicArn",
 						],
 					],
 				},

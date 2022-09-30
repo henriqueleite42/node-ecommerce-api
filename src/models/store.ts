@@ -1,6 +1,11 @@
+import type { ProductEntity } from "./product";
+
+import type { ProductTypeEnum } from "../types/enums/product-type";
+
 export interface StoreEntity {
 	storeId: string; // Same as accountId
 	accountId: string;
+	productTypes: Array<ProductTypeEnum>;
 	name: string;
 	description?: string;
 	color?: string;
@@ -25,6 +30,11 @@ export interface CreateInput
 export type EditInput = Partial<Omit<StoreEntity, "createdAt" | "name">> &
 	Pick<StoreEntity, "storeId">;
 
+export interface ModifyProductTypeInput {
+	storeId: string;
+	productType: ProductTypeEnum;
+}
+
 export type GetByIdInput = Pick<StoreEntity, "storeId">;
 
 export type GetManyByIdInput = Array<Pick<StoreEntity, "storeId">>;
@@ -35,6 +45,10 @@ export interface StoreRepository {
 	create: (p: CreateInput) => Promise<StoreEntity>;
 
 	edit: (p: EditInput) => Promise<StoreEntity | null>;
+
+	addProductType: (p: ModifyProductTypeInput) => Promise<void>;
+
+	removeProductType: (p: ModifyProductTypeInput) => Promise<void>;
 
 	getById: (p: GetByIdInput) => Promise<StoreEntity | null>;
 
@@ -68,6 +82,10 @@ export interface StoreUseCase {
 	create: (p: CreateInput) => Promise<StoreEntity>;
 
 	edit: (p: EditInput) => Promise<StoreEntity>;
+
+	addProductType: (p: ProductEntity) => Promise<void>;
+
+	removeProductType: (p: ProductEntity) => Promise<void>;
 
 	getByName: (p: GetByNameInput) => Promise<StoreEntity>;
 

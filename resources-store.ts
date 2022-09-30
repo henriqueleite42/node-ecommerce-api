@@ -246,6 +246,46 @@ export const resourcesStore: AWS["resources"] = {
 				},
 			},
 		},
+		AddProductTypeQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'local'}-add-product-type",
+			},
+		},
+		AddProductTypeSubscription: {
+			Type: "AWS::SNS::Subscription",
+			Properties: {
+				Protocol: "sqs",
+				Endpoint: {
+					"Fn::GetAtt": ["AddProductTypeQueue", "Arn"],
+				},
+				Region: "${self:custom.region.${opt:stage, 'local'}}",
+				TopicArn: {
+					"Fn::ImportValue": "product-${opt:stage, 'local'}:ProductCreatedTopicArn"
+				},
+			},
+		},
+		RemoveProductTypeQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'local'}-remove-product-type",
+			},
+		},
+		RemoveProductTypeSubscription: {
+			Type: "AWS::SNS::Subscription",
+			Properties: {
+				Protocol: "sqs",
+				Endpoint: {
+					"Fn::GetAtt": ["RemoveProductTypeQueue", "Arn"],
+				},
+				Region: "${self:custom.region.${opt:stage, 'local'}}",
+				TopicArn: {
+					"Fn::ImportValue": "product-${opt:stage, 'local'}:ProductDeletedTopicArn"
+				},
+			},
+		},
 	},
 	Outputs: {
 		StoreCreatedTopicArn: {

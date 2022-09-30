@@ -151,3 +151,5 @@ export interface ProductUseCase {
  */
 
 export type ProductCreatedMessage = ProductEntity;
+
+export type ProductDeletedMessage = ProductEntity;

@@ -12,6 +12,8 @@ import type {
 	IncreaseSalesCountInput,
 	IncreaseTotalBilledInput,
 	DeleteInput,
+	ProductCreatedMessage,
+	ProductDeletedMessage,
 } from "../models/product";
 import type { UploadManager } from "../providers/upload-manager";
 
@@ -48,7 +50,7 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 
 		const product = await this.productRepository.create(p);
 
-		await this.topicManager.sendMsg({
+		await this.topicManager.sendMsg<ProductCreatedMessage>({
 			to: process.env.PRODUCT_PRODUCT_CREATED_TOPIC_ARN!,
 			message: {
 				...product,
@@ -107,8 +109,19 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 		return product;
 	}
 
-	public delete(p: DeleteInput) {
-		return this.productRepository.delete(p);
+	public async delete(p: DeleteInput) {
+		const product = await this.productRepository.getById(p);
+
+		if (!product) {
+			throw new CustomError("Not found", StatusCodeEnum.NOT_FOUND);
+		}
+
+		await this.productRepository.delete(p);
+
+		await this.topicManager.sendMsg<ProductDeletedMessage>({
+			to: process.env.PRODUCT_PRODUCT_DELETED_TOPIC_ARN!,
+			message: product,
+		});
 	}
 
 	public getProductsByType(p: GetProductsByTypeInput) {
@@ -116,13 +129,13 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 	}
 
 	public async getById(p: GetByIdInput) {
-		const store = await this.productRepository.getById(p);
+		const product = await this.productRepository.getById(p);
 
-		if (!store) {
+		if (!product) {
 			throw new CustomError("Not found", StatusCodeEnum.NOT_FOUND);
 		}
 
-		return store;
+		return product;
 	}
 
 	public async getTop() {

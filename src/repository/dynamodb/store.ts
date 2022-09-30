@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { PutItemCommand } from "@aws-sdk/client-dynamodb";
+import { PutItemCommand, UpdateItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { cleanObj } from "@techmmunity/utils";
 
 import type {
+	ModifyProductTypeInput,
 	CreateInput,
 	EditInput,
 	GetByIdInput,
@@ -16,9 +17,12 @@ import type {
 
 import { DynamodbRepository } from ".";
 
+import type { ProductTypeEnum } from "../../types/enums/product-type";
+
 export interface StoreTable {
 	storeId: string; // Same as AccountId
 	accountId: string;
+	productTypes: Array<ProductTypeEnum>;
 	name: string;
 	description?: string;
 	color?: string;
@@ -44,6 +48,7 @@ export class StoreRepositoryDynamoDB
 		const item: StoreEntity = {
 			storeId: accountId,
 			accountId,
+			productTypes: [],
 			name,
 			description,
 			color,
@@ -79,6 +84,50 @@ export class StoreRepositoryDynamoDB
 				bannerUrl,
 				avatarUrl,
 			},
+		);
+	}
+
+	public async addProductType({
+		storeId,
+		productType,
+	}: ModifyProductTypeInput) {
+		await this.dynamodb.send(
+			new UpdateItemCommand({
+				TableName: this.tableName,
+				UpdateExpression:
+					"SET #productTypes = list_append(#productTypes, :productType)",
+				ConditionExpression: "NOT contains(#productTypes, :productType)",
+				ExpressionAttributeNames: {
+					"#productTypes": "productTypes",
+				},
+				ExpressionAttributeValues: marshall({
+					":productType": productType,
+				}),
+				Key: marshall({
+					storeId: `STORE#${storeId}`,
+				}),
+			}),
+		);
+	}
+
+	public async removeProductType({
+		storeId,
+		productType,
+	}: ModifyProductTypeInput) {
+		await this.dynamodb.send(
+			new UpdateItemCommand({
+				TableName: this.tableName,
+				UpdateExpression: "DELETE #productTypes :productType",
+				ExpressionAttributeNames: {
+					"#productTypes": "productTypes",
+				},
+				ExpressionAttributeValues: marshall({
+					":productType": productType,
+				}),
+				Key: marshall({
+					storeId: `STORE#${storeId}`,
+				}),
+			}),
 		);
 	}
 
@@ -135,6 +184,7 @@ export class StoreRepositoryDynamoDB
 		return cleanObj<Partial<StoreTable>>({
 			storeId: entity.storeId ? `STORE#${entity.storeId}` : undefined,
 			accountId: entity.accountId ? `ACCOUNT#${entity.accountId}` : undefined,
+			productTypes: entity.productTypes,
 			name: entity.name ? `NAME#${entity.name}` : undefined,
 			description: entity.description,
 			color: entity.color,
@@ -148,6 +198,7 @@ export class StoreRepositoryDynamoDB
 		return {
 			storeId: table.storeId.replace("STORE#", ""),
 			accountId: table.accountId.replace("ACCOUNT#", ""),
+			productTypes: table.productTypes,
 			name: table.name.replace("NAME#", ""),
 			description: table.description,
 			color: table.color,

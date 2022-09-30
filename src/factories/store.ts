@@ -6,6 +6,7 @@ import { UploadManagerProvider } from "../providers/implementations/upload-manag
 import { getDynamoInstance } from "../repository/dynamodb";
 import { BlacklistRepositoryDynamoDB } from "../repository/dynamodb/blacklist";
 import { CounterRepositoryDynamoDB } from "../repository/dynamodb/counter";
+import { ProductRepositoryDynamoDB } from "../repository/dynamodb/product";
 import { StoreRepositoryDynamoDB } from "../repository/dynamodb/store";
 import { StoreUseCaseImplementation } from "../usecase/store";
 
@@ -19,6 +20,7 @@ export class StoreService extends Service<StoreUseCase> {
 		const s3 = new S3Adapter();
 
 		const storeRepository = new StoreRepositoryDynamoDB(dynamodb);
+		const productRepository = new ProductRepositoryDynamoDB(dynamodb);
 		const blacklistRepository = new BlacklistRepositoryDynamoDB(dynamodb);
 		const counterRepository = new CounterRepositoryDynamoDB(dynamodb);
 
@@ -26,6 +28,7 @@ export class StoreService extends Service<StoreUseCase> {
 
 		return new StoreUseCaseImplementation(
 			storeRepository,
+			productRepository,
 			blacklistRepository,
 			counterRepository,
 			sns,
