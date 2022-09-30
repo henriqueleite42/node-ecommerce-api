@@ -5,6 +5,7 @@ import { resourcesAccount } from "./resources-account";
 import { resourcesBlacklist } from "./resources-blacklist";
 import { resourcesContent } from "./resources-content";
 import { resourcesCounter } from "./resources-counter";
+import { resourcesDiscord } from "./resources-discord";
 import { resourcesEventAlert } from "./resources-event-alert";
 import { resourcesProduct } from "./resources-product";
 import { resourcesSale } from "./resources-sale";
@@ -13,6 +14,7 @@ import { resourcesUpload } from "./resources-upload";
 import { resourcesWallet } from "./resources-wallet";
 
 import { content } from "./src/delivery/queue/content";
+import { discord } from "./src/delivery/queue/discord";
 import { eventAlert } from "./src/delivery/queue/event-alert";
 import { product } from "./src/delivery/queue/product";
 import { store } from "./src/delivery/queue/store";
@@ -106,11 +108,41 @@ const counterConfig = {
 	resources: resourcesCounter,
 };
 
+const discordConfig = {
+	service: "discord",
+	plugins: [
+		"serverless-webpack",
+	],
+	provider: {
+		environment: {
+			DISCORD_BOT_TOKEN: `\${ssm:monetizzer-\${opt:stage, 'dev'}-discordBotToken}`,
+		},
+	},
+	resources: resourcesDiscord,
+	functions: discord,
+};
+
 const eventsAlertsConfig = {
 	service: "event-alert",
 	plugins: [
 		"serverless-webpack",
 	],
+	provider: {
+		environment: {
+			DISCORD_NEW_SALE_ANNOUNCEMENT_QUEUE_URL: {
+				"Fn::ImportValue":
+					"discord-${opt:stage, 'local'}:NewSaleAnnouncementQueueUrl",
+			},
+			DISCORD_NEW_STORE_ANNOUNCEMENT_QUEUE_URL: {
+				"Fn::ImportValue":
+					"discord-${opt:stage, 'local'}:NewStoreAnnouncementQueueUrl",
+			},
+			DISCORD_NEW_PRODUCT_ANNOUNCEMENT_QUEUE_URL: {
+				"Fn::ImportValue":
+					"discord-${opt:stage, 'local'}:NewProductAnnouncementQueueUrl",
+			},
+		},
+	},
 	resources: resourcesEventAlert,
 	functions: eventAlert,
 };
@@ -181,6 +213,9 @@ const getConfig = () => {
 
 		case "COUNTER":
 			return merge(baseConfig, counterConfig);
+
+		case "DISCORD":
+			return merge(baseConfig, discordConfig);
 
 		case "EVENT-ALERT":
 			return merge(baseConfig, eventsAlertsConfig);

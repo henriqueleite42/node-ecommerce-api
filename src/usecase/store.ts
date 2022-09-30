@@ -7,6 +7,7 @@ import type {
 	GetByNameInput,
 	IncreaseSalesCountInput,
 	IncreaseTotalBilledInput,
+	StoreCreatedMessage,
 	StoreRepository,
 	StoreUseCase,
 } from "../models/store";
@@ -83,9 +84,13 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 			});
 		}
 
-		await this.topicManager.sendMsg({
+		await this.topicManager.sendMsg<StoreCreatedMessage>({
 			to: process.env.STORE_STORE_CREATED_TOPIC_ARN!,
-			message: store,
+			message: {
+				...store,
+				avatarUrl,
+				bannerUrl,
+			},
 		});
 
 		return store;

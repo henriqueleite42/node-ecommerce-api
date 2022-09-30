@@ -81,3 +81,13 @@ export interface StoreUseCase {
 
 	increaseTotalBilled: (p: IncreaseTotalBilledInput) => Promise<void>;
 }
+
+/**
+ *
+ *
+ * Topic Messages
+ *
+ *
+ */
+
+export type StoreCreatedMessage = StoreEntity;

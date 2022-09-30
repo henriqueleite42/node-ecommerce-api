@@ -15,6 +15,8 @@ import type {
 	SaleRepository,
 	SaleUseCase,
 	CheckoutSaleInput,
+	PaymentProcessedMessage,
+	SaleCreatedMessage,
 } from "../models/sale";
 
 import { CustomError } from "../utils/error";
@@ -63,7 +65,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 			products: saleProducts,
 		});
 
-		await this.topicManager.sendMsg({
+		await this.topicManager.sendMsg<SaleCreatedMessage>({
 			to: process.env.SALE_SALE_CREATED_TOPIC_ARN!,
 			message: sale,
 		});
@@ -186,7 +188,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 			status: SalesStatusEnum.PAID,
 		});
 
-		await this.topicManager.sendMsg({
+		await this.topicManager.sendMsg<PaymentProcessedMessage>({
 			to: process.env.SALE_PAYMENT_PROCESSED_TOPIC_ARN!,
 			message: sale,
 		});

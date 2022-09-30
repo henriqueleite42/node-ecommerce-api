@@ -45,3 +45,13 @@ export interface AccessUseCase {
 
 	get: (p: AccessIds) => Promise<AccessEntity>;
 }
+
+/**
+ *
+ *
+ * Topic Messages
+ *
+ *
+ */
+
+export type AccessCreatedMessage = Array<AccessEntity>;

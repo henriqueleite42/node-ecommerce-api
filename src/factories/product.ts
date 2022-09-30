@@ -1,4 +1,5 @@
 import { S3Adapter } from "../adapters/implementations/s3";
+import { SNSAdapter } from "../adapters/implementations/sns";
 import { SQSAdapter } from "../adapters/implementations/sqs";
 import type { ProductUseCase } from "../models/product";
 import { UploadManagerProvider } from "../providers/implementations/upload-manager";
@@ -15,6 +16,7 @@ export class ProductService extends Service<ProductUseCase> {
 	public getInstance() {
 		const dynamodb = getDynamoInstance();
 		const sqs = new SQSAdapter();
+		const sns = new SNSAdapter();
 		const s3 = new S3Adapter();
 
 		const uploadManager = new UploadManagerProvider(sqs, s3);
@@ -33,6 +35,7 @@ export class ProductService extends Service<ProductUseCase> {
 			counterRepository,
 			contentUseCase,
 			uploadManager,
+			sns,
 		);
 	}
 }

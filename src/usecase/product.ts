@@ -1,3 +1,4 @@
+import type { TopicManager } from "../adapters/topic-manager";
 import type { ContentUseCase } from "../models/content";
 import type { CounterRepository } from "../models/counter";
 import type {
@@ -27,6 +28,7 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 		private readonly counterRepository: CounterRepository,
 		private readonly contentUseCase: ContentUseCase,
 		private readonly uploadManager: UploadManager,
+		private readonly topicManager: TopicManager,
 	) {}
 
 	public async create({ imageUrl, ...p }: CreateProductInput) {
@@ -45,6 +47,14 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 		}
 
 		const product = await this.productRepository.create(p);
+
+		await this.topicManager.sendMsg({
+			to: process.env.PRODUCT_PRODUCT_CREATED_TOPIC_ARN!,
+			message: {
+				...product,
+				imageUrl,
+			},
+		});
 
 		if (imageUrl) {
 			await this.uploadManager.uploadFromUrl({

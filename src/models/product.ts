@@ -141,3 +141,13 @@ export interface ProductUseCase {
 
 	getProductsCount: () => Promise<GetProductsCountOutput>;
 }
+
+/**
+ *
+ *
+ * Topic Messages
+ *
+ *
+ */
+
+export type ProductCreatedMessage = ProductEntity;

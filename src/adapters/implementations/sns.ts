@@ -12,7 +12,7 @@ export class SNSAdapter implements TopicManager {
 		this.sns = new SNSClient({});
 	}
 
-	public async sendMsg(p: SendMsgInput) {
+	public async sendMsg<T>(p: SendMsgInput<T>) {
 		const metadata: Record<string, MessageAttributeValue> = {};
 
 		if (p.metadata) {

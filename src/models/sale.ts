@@ -135,3 +135,15 @@ export interface SaleUseCase {
 		p: GetByStoreIdStatusInput,
 	) => Promise<PaginatedItems<SaleEntity>>;
 }
+
+/**
+ *
+ *
+ * Topic Messages
+ *
+ *
+ */
+
+export type SaleCreatedMessage = SaleEntity;
+
+export type PaymentProcessedMessage = SaleEntity;

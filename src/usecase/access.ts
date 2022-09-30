@@ -1,5 +1,6 @@
 import type { TopicManager } from "../adapters/topic-manager";
 import type {
+	AccessCreatedMessage,
 	AccessIds,
 	AccessRepository,
 	AccessUseCase,
@@ -19,7 +20,7 @@ export class AccessUseCaseImplementation implements AccessUseCase {
 	public async createMany(p: CreateManyInput) {
 		const access = await this.accessRepository.createMany(p);
 
-		await this.topicManager.sendMsg({
+		await this.topicManager.sendMsg<AccessCreatedMessage>({
 			to: process.env.ACCESS_ACCESS_CREATED_TOPIC_ARN!,
 			message: access,
 		});
