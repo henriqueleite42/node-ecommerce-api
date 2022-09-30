@@ -16,6 +16,7 @@ export interface SaleProduct {
 	price: number;
 	imageUrl?: string;
 	deliveryMethod: DeliveryMethodEnum;
+	delivered?: boolean;
 }
 
 export interface SaleEntity {
@@ -51,6 +52,12 @@ export type EditInput = Partial<
 > &
 	Pick<SaleEntity, "saleId">;
 
+export interface EditSaleProductInput {
+	saleId: string;
+	productIndex: number;
+	delivered?: boolean;
+}
+
 export interface BulkEditInput {
 	salesIds: Array<string>;
 	data: Partial<Pick<SaleEntity, "clientId" | "origin" | "status" | "storeId">>;
@@ -85,6 +92,8 @@ export interface SaleRepository {
 	create: (p: CreateInput) => Promise<SaleEntity>;
 
 	edit: (p: EditInput) => Promise<SaleEntity | null>;
+
+	editSaleProduct: (p: EditSaleProductInput) => Promise<SaleEntity | undefined>;
 
 	bulkEdit: (p: BulkEditInput) => Promise<void>;
 
@@ -135,9 +144,11 @@ export interface CheckoutSaleOutput {
 	pixData: CreatePixOutput;
 }
 
-export interface SetAsDeliveredInput {
+export interface SetProductAsDeliveredInput {
 	storeId: string;
 	saleId: string;
+	productId: string;
+	variationId?: string;
 }
 
 export interface SaleUseCase {
@@ -149,7 +160,7 @@ export interface SaleUseCase {
 
 	processPixPayment: (p: any) => Promise<void>;
 
-	setAsDelivered: (p: SetAsDeliveredInput) => Promise<SaleEntity>;
+	setProductAsDelivered: (p: SetProductAsDeliveredInput) => Promise<SaleEntity>;
 
 	getById: (p: GetByIdInput) => Promise<SaleEntity>;
 

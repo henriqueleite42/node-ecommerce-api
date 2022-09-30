@@ -4,6 +4,7 @@ import {
 	BatchWriteItemCommand,
 	PutItemCommand,
 	QueryCommand,
+	UpdateItemCommand,
 } from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { cleanObj } from "@techmmunity/utils";
@@ -19,6 +20,7 @@ import type {
 	GetByStoreIdStatusInput,
 	GetExpiredInput,
 	BulkEditInput,
+	EditSaleProductInput,
 } from "../../models/sale";
 
 import { DynamodbRepository } from ".";
@@ -72,6 +74,34 @@ export class SaleRepositoryDynamoDB
 
 	public edit({ saleId, ...data }: EditInput) {
 		return this.update(this.indexSaleId({ saleId }), data);
+	}
+
+	public async editSaleProduct({
+		saleId,
+		productIndex,
+		delivered,
+	}: EditSaleProductInput) {
+		const result = await this.dynamodb.send(
+			new UpdateItemCommand({
+				TableName: this.tableName,
+				UpdateExpression: `SET #products[${productIndex}].#delivered = :delivered`,
+				ExpressionAttributeNames: {
+					"#products": "products",
+					"#delivered": "delivered",
+				},
+				ExpressionAttributeValues: marshall({
+					":delivered": Boolean(delivered),
+				}),
+				Key: marshall({
+					saleId: `SALE#${saleId}`,
+				}),
+				ReturnValues: "ALL_NEW",
+			}),
+		);
+
+		return result.Attributes
+			? this.tableToEntity(unmarshall(result.Attributes) as SaleTable)
+			: undefined;
 	}
 
 	public async bulkEdit({ salesIds, data }: BulkEditInput) {

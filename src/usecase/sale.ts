@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable sonarjs/no-duplicate-string */
 
@@ -18,7 +19,7 @@ import type {
 	CheckoutSaleInput,
 	PaymentProcessedMessage,
 	SaleCreatedMessage,
-	SetAsDeliveredInput,
+	SetProductAsDeliveredInput,
 	SaleDeliveredMessage,
 	SaleExpiredMessage,
 } from "../models/sale";
@@ -203,7 +204,12 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		});
 	}
 
-	public async setAsDelivered({ storeId, saleId }: SetAsDeliveredInput) {
+	public async setProductAsDelivered({
+		storeId,
+		saleId,
+		productId,
+		variationId,
+	}: SetProductAsDeliveredInput) {
 		const sale = await this.saleRepository.getById({ saleId });
 
 		if (!sale) {
@@ -218,19 +224,41 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 			throw new CustomError("Sale status invalid", StatusCodeEnum.CONFLICT);
 		}
 
-		if (!sale.products.some(p => isManualDelivery(p.deliveryMethod))) {
+		const productIndex = sale.products.findIndex(
+			p => p.productId === productId && p.variationId === variationId,
+		);
+
+		if (productIndex === -1) {
+			throw new CustomError("Product not found", StatusCodeEnum.NOT_FOUND);
+		}
+
+		const product = sale.products[productIndex];
+
+		if (!isManualDelivery(product.deliveryMethod)) {
 			throw new CustomError("Invalid delivery method", StatusCodeEnum.CONFLICT);
 		}
 
-		const saleUpdated = await this.saleRepository.edit({
+		const saleUpdated = await this.saleRepository.editSaleProduct({
 			saleId,
-			status: SalesStatusEnum.DELIVERED,
+			productIndex,
+			delivered: true,
 		});
 
-		await this.topicManager.sendMsg<SaleDeliveredMessage>({
-			to: process.env.SALE_SALE_DELIVERED_TOPIC_ARN!,
-			message: sale,
-		});
+		// Adds 1 because of the updated product
+		const productsDelivered = sale.products.filter(p => p.delivered).length + 1;
+
+		// If all products of the sale where delivered, we must set the sale as delivered
+		if (sale.products.length === productsDelivered) {
+			await this.saleRepository.edit({
+				saleId,
+				status: SalesStatusEnum.DELIVERED,
+			});
+
+			await this.topicManager.sendMsg<SaleDeliveredMessage>({
+				to: process.env.SALE_SALE_DELIVERED_TOPIC_ARN!,
+				message: sale,
+			});
+		}
 
 		return saleUpdated!;
 	}

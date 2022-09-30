@@ -1,12 +1,12 @@
 import { SaleService } from "../../../factories/sale";
-import type { SetAsDeliveredInput } from "../../../models/sale";
+import type { SetProductAsDeliveredInput } from "../../../models/sale";
 import type { DeliveryManager } from "../../../providers/delivery-manager";
 import { AuthManagerProvider } from "../../../providers/implementations/auth-manager";
 import { Validations } from "../../../providers/implementations/validations";
 import { ValidatorProvider } from "../../../providers/implementations/validator";
 
 export const deliver = (server: DeliveryManager) => {
-	server.addRoute<SetAsDeliveredInput>(
+	server.addRoute<SetProductAsDeliveredInput>(
 		{
 			method: "POST",
 			path: "sales/deliver",
@@ -27,12 +27,22 @@ export const deliver = (server: DeliveryManager) => {
 							loc: "body",
 							validations: [Validations.required, Validations.uuid],
 						},
+						{
+							key: "productId",
+							loc: "body",
+							validations: [Validations.required, Validations.code],
+						},
+						{
+							key: "variationId",
+							loc: "body",
+							validations: [Validations.code],
+						},
 					]),
 				)
 				.setFunc(p => {
 					const service = new SaleService().getInstance();
 
-					return service.setAsDelivered(p);
+					return service.setProductAsDelivered(p);
 				}),
 	);
 };
