@@ -1,0 +1,15 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /var/www/api-temp
+hooks:
+  BeforeInstall:
+    - location: scripts/cd-prepare.sh
+      timeout: 300
+      runas: ubuntu
+
+  ApplicationStart:
+    - location: scripts/cd-start.sh
+      timeout: 300
+      runas: ubuntu
