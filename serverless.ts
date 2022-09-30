@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-
 import type { AWS } from "@serverless/typescript";
 import { merge } from "lodash";
 
@@ -20,9 +18,6 @@ import { product } from "./src/delivery/queue/product";
 import { store } from "./src/delivery/queue/store";
 import { upload } from "./src/delivery/queue/upload";
 import { wallet } from "./src/delivery/queue/wallet";
-
-// You need to change this if you changed the one at docker-events-listener-build/listen-docker-events.sh
-const SERVICE_NAME = "monetizzer";
 
 const baseConfig: Partial<AWS> = {
 	plugins: [
@@ -60,7 +55,6 @@ const baseConfig: Partial<AWS> = {
 			AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
 			NODE_ENV: "${opt:stage, 'local'}",
 			CLOUD_REGION: "${self:provider.region}",
-			API_BOT_TOKEN: `\${ssm:${SERVICE_NAME}-\${opt:stage, 'local'}-apiBotToken}`,
 		},
 		iam: {
 			role: {
@@ -167,6 +161,13 @@ const walletConfig = {
 	functions: wallet,
 };
 
+/**
+ *
+ * Every time that a new domain is added,
+ * you have to add it too to the
+ * `./scripts/deploy-serverless-*` scripts
+ *
+ */
 const getConfig = () => {
 	switch (process.env.API_MODULE) {
 		case "ACCOUNT":

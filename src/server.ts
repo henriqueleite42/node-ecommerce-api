@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable no-console */
+
 import { CloudformationAdapter } from "./adapters/implementations/cloudfront";
 import { SSMAdapter } from "./adapters/implementations/ssm";
 import { accountDomain } from "./delivery/http/account";
@@ -18,12 +21,20 @@ const bootstrap = async () => {
 		resourcesLoader: new CloudformationAdapter(),
 	};
 
+	const initialEnvVars = Object.keys(process.env);
+
 	await accountDomain(params);
 	await blacklistDomain(params);
 	await productDomain(params);
 	await saleDomain(params);
 	await storeDomain(params);
 	await walletDomain(params);
+
+	const currentEnvVars = Object.keys(process.env).filter(
+		ev => ev === "NODE_ENV" || !initialEnvVars.includes(ev),
+	);
+
+	console.log(JSON.stringify(currentEnvVars, null, 2));
 
 	server.listen();
 };

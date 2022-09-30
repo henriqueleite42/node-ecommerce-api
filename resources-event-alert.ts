@@ -131,7 +131,7 @@ export const resourcesEventAlert: AWS["resources"] = {
 			Type: "AWS::SQS::Queue",
 			Properties: {
 				QueueName:
-					"${self:service}-${opt:stage, 'local'}-discord-new-product-event",
+					"${self:service}-${opt:stage, 'local'}-discord-new-sale-event",
 			},
 		},
 		DiscordNewSaleEventSubscription: {
@@ -151,7 +151,7 @@ export const resourcesEventAlert: AWS["resources"] = {
 			Type: "AWS::SQS::Queue",
 			Properties: {
 				QueueName:
-					"${self:service}-${opt:stage, 'local'}-discord-new-product-event",
+					"${self:service}-${opt:stage, 'local'}-discord-new-store-event",
 			},
 		},
 		DiscordNewStoreEventSubscription: {
