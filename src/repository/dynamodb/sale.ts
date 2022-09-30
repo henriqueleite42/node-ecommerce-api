@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { PutItemCommand } from "@aws-sdk/client-dynamodb";
-import { marshall } from "@aws-sdk/util-dynamodb";
+import {
+	BatchWriteItemCommand,
+	PutItemCommand,
+	QueryCommand,
+} from "@aws-sdk/client-dynamodb";
+import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { cleanObj } from "@techmmunity/utils";
 import { v4 } from "uuid";
 
@@ -13,6 +17,8 @@ import type {
 	GetByIdInput,
 	GetByClientIdStatusInput,
 	GetByStoreIdStatusInput,
+	GetExpiredInput,
+	BulkEditInput,
 } from "../../models/sale";
 
 import { DynamodbRepository } from ".";
@@ -28,8 +34,13 @@ export interface SaleTable {
 	products: SaleEntity["products"];
 	finalPrice: number;
 	createdAt: string;
+	expiresAt: string;
 
+	storeId_clientId: string;
+	createdAt_saleId: string;
 	status_createdAt: string;
+	status_createdAt_saleId: string;
+	expiresAt_saleId: string;
 }
 
 export class SaleRepositoryDynamoDB
@@ -63,6 +74,23 @@ export class SaleRepositoryDynamoDB
 		return this.update(this.indexSaleId({ saleId }), data);
 	}
 
+	public async bulkEdit({ salesIds, data }: BulkEditInput) {
+		await this.dynamodb.send(
+			new BatchWriteItemCommand({
+				RequestItems: {
+					[this.tableName]: salesIds.map(saleId => ({
+						PutRequest: {
+							Item: marshall({
+								saleId,
+								...data,
+							}),
+						},
+					})),
+				},
+			}),
+		);
+	}
+
 	public getById({ saleId }: GetByIdInput) {
 		return this.getSingleItem(this.indexSaleId({ saleId }));
 	}
@@ -89,6 +117,44 @@ export class SaleRepositoryDynamoDB
 			limit,
 			continueFrom,
 		);
+	}
+
+	public async getExpired({ continueFrom }: GetExpiredInput) {
+		const result = await this.dynamodb.send(
+			new QueryCommand({
+				TableName: this.tableName,
+				Limit: 100,
+				IndexName: "StatusExpiresAtSaleId",
+				KeyConditionExpression:
+					"#status = :status AND begins_with(#expiresAt_saleId, :expiresAt_saleId)",
+				ExpressionAttributeNames: {
+					"#status": "status",
+					"#expiresAt_saleId": "expiresAt_saleId",
+				},
+				ExpressionAttributeValues: marshall({
+					":status": SalesStatusEnum.PENDING,
+					":expiresAt_saleId": new Date().toISOString(),
+				}),
+				ExclusiveStartKey: this.getExclusiveStartKey(continueFrom),
+			}),
+		);
+
+		if (!result.Items || result.Items.length === 0) {
+			return {
+				items: [] as Array<SaleEntity>,
+			};
+		}
+
+		const items = result.Items.map(i =>
+			this.tableToEntity(unmarshall(i) as SaleTable),
+		);
+
+		return {
+			items,
+			nextPage: result.LastEvaluatedKey
+				? this.toCursor(result.LastEvaluatedKey)
+				: undefined,
+		};
 	}
 
 	// Keys
@@ -162,11 +228,31 @@ export class SaleRepositoryDynamoDB
 			finalPrice: entity.finalPrice,
 			createdAt: entity.createdAt?.toISOString(),
 
+			storeId_clientId:
+				entity.storeId && entity.clientId
+					? `STORE#${entity.storeId}#CLIENT#${entity.clientId}`
+					: undefined,
 			status_createdAt:
 				entity.status && entity.createdAt
 					? `STATUS#${
 							entity.status
 					  }#CREATED_AT#${entity.createdAt.toISOString()}`
+					: undefined,
+			createdAt_saleId:
+				entity.createdAt && entity.saleId
+					? `${entity.createdAt.toISOString()}#SALE#${entity.saleId}`
+					: undefined,
+			status_createdAt_saleId:
+				entity.status && entity.createdAt && entity.saleId
+					? `STATUS#${
+							entity.status
+					  }#CREATED_AT#${entity.createdAt.toISOString()}#SALE#${
+							entity.saleId
+					  }`
+					: undefined,
+			expiresAt_saleId:
+				entity.expiresAt && entity.saleId
+					? `${entity.expiresAt}#SALE#${entity.saleId}`
 					: undefined,
 		});
 	}
@@ -181,6 +267,7 @@ export class SaleRepositoryDynamoDB
 			products: table.products,
 			finalPrice: table.finalPrice,
 			createdAt: new Date(table.createdAt),
+			expiresAt: new Date(table.expiresAt),
 		};
 	}
 }

@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable sonarjs/no-duplicate-string */
 
 import type { PixManager } from "../adapters/pix-manager";
@@ -19,6 +20,7 @@ import type {
 	SaleCreatedMessage,
 	SetAsDeliveredInput,
 	SaleDeliveredMessage,
+	SaleExpiredMessage,
 } from "../models/sale";
 
 import { CustomError } from "../utils/error";
@@ -249,6 +251,36 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 
 	public getByStoreIdStatus(p: GetByStoreIdStatusInput) {
 		return this.saleRepository.getByStoreIdStatus(p);
+	}
+
+	public async setExpiredStatus() {
+		let cursor: string | undefined;
+
+		do {
+			const { items, nextPage } = await this.saleRepository.getExpired({
+				continueFrom: cursor,
+			});
+
+			if (items.length === 0) {
+				return;
+			}
+
+			await this.saleRepository.bulkEdit({
+				salesIds: items.map(i => i.saleId),
+				data: {
+					status: SalesStatusEnum.EXPIRED,
+				},
+			});
+
+			await this.topicManager.sendMsg<SaleExpiredMessage>({
+				to: process.env.SALE_SALES_EXPIRED_TOPIC_ARN!,
+				message: {
+					sales: items,
+				},
+			});
+
+			cursor = nextPage;
+		} while (cursor);
 	}
 
 	// Internal Methods

@@ -27,6 +27,7 @@ export interface SaleEntity {
 	products: Array<SaleProduct>;
 	finalPrice: number;
 	createdAt: Date;
+	expiresAt: Date;
 }
 
 /**
@@ -50,6 +51,11 @@ export type EditInput = Partial<
 > &
 	Pick<SaleEntity, "saleId">;
 
+export interface BulkEditInput {
+	salesIds: Array<string>;
+	data: Partial<Pick<SaleEntity, "clientId" | "origin" | "status" | "storeId">>;
+}
+
 export type GetByIdInput = Pick<SaleEntity, "saleId">;
 
 export interface GetByClientIdStatusInput {
@@ -66,10 +72,21 @@ export interface GetByStoreIdStatusInput {
 	continueFrom?: string;
 }
 
+export interface GetExpiredInput {
+	continueFrom?: string;
+}
+
+export interface GetExpiredOutput {
+	items: Array<SaleEntity>; // Sales ids
+	nextPage?: string;
+}
+
 export interface SaleRepository {
 	create: (p: CreateInput) => Promise<SaleEntity>;
 
 	edit: (p: EditInput) => Promise<SaleEntity | null>;
+
+	bulkEdit: (p: BulkEditInput) => Promise<void>;
 
 	getById: (p: GetByIdInput) => Promise<SaleEntity | null>;
 
@@ -80,6 +97,8 @@ export interface SaleRepository {
 	getByStoreIdStatus: (
 		p: GetByStoreIdStatusInput,
 	) => Promise<PaginatedItems<SaleEntity>>;
+
+	getExpired: (p: GetExpiredInput) => Promise<GetExpiredOutput>;
 }
 
 /**
@@ -141,6 +160,8 @@ export interface SaleUseCase {
 	getByStoreIdStatus: (
 		p: GetByStoreIdStatusInput,
 	) => Promise<PaginatedItems<SaleEntity>>;
+
+	setExpiredStatus: () => Promise<void>;
 }
 
 /**
@@ -156,3 +177,7 @@ export type SaleCreatedMessage = SaleEntity;
 export type PaymentProcessedMessage = SaleEntity;
 
 export type SaleDeliveredMessage = SaleEntity;
+
+export interface SaleExpiredMessage {
+	sales: Array<SaleEntity>;
+}

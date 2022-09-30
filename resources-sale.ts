@@ -39,6 +39,14 @@ export const resourcesSale: AWS["resources"] = {
 						AttributeName: "storeId_clientId",
 						AttributeType: "S",
 					},
+					{
+						AttributeName: "status",
+						AttributeType: "S",
+					},
+					{
+						AttributeName: "expiresAt_saleId",
+						AttributeType: "S",
+					},
 				],
 				KeySchema: [
 					{
@@ -132,6 +140,23 @@ export const resourcesSale: AWS["resources"] = {
 						},
 						ProvisionedThroughput: PROVISIONED_THROUGHPUT_SALES,
 					},
+					{
+						IndexName: "StatusExpiresAtSaleId",
+						KeySchema: [
+							{
+								AttributeName: "status",
+								KeyType: "HASH",
+							},
+							{
+								AttributeName: "expiresAt_saleId",
+								KeyType: "RANGE",
+							},
+						],
+						Projection: {
+							ProjectionType: "ALL"
+						},
+						ProvisionedThroughput: PROVISIONED_THROUGHPUT_SALES,
+					},
 				],
 			},
 		},
@@ -151,6 +176,12 @@ export const resourcesSale: AWS["resources"] = {
 			Type: "AWS::SNS::Topic",
 			Properties: {
 				TopicName: "${self:service}-${opt:stage, 'local'}-sale-delivered",
+			},
+		},
+		SalesExpiredTopic: {
+			Type: "AWS::SNS::Topic",
+			Properties: {
+				TopicName: "${self:service}-${opt:stage, 'local'}-sales-expired",
 			},
 		},
 	},
@@ -208,6 +239,24 @@ export const resourcesSale: AWS["resources"] = {
 					],
 				},
 			}
-		}
+		},
+		SalesExpiredTopicArn: {
+			Value: {
+				Ref: "SalesExpiredTopic"
+			},
+			Export: {
+				Name: {
+					"Fn::Join": [
+						":",
+						[
+							{
+								Ref: "AWS::StackName",
+							},
+							"SalesExpiredTopicArn",
+						],
+					],
+				},
+			}
+		},
 	}
 };

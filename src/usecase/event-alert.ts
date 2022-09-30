@@ -19,6 +19,7 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 		private readonly queueManager: QueueManager,
 	) {}
 
+	// eslint-disable-next-line sonarjs/cognitive-complexity
 	public async processDiscordNewSaleEvent(sale: SaleEntity) {
 		let cursor;
 
@@ -34,6 +35,10 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 				alertType: AlertTypeEnum.NEW_STORE,
 				limit: 25,
 			});
+
+			if (items.length === 0) {
+				return;
+			}
 
 			const alerts = items.filter(i => {
 				if (!i.storeId && !i.productType) return true;
@@ -80,6 +85,10 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 				limit: 25,
 			});
 
+			if (items.length === 0) {
+				return;
+			}
+
 			this.queueManager.sendMsg({
 				to: process.env.DISCORD_NEW_STORE_ANNOUNCEMENT_QUEUE_URL!,
 				message: {
@@ -94,6 +103,7 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 		} while (cursor);
 	}
 
+	// eslint-disable-next-line sonarjs/cognitive-complexity
 	public async processDiscordNewProductEvent(product: ProductEntity) {
 		let cursor;
 
@@ -109,6 +119,10 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 				alertType: AlertTypeEnum.NEW_STORE,
 				limit: 25,
 			});
+
+			if (items.length === 0) {
+				return;
+			}
 
 			const alerts = items.filter(i => {
 				if (!i.storeId && !i.productType) return true;

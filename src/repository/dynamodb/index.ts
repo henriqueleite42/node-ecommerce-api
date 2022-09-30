@@ -9,6 +9,7 @@ import type {
 	DynamoDBClientConfig,
 	QueryCommandInput,
 	KeysAndAttributes,
+	AttributeValue,
 } from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { cleanObj } from "@techmmunity/utils";
@@ -74,7 +75,7 @@ export abstract class DynamodbRepository<TableType, EntityType> {
 			),
 			curPage: continueFrom,
 			nextPage: result.LastEvaluatedKey
-				? JSON.stringify(unmarshall(result.LastEvaluatedKey))
+				? this.toCursor(result.LastEvaluatedKey)
 				: undefined,
 		};
 	}
@@ -116,6 +117,16 @@ export abstract class DynamodbRepository<TableType, EntityType> {
 		return this.tableToEntity(unmarshall(result.Attributes) as TableType);
 	}
 
+	protected getExclusiveStartKey(continueFrom?: string) {
+		if (!continueFrom) return;
+
+		return marshall(JSON.parse(continueFrom));
+	}
+
+	protected toCursor(p: Record<string, AttributeValue>) {
+		return JSON.stringify(unmarshall(p));
+	}
+
 	// Internal Methods
 
 	private getUpdateData(d: Record<string, any>) {
@@ -141,12 +152,6 @@ export abstract class DynamodbRepository<TableType, EntityType> {
 			// eslint-disable-next-line @typescript-eslint/naming-convention
 			ExpressionAttributeValues: marshall(expressionAttributeValues),
 		};
-	}
-
-	private getExclusiveStartKey(continueFrom?: string) {
-		if (!continueFrom) return;
-
-		return marshall(JSON.parse(continueFrom));
 	}
 
 	// Abstract Methods
