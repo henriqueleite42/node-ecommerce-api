@@ -7,8 +7,8 @@ export enum ProductTypeEnum {
 	CUSTOM_VIDEO = "CUSTOM_VIDEO",
 	CUSTOM_IMAGE = "CUSTOM_IMAGE", // Plaquinha
 	RENT_A_GIRLFRIEND = "RENT_A_GIRLFRIEND",
-	SEX_VOICE_CALL = "SEX_VOICE_CALL", // GF
-	SEX_VIDEO_CALL = "SEX_VIDEO_CALL",
+	SEXY_VOICE_CALL = "SEXY_VOICE_CALL", // GF
+	SEXY_VIDEO_CALL = "SEXY_VIDEO_CALL",
 }
 
 export const isPreMadeProduct = (type: ProductTypeEnum) =>
@@ -27,6 +27,6 @@ export const isCustomProduct = (type: ProductTypeEnum) =>
 	].includes(type);
 
 export const isLiveProduct = (type: ProductTypeEnum) =>
-	[ProductTypeEnum.SEX_VOICE_CALL, ProductTypeEnum.SEX_VIDEO_CALL].includes(
+	[ProductTypeEnum.SEXY_VOICE_CALL, ProductTypeEnum.SEXY_VIDEO_CALL].includes(
 		type,
 	);

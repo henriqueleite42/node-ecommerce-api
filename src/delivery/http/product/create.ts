@@ -70,7 +70,7 @@ export const create = (server: DeliveryManager) => {
 							loc: "body",
 							validations: [
 								Validations.minLength(1),
-								Validations.maxLength(2),
+								Validations.maxLength(5),
 								Validations.arrOfObj([
 									{
 										key: "name",
