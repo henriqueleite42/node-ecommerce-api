@@ -25,6 +25,7 @@ export interface DiscordEventAlert extends BaseEventAlert {
 	platform: AnnouncementPlatformEnum.DISCORD;
 	discordGuildId: string;
 	discordChannelId: string;
+	discordRolesToMention: Array<string>;
 }
 
 export interface TelegramEventAlert extends BaseEventAlert {

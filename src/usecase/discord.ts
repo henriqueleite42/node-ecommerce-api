@@ -83,13 +83,16 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 		};
 
 		await Promise.all(
-			items.map(i =>
-				this.discordManager.sendMessage({
+			items.map(i => {
+				const rolesToMention = this.getRolesToMention(i.discordRolesToMention);
+
+				return this.discordManager.sendMessage({
 					channelId: i.discordChannelId!,
+					content: rolesToMention,
 					components: makeComponents(i),
 					...(message as any),
-				}),
-			),
+				});
+			}),
 		);
 	}
 
@@ -143,6 +146,34 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 				}),
 			),
 		);
+
+		await Promise.all(
+			items.map(i => {
+				const rolesToMention = this.getRolesToMention(i.discordRolesToMention);
+
+				return this.discordManager.sendMessage({
+					channelId: i.discordChannelId!,
+					content: rolesToMention,
+					embeds,
+					components: [
+						[
+							{
+								style: "primary",
+								customId: `SEE_STORE/${store.storeId}`,
+								label: "Ver lojinha",
+								emoji: "🛍",
+							},
+							{
+								style: "success",
+								customId: `BUY_PRODUCT/${store.storeId}/${product.productId}/GUILD#${i.discordGuildId}`,
+								label: "Comprar",
+								emoji: "🔥",
+							},
+						],
+					],
+				});
+			}),
+		);
 	}
 
 	public async sendNewStoreAnnouncementMessages({
@@ -150,9 +181,12 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 		store,
 	}: SendNewStoreAnnouncementMessagesInput) {
 		await Promise.all(
-			items.map(i =>
-				this.discordManager.sendMessage({
+			items.map(i => {
+				const rolesToMention = this.getRolesToMention(i.discordRolesToMention);
+
+				return this.discordManager.sendMessage({
 					channelId: i.discordChannelId!,
+					content: rolesToMention,
 					embeds: [
 						{
 							author: {
@@ -175,8 +209,8 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 							},
 						],
 					],
-				}),
-			),
+				});
+			}),
 		);
 	}
 
@@ -224,5 +258,17 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 			default:
 				return "";
 		}
+	}
+
+	protected getRolesToMention(rolesToMention?: Array<string>) {
+		if (!rolesToMention) return;
+
+		return rolesToMention
+			.map(r => {
+				if (r === "@everyone") return r;
+
+				return `<@&${r}>`;
+			})
+			.join(" ");
 	}
 }

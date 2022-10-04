@@ -24,6 +24,7 @@ export interface EventAlertTable {
 	// DISCORD
 	discordGuildId?: string;
 	discordChannelId?: string;
+	discordRolesToMention?: Array<string>;
 	// TELEGRAM
 	telegramChannelId?: string;
 
@@ -116,6 +117,7 @@ export class EventAlertRepositoryDynamoDB
 			// DISCORD
 			discordGuildId,
 			discordChannelId,
+			discordRolesToMention: entity.discordRolesToMention,
 			// TELEGRAM
 			telegramChannelId,
 
@@ -148,6 +150,7 @@ export class EventAlertRepositoryDynamoDB
 			// DISCORD
 			discordGuildId: table.discordGuildId?.replace("DISCORD_GUILD#", ""),
 			discordChannelId: table.discordChannelId?.replace("DISCORD_CHANNEL#", ""),
+			discordRolesToMention: table.discordRolesToMention,
 			// TELEGRAM
 			telegramChannelId: table.telegramChannelId?.replace(
 				"TELEGRAM_CHANNEL#",
