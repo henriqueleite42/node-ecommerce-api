@@ -13,7 +13,8 @@ export interface SaleProduct {
 	type: ProductTypeEnum;
 	name: string;
 	description: string;
-	price: number;
+	originalPrice: number;
+	finalPrice?: number;
 	imageUrl?: string;
 	deliveryMethod: DeliveryMethodEnum;
 	delivered?: boolean;
@@ -26,7 +27,8 @@ export interface SaleEntity {
 	origin: string;
 	status: SalesStatusEnum;
 	products: Array<SaleProduct>;
-	finalPrice: number;
+	originalValue: number;
+	finalValue?: number;
 	createdAt: Date;
 	expiresAt: Date;
 }

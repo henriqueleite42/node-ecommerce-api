@@ -30,7 +30,7 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 				[
 					`**Conteúdo:** ${p.name}`,
 					`**Tipo:** ${this.getTypeDisplay(p.type)}`,
-					`**Valor:** ${this.formatBRL(p.price)}`,
+					`**Valor:** ${this.formatBRL(p.originalPrice)}`,
 				].join("\n"),
 			)
 			.join("\n\n");

@@ -66,8 +66,13 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 			return this.productToSaleProduct(product, data);
 		});
 
+		const originalValue = saleProducts.reduce((acc, cur) => {
+			return acc + cur.originalPrice;
+		}, 0);
+
 		const sale = await this.saleRepository.create({
 			...i,
+			originalValue,
 			products: saleProducts,
 		});
 
@@ -116,12 +121,18 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 			throw new CustomError("Product not found", StatusCodeEnum.NOT_FOUND);
 		}
 
+		const newProduct = this.productToSaleProduct(productData, product);
+
+		const products = [...sale.products, newProduct];
+
+		const originalValue = products.reduce((acc, cur) => {
+			return acc + cur.originalPrice;
+		}, 0);
+
 		return this.saleRepository.edit({
 			saleId,
-			products: [
-				...sale.products,
-				this.productToSaleProduct(productData, product),
-			],
+			originalValue,
+			products,
 		}) as Promise<SaleEntity>;
 	}
 
@@ -147,8 +158,21 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 			);
 		}
 
+		let finalValue = 0;
+
+		const products = sale.products.map(p => {
+			finalValue += p.originalPrice;
+
+			return {
+				...p,
+				finalPrice: p.originalPrice,
+			};
+		});
+
 		await this.saleRepository.edit({
 			saleId,
+			products,
+			finalValue,
 			status: SalesStatusEnum.PENDING,
 		});
 
@@ -157,8 +181,9 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 				return {
 					pixData: await this.pixManager.createPix({
 						saleId,
-						value: sale.finalPrice,
+						value: finalValue,
 					}),
+					finalValue,
 				};
 
 			default:
@@ -185,7 +210,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 			);
 		}
 
-		if (value !== sale.finalPrice) {
+		if (value !== sale.finalValue) {
 			/**
 			 * We should handle refund here!
 			 */
@@ -321,16 +346,18 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 			throw new CustomError("Missing variation", StatusCodeEnum.BAD_REQUEST);
 		}
 
+		const price =
+			product.variations?.find(v => v.id === variationId)?.price ||
+			product.price ||
+			// eslint-disable-next-line @typescript-eslint/no-magic-numbers
+			0.1;
+
 		return {
 			productId,
 			type: product.type,
 			name: product.name,
 			description: product.description,
-			price:
-				product.variations?.find(v => v.id === variationId)?.price ||
-				product.price ||
-				// eslint-disable-next-line @typescript-eslint/no-magic-numbers
-				0.1,
+			originalPrice: price,
 			imageUrl: product.imageUrl,
 			deliveryMethod: product.deliveryMethod,
 		};

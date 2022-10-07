@@ -34,7 +34,8 @@ export interface SaleTable {
 	origin: string;
 	status: SalesStatusEnum;
 	products: SaleEntity["products"];
-	finalPrice: number;
+	originalValue: number;
+	finalValue?: number;
 	createdAt: string;
 	expiresAt: string;
 
@@ -54,7 +55,10 @@ export class SaleRepositoryDynamoDB
 	public async create(data: CreateInput) {
 		const item: SaleEntity = {
 			...data,
-			finalPrice: data.products.reduce((acc, cur) => acc + cur.price, 0),
+			finalValue: data.products.reduce(
+				(acc, cur) => acc + cur.originalPrice,
+				0,
+			),
 			status: SalesStatusEnum.IN_CART,
 			saleId: v4(),
 			createdAt: new Date(),
@@ -255,7 +259,7 @@ export class SaleRepositoryDynamoDB
 			origin: entity.origin,
 			status: entity.status,
 			products: entity.products,
-			finalPrice: entity.finalPrice,
+			finalPrice: entity.finalValue,
 			createdAt: entity.createdAt?.toISOString(),
 
 			storeId_clientId:
@@ -295,7 +299,8 @@ export class SaleRepositoryDynamoDB
 			origin: table.origin,
 			status: table.status,
 			products: table.products,
-			finalPrice: table.finalPrice,
+			finalValue: table.finalValue,
+			originalValue: table.originalValue,
 			createdAt: new Date(table.createdAt),
 			expiresAt: new Date(table.expiresAt),
 		};

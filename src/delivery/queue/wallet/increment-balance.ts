@@ -26,7 +26,7 @@ export const func = sqsManager
 	.setFunc(async ({ service, data }) => {
 		await service.incrementBalance({
 			accountId: data.storeId,
-			amount: data.finalPrice,
+			amount: data.finalValue!,
 		});
 	})
 	.getFunc();
