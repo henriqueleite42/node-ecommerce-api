@@ -20,6 +20,7 @@ import { CustomError } from "../../utils/error";
 import { DeliveryMethodEnum } from "../../types/enums/delivery-method";
 import { MediaTypeEnum } from "../../types/enums/media-type";
 import { PaymentMethodEnum } from "../../types/enums/payment-method";
+import { PlatformEnum } from "../../types/enums/platform";
 import { ProductTypeEnum } from "../../types/enums/product-type";
 import { StatusCodeEnum } from "../../types/enums/status-code";
 
@@ -246,26 +247,6 @@ export class Validations {
 		}
 	}
 
-	public static deliveryMethod(key: string, p?: any) {
-		if (!p) return;
-
-		if (typeof p !== "string") {
-			throw new CustomError(
-				`${key} must be a string`,
-				StatusCodeEnum.BAD_REQUEST,
-			);
-		}
-
-		const values = getEnumValues(DeliveryMethodEnum);
-
-		if (!values.includes(p)) {
-			throw new CustomError(
-				`${key} must be in: ${values.map(v => `'${v}'`)}`,
-				StatusCodeEnum.BAD_REQUEST,
-			);
-		}
-	}
-
 	public static storeDescription(key: string, p?: any) {
 		if (!p) return;
 
@@ -277,26 +258,6 @@ export class Validations {
 		}
 
 		Validations.maxLength(500)(key, p);
-	}
-
-	public static productType(key: string, p?: any) {
-		if (!p) return;
-
-		if (typeof p !== "string") {
-			throw new CustomError(
-				`${key} must be a string`,
-				StatusCodeEnum.BAD_REQUEST,
-			);
-		}
-
-		const values = getEnumValues(ProductTypeEnum);
-
-		if (!values.includes(p)) {
-			throw new CustomError(
-				`${key} must be in: ${values.map(v => `'${v}'`)}`,
-				StatusCodeEnum.BAD_REQUEST,
-			);
-		}
 	}
 
 	public static productName(key: string, p?: any) {
@@ -336,7 +297,7 @@ export class Validations {
 	}
 
 	public static productPrice(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (typeof p !== "number") {
 			throw new CustomError(
@@ -386,6 +347,84 @@ export class Validations {
 		}
 	}
 
+	public static pixKey(key: string, p?: any) {
+		if (!p) return;
+
+		if (typeof p !== "string") {
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+
+		if (!isCpf(p) && !isCnpj(p) && !isEmail(p) && !isBrazilianPhone(p)) {
+			throw new CustomError(
+				`${key} must be a valid pix key`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+	}
+
+	public static couponCode(key: string, p?: any) {
+		if (!p) return;
+
+		if (typeof p !== "string") {
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+
+		if (!/^[A-Z0-9]{1,20}$/.test(p)) {
+			throw new CustomError(
+				`${key} must be a valid coupon code`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+	}
+
+	// Enums
+
+	public static deliveryMethod(key: string, p?: any) {
+		if (!p) return;
+
+		if (typeof p !== "string") {
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+
+		const values = getEnumValues(DeliveryMethodEnum);
+
+		if (!values.includes(p)) {
+			throw new CustomError(
+				`${key} must be in: ${values.map(v => `'${v}'`)}`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+	}
+
+	public static productType(key: string, p?: any) {
+		if (!p) return;
+
+		if (typeof p !== "string") {
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+
+		const values = getEnumValues(ProductTypeEnum);
+
+		if (!values.includes(p)) {
+			throw new CustomError(
+				`${key} must be in: ${values.map(v => `'${v}'`)}`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+	}
+
 	public static mediaType(key: string, p?: any) {
 		if (!p) return;
 
@@ -426,7 +465,7 @@ export class Validations {
 		}
 	}
 
-	public static pixKey(key: string, p?: any) {
+	public static platform(key: string, p?: any) {
 		if (!p) return;
 
 		if (typeof p !== "string") {
@@ -436,27 +475,11 @@ export class Validations {
 			);
 		}
 
-		if (!isCpf(p) && !isCnpj(p) && !isEmail(p) && !isBrazilianPhone(p)) {
-			throw new CustomError(
-				`${key} must be a valid pix key`,
-				StatusCodeEnum.BAD_REQUEST,
-			);
-		}
-	}
+		const values = getEnumValues(PlatformEnum);
 
-	public static saleOrigin(key: string, p?: any) {
-		if (!p) return;
-
-		if (typeof p !== "string") {
+		if (!values.includes(p)) {
 			throw new CustomError(
-				`${key} must be a string`,
-				StatusCodeEnum.BAD_REQUEST,
-			);
-		}
-
-		if (!p.startsWith("DISCORD#")) {
-			throw new CustomError(
-				`${key} must be a valid origin`,
+				`${key} must be in: ${values.map(v => `'${v}'`)}`,
 				StatusCodeEnum.BAD_REQUEST,
 			);
 		}
@@ -518,7 +541,7 @@ export class Validations {
 	}
 
 	public static money(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (typeof p !== "number") {
 			throw new CustomError(
@@ -544,7 +567,7 @@ export class Validations {
 
 	public static min(min: number) {
 		return (key: string, p?: any) => {
-			if (!p) return;
+			if (typeof p === "undefined") return;
 
 			if (typeof p !== "number") {
 				throw new CustomError(
@@ -564,7 +587,7 @@ export class Validations {
 
 	public static max(max: number) {
 		return (key: string, p?: any) => {
-			if (!p) return;
+			if (typeof p === "undefined") return;
 
 			if (typeof p !== "number") {
 				throw new CustomError(

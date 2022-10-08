@@ -43,7 +43,19 @@ export const create = (server: DeliveryManager) => {
 						{
 							key: "origin",
 							loc: "body",
-							validations: [Validations.required, Validations.saleOrigin],
+							validations: [
+								Validations.required,
+								Validations.obj([
+									{
+										key: "platform",
+										validations: [Validations.required, Validations.platform],
+									},
+									{
+										key: "id",
+										validations: [Validations.required, Validations.string],
+									},
+								]),
+							],
 						},
 						{
 							key: "products",

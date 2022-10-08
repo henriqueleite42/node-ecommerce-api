@@ -4,10 +4,18 @@ import { DiscordUseCaseImplementation } from "../usecase/discord";
 
 import { Service } from ".";
 
+let instance: DiscordUseCaseImplementation;
+
 export class DiscordService extends Service<DiscordUseCase> {
 	public getInstance() {
+		if (instance) return instance;
+
 		const discordManager = new DiscordJSAdapter();
 
-		return new DiscordUseCaseImplementation(discordManager);
+		const newInstance = new DiscordUseCaseImplementation(discordManager);
+
+		instance = newInstance;
+
+		return instance;
 	}
 }

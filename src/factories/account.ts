@@ -5,12 +5,20 @@ import { AccountUseCaseImplementation } from "../usecase/account";
 
 import { Service } from ".";
 
+let instance: AccountUseCaseImplementation;
+
 export class AccountService extends Service<AccountUseCase> {
 	public getInstance() {
+		if (instance) return instance;
+
 		const dynamodb = getDynamoInstance();
 
 		const accountRepository = new AccountRepositoryDynamoDB(dynamodb);
 
-		return new AccountUseCaseImplementation(accountRepository);
+		const newInstance = new AccountUseCaseImplementation(accountRepository);
+
+		instance = newInstance;
+
+		return instance;
 	}
 }

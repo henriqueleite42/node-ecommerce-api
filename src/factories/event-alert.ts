@@ -7,18 +7,26 @@ import { EventAlertUseCaseImplementation } from "../usecase/event-alert";
 
 import { Service } from ".";
 
+let instance: EventAlertUseCaseImplementation;
+
 export class EventAlertService extends Service<EventAlertUseCase> {
 	public getInstance() {
+		if (instance) return instance;
+
 		const dynamodb = getDynamoInstance();
 		const sqs = new SQSAdapter();
 
 		const eventAlertRepository = new EventAlertRepositoryDynamoDB(dynamodb);
 		const storeRepository = new StoreRepositoryDynamoDB(dynamodb);
 
-		return new EventAlertUseCaseImplementation(
+		const newInstance = new EventAlertUseCaseImplementation(
 			eventAlertRepository,
 			storeRepository,
 			sqs,
 		);
+
+		instance = newInstance;
+
+		return instance;
 	}
 }

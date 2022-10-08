@@ -6,13 +6,21 @@ import { AccessUseCaseImplementation } from "../usecase/access";
 
 import { Service } from ".";
 
+let instance: AccessUseCaseImplementation;
+
 export class AccessService extends Service<AccessUseCase> {
 	public getInstance() {
+		if (instance) return instance;
+
 		const dynamodb = getDynamoInstance();
 		const sns = new SNSAdapter();
 
 		const accessRepository = new AccessRepositoryDynamoDB(dynamodb);
 
-		return new AccessUseCaseImplementation(accessRepository, sns);
+		const newInstance = new AccessUseCaseImplementation(accessRepository, sns);
+
+		instance = newInstance;
+
+		return instance;
 	}
 }

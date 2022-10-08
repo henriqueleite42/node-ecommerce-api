@@ -8,8 +8,12 @@ import { ContentUseCaseImplementation } from "../usecase/content";
 
 import { Service } from ".";
 
+let instance: ContentUseCaseImplementation;
+
 export class ContentService extends Service<ContentUseCase> {
 	public getInstance() {
+		if (instance) return instance;
+
 		const dynamodb = getDynamoInstance();
 		const sqs = new SQSAdapter();
 		const s3 = new S3Adapter();
@@ -18,6 +22,13 @@ export class ContentService extends Service<ContentUseCase> {
 
 		const uploadManager = new UploadManagerProvider(sqs, s3);
 
-		return new ContentUseCaseImplementation(contentRepository, uploadManager);
+		const newInstance = new ContentUseCaseImplementation(
+			contentRepository,
+			uploadManager,
+		);
+
+		instance = newInstance;
+
+		return instance;
 	}
 }

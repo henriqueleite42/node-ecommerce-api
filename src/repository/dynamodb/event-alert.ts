@@ -12,11 +12,11 @@ import type {
 import { DynamodbRepository } from ".";
 
 import type { AlertTypeEnum } from "../../types/enums/alert-type";
-import type { AnnouncementPlatformEnum } from "../../types/enums/platform";
+import type { PlatformEnum } from "../../types/enums/platform";
 import type { ProductTypeEnum } from "../../types/enums/product-type";
 
 export interface EventAlertTable {
-	platform: AnnouncementPlatformEnum;
+	platform: PlatformEnum;
 	alertType: AlertTypeEnum;
 	storeId?: string;
 	productType?: ProductTypeEnum;

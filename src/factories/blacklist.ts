@@ -5,12 +5,20 @@ import { BlacklistUseCaseImplementation } from "../usecase/blacklist";
 
 import { Service } from ".";
 
+let instance: BlacklistUseCaseImplementation;
+
 export class BlacklistService extends Service<BlacklistUseCase> {
 	public getInstance() {
+		if (instance) return instance;
+
 		const dynamodb = getDynamoInstance();
 
 		const blacklistRepository = new BlacklistRepositoryDynamoDB(dynamodb);
 
-		return new BlacklistUseCaseImplementation(blacklistRepository);
+		const newInstance = new BlacklistUseCaseImplementation(blacklistRepository);
+
+		instance = newInstance;
+
+		return instance;
 	}
 }

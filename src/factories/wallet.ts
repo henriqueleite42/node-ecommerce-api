@@ -5,12 +5,20 @@ import { WalletUseCaseImplementation } from "../usecase/wallet";
 
 import { Service } from ".";
 
+let instance: WalletUseCaseImplementation;
+
 export class WalletService extends Service<WalletUseCase> {
 	public getInstance() {
+		if (instance) return instance;
+
 		const dynamodb = getDynamoInstance();
 
 		const walletRepository = new WalletRepositoryDynamoDB(dynamodb);
 
-		return new WalletUseCaseImplementation(walletRepository);
+		const newInstance = new WalletUseCaseImplementation(walletRepository);
+
+		instance = newInstance;
+
+		return instance;
 	}
 }

@@ -12,8 +12,12 @@ import { ProductUseCaseImplementation } from "../usecase/product";
 
 import { Service } from ".";
 
+let instance: ProductUseCaseImplementation;
+
 export class ProductService extends Service<ProductUseCase> {
 	public getInstance() {
+		if (instance) return instance;
+
 		const dynamodb = getDynamoInstance();
 		const sqs = new SQSAdapter();
 		const sns = new SNSAdapter();
@@ -30,12 +34,16 @@ export class ProductService extends Service<ProductUseCase> {
 			uploadManager,
 		);
 
-		return new ProductUseCaseImplementation(
+		const newInstance = new ProductUseCaseImplementation(
 			productRepository,
 			counterRepository,
 			contentUseCase,
 			uploadManager,
 			sns,
 		);
+
+		instance = newInstance;
+
+		return instance;
 	}
 }

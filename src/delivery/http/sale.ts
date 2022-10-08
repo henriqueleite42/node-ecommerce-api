@@ -1,3 +1,4 @@
+import { addCoupon } from "./sale/add-coupon";
 import { addProduct } from "./sale/add-product";
 import { checkout } from "./sale/checkout";
 import { create } from "./sale/create";
@@ -17,6 +18,7 @@ export const saleDomain = async ({
 	await secretsLoader.loadSecrets("monetizzer/gerencianet-certs-key");
 	await resourcesLoader.loadSecrets("sale");
 
+	addCoupon(server);
 	addProduct(server);
 	checkout(server);
 	create(server);

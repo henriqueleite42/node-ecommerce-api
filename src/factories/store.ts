@@ -12,8 +12,12 @@ import { StoreUseCaseImplementation } from "../usecase/store";
 
 import { Service } from ".";
 
+let instance: StoreUseCaseImplementation;
+
 export class StoreService extends Service<StoreUseCase> {
 	public getInstance() {
+		if (instance) return instance;
+
 		const dynamodb = getDynamoInstance();
 		const sns = new SNSAdapter();
 		const sqs = new SQSAdapter();
@@ -26,7 +30,7 @@ export class StoreService extends Service<StoreUseCase> {
 
 		const uploadManager = new UploadManagerProvider(sqs, s3);
 
-		return new StoreUseCaseImplementation(
+		const newInstance = new StoreUseCaseImplementation(
 			storeRepository,
 			productRepository,
 			blacklistRepository,
@@ -34,5 +38,9 @@ export class StoreService extends Service<StoreUseCase> {
 			sns,
 			uploadManager,
 		);
+
+		instance = newInstance;
+
+		return instance;
 	}
 }

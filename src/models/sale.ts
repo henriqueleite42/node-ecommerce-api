@@ -3,9 +3,22 @@ import type { CreatePixOutput } from "../adapters/pix-manager";
 import type { PaginatedItems } from "./types";
 
 import type { DeliveryMethodEnum } from "../types/enums/delivery-method";
+import type { DiscountTypeEnum } from "../types/enums/discount-type";
 import type { PaymentMethodEnum } from "../types/enums/payment-method";
+import type { PlatformEnum } from "../types/enums/platform";
 import type { ProductTypeEnum } from "../types/enums/product-type";
 import type { SalesStatusEnum } from "../types/enums/sale-status";
+
+export interface SaleOrigin {
+	platform: PlatformEnum;
+	id: string;
+}
+
+export interface SaleCoupon {
+	code: string;
+	discountType: DiscountTypeEnum;
+	amount: number;
+}
 
 export interface SaleProduct {
 	productId: string;
@@ -24,7 +37,8 @@ export interface SaleEntity {
 	saleId: string;
 	storeId: string;
 	clientId: string;
-	origin: string;
+	coupon?: SaleCoupon;
+	origin: SaleOrigin;
 	status: SalesStatusEnum;
 	products: Array<SaleProduct>;
 	originalValue: number;
@@ -81,6 +95,13 @@ export interface GetByStoreIdStatusInput {
 	continueFrom?: string;
 }
 
+export interface GetByStoreIdClientInput {
+	storeId: SaleEntity["storeId"];
+	clientId: SaleEntity["clientId"];
+	limit: number;
+	continueFrom?: string;
+}
+
 export interface GetExpiredInput {
 	continueFrom?: string;
 }
@@ -107,6 +128,10 @@ export interface SaleRepository {
 
 	getByStoreIdStatus: (
 		p: GetByStoreIdStatusInput,
+	) => Promise<PaginatedItems<SaleEntity>>;
+
+	getByStoreIdClientId: (
+		p: GetByStoreIdClientInput,
 	) => Promise<PaginatedItems<SaleEntity>>;
 
 	getExpired: (p: GetExpiredInput) => Promise<GetExpiredOutput>;
@@ -136,6 +161,12 @@ export interface AddProductSaleInput {
 	};
 }
 
+export interface AddCouponInput {
+	clientId: string;
+	saleId: string;
+	coupon: string;
+}
+
 export interface CheckoutSaleInput {
 	clientId: string;
 	saleId: string;
@@ -157,6 +188,8 @@ export interface SaleUseCase {
 	create: (p: CreateSaleInput) => Promise<SaleEntity>;
 
 	addProduct: (p: AddProductSaleInput) => Promise<SaleEntity>;
+
+	addCoupon: (p: AddCouponInput) => Promise<SaleEntity>;
 
 	checkout: (p: CheckoutSaleInput) => Promise<CheckoutSaleOutput>;
 

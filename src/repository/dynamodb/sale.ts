@@ -21,6 +21,7 @@ import type {
 	GetExpiredInput,
 	BulkEditInput,
 	EditSaleProductInput,
+	GetByStoreIdClientInput,
 } from "../../models/sale";
 
 import { DynamodbRepository } from ".";
@@ -31,9 +32,10 @@ export interface SaleTable {
 	saleId: string;
 	storeId: string;
 	clientId: string;
-	origin: string;
 	status: SalesStatusEnum;
 	products: SaleEntity["products"];
+	origin: SaleEntity["origin"];
+	coupon: SaleEntity["coupon"];
 	originalValue: number;
 	finalValue?: number;
 	createdAt: string;
@@ -153,6 +155,18 @@ export class SaleRepositoryDynamoDB
 		);
 	}
 
+	public getByStoreIdClientId({
+		limit,
+		continueFrom,
+		...keys
+	}: GetByStoreIdClientInput) {
+		return this.getMultipleItems(
+			this.indexStoreIdClientId(keys),
+			limit,
+			continueFrom,
+		);
+	}
+
 	public async getExpired({ continueFrom }: GetExpiredInput) {
 		const result = await this.dynamodb.send(
 			new QueryCommand({
@@ -249,6 +263,24 @@ export class SaleRepositoryDynamoDB
 		};
 	}
 
+	private indexStoreIdClientId(
+		entity: Pick<SaleEntity, "clientId" | "storeId">,
+	) {
+		return {
+			IndexName: "StoreIdClientIdCreatedAtSaleId",
+			KeyConditionExpression: "#storeId_clientId = :storeId_clientId",
+			ExpressionAttributeNames: {
+				"#storeId_clientId": "storeId_clientId",
+			},
+			ExpressionAttributeValues: marshall({
+				":storeId_clientId": `STORE#${entity.storeId}#CLIENT#${entity.clientId}`,
+			}),
+			Key: marshall({
+				storeId_clientId: `STORE#${entity.storeId}#CLIENT#${entity.clientId}`,
+			}),
+		};
+	}
+
 	// Mappers
 
 	protected entityToTable(entity: Partial<SaleEntity>): Partial<SaleTable> {
@@ -259,6 +291,7 @@ export class SaleRepositoryDynamoDB
 			origin: entity.origin,
 			status: entity.status,
 			products: entity.products,
+			coupon: entity.coupon,
 			finalPrice: entity.finalValue,
 			createdAt: entity.createdAt?.toISOString(),
 
@@ -299,6 +332,7 @@ export class SaleRepositoryDynamoDB
 			origin: table.origin,
 			status: table.status,
 			products: table.products,
+			coupon: table.coupon,
 			finalValue: table.finalValue,
 			originalValue: table.originalValue,
 			createdAt: new Date(table.createdAt),

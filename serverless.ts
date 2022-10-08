@@ -5,6 +5,7 @@ import { resourcesAccount } from "./resources-account";
 import { resourcesBlacklist } from "./resources-blacklist";
 import { resourcesContent } from "./resources-content";
 import { resourcesCounter } from "./resources-counter";
+import { resourcesCoupon } from "./resources-coupon";
 import { resourcesDiscord } from "./resources-discord";
 import { resourcesEventAlert } from "./resources-event-alert";
 import { resourcesProduct } from "./resources-product";
@@ -106,6 +107,11 @@ const contentConfig = {
 const counterConfig = {
 	service: "counter",
 	resources: resourcesCounter,
+};
+
+const couponConfig = {
+	service: "coupon",
+	resources: resourcesCoupon,
 };
 
 const discordConfig = {
@@ -213,6 +219,9 @@ const getConfig = () => {
 
 		case "COUNTER":
 			return merge(baseConfig, counterConfig);
+
+		case "COUPON":
+			return merge(baseConfig, couponConfig);
 
 		case "DISCORD":
 			return merge(baseConfig, discordConfig);

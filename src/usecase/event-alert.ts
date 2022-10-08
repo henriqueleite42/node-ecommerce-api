@@ -10,7 +10,7 @@ import type { SaleEntity } from "../models/sale";
 import type { StoreEntity, StoreRepository } from "../models/store";
 
 import { AlertTypeEnum } from "../types/enums/alert-type";
-import { AnnouncementPlatformEnum } from "../types/enums/platform";
+import { PlatformEnum } from "../types/enums/platform";
 
 export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 	public constructor(
@@ -31,7 +31,7 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 
 		do {
 			const { items, nextPage } = await this.eventAlertRepository.getEvents({
-				platform: AnnouncementPlatformEnum.DISCORD,
+				platform: PlatformEnum.DISCORD,
 				alertType: AlertTypeEnum.NEW_STORE,
 				limit: 25,
 			});
@@ -80,7 +80,7 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 
 		do {
 			const { items, nextPage } = await this.eventAlertRepository.getEvents({
-				platform: AnnouncementPlatformEnum.DISCORD,
+				platform: PlatformEnum.DISCORD,
 				alertType: AlertTypeEnum.NEW_STORE,
 				limit: 25,
 			});
@@ -115,7 +115,7 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 
 		do {
 			const { items, nextPage } = await this.eventAlertRepository.getEvents({
-				platform: AnnouncementPlatformEnum.DISCORD,
+				platform: PlatformEnum.DISCORD,
 				alertType: AlertTypeEnum.NEW_STORE,
 				limit: 25,
 			});

@@ -5,6 +5,7 @@
 import type { PixManager } from "../adapters/pix-manager";
 import type { TopicManager } from "../adapters/topic-manager";
 import type { BlacklistRepository } from "../models/blacklist";
+import type { CouponRepository } from "../models/coupon";
 import type { ProductEntity, ProductRepository } from "../models/product";
 import type {
 	AddProductSaleInput,
@@ -22,11 +23,14 @@ import type {
 	SetProductAsDeliveredInput,
 	SaleDeliveredMessage,
 	SaleExpiredMessage,
+	AddCouponInput,
+	SaleCoupon,
 } from "../models/sale";
 
 import { CustomError } from "../utils/error";
 
 import { isManualDelivery } from "../types/enums/delivery-method";
+import { DiscountTypeEnum } from "../types/enums/discount-type";
 import { PaymentMethodEnum } from "../types/enums/payment-method";
 import { SalesStatusEnum } from "../types/enums/sale-status";
 import { StatusCodeEnum } from "../types/enums/status-code";
@@ -36,6 +40,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		private readonly saleRepository: SaleRepository,
 		private readonly blacklistRepository: BlacklistRepository,
 		private readonly productRepository: ProductRepository,
+		private readonly couponRepository: CouponRepository,
 		private readonly topicManager: TopicManager,
 		private readonly pixManager: PixManager,
 	) {}
@@ -123,16 +128,176 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 
 		const newProduct = this.productToSaleProduct(productData, product);
 
-		const products = [...sale.products, newProduct];
-
-		const originalValue = products.reduce((acc, cur) => {
-			return acc + cur.originalPrice;
-		}, 0);
+		const { originalValue, finalValue, products } = this.getProductsAndValues(
+			[...sale.products, newProduct],
+			sale.coupon,
+		);
 
 		return this.saleRepository.edit({
 			saleId,
 			originalValue,
+			finalValue,
 			products,
+		}) as Promise<SaleEntity>;
+	}
+
+	// eslint-disable-next-line sonarjs/cognitive-complexity
+	public async addCoupon({
+		clientId,
+		saleId,
+		coupon: couponCode,
+	}: AddCouponInput) {
+		const sale = await this.saleRepository.getById({ saleId });
+
+		if (!sale) {
+			throw new CustomError("Sale not found", StatusCodeEnum.NOT_FOUND);
+		}
+
+		if (sale.clientId !== clientId) {
+			throw new CustomError("Unauthorized", StatusCodeEnum.UNAUTHORIZED);
+		}
+
+		if (sale.status !== SalesStatusEnum.IN_CART) {
+			throw new CustomError(
+				"Sale already in progress",
+				StatusCodeEnum.CONFLICT,
+			);
+		}
+
+		const couponData = await this.couponRepository.get({
+			storeId: sale.storeId,
+			code: couponCode,
+		});
+
+		if (!couponData) {
+			throw new CustomError("Coupon not found", StatusCodeEnum.NOT_FOUND);
+		}
+
+		if (
+			couponData.validations?.validAfter &&
+			new Date().getTime() < couponData.validations.validAfter.getTime()
+		) {
+			throw new CustomError("Coupon not valid yet", StatusCodeEnum.CONFLICT);
+		}
+
+		if (
+			couponData.validations?.expiresAt &&
+			new Date().getTime() > couponData.validations.expiresAt.getTime()
+		) {
+			throw new CustomError("Coupon expired", StatusCodeEnum.CONFLICT);
+		}
+
+		if (
+			couponData.validations?.clientsIds &&
+			!couponData.validations.clientsIds.includes(clientId)
+		) {
+			throw new CustomError(
+				"Client cannot use this coupon",
+				StatusCodeEnum.CONFLICT,
+			);
+		}
+
+		if (
+			couponData.validations?.productsIds &&
+			!couponData.validations.productsIds.some(pId =>
+				sale.products.find(p => p.productId === pId),
+			)
+		) {
+			throw new CustomError(
+				"Coupon depends on products that aren't in the cart",
+				StatusCodeEnum.CONFLICT,
+			);
+		}
+
+		if (
+			couponData.validations?.productsTypes &&
+			!couponData.validations.productsTypes.some(pType =>
+				sale.products.find(p => p.type === pType),
+			)
+		) {
+			throw new CustomError(
+				"Coupon depends on product type that aren't in the cart",
+				StatusCodeEnum.CONFLICT,
+			);
+		}
+
+		if (
+			couponData.validations?.usesLimit &&
+			couponData.usesCount >= couponData.validations.usesLimit
+		) {
+			throw new CustomError("Coupon uses exceeded", StatusCodeEnum.CONFLICT);
+		}
+
+		if (couponData.validations?.onlyOnUserFirstStorePurchase) {
+			const previousSales = await this.saleRepository.getByStoreIdClientId({
+				storeId: sale.storeId,
+				clientId: sale.clientId,
+				limit: 100,
+			});
+
+			const previousSaleCompleted = previousSales.items.find(
+				s => s.status === SalesStatusEnum.DELIVERED,
+			);
+
+			if (previousSaleCompleted) {
+				throw new CustomError(
+					"Only valid on the first store purchase",
+					StatusCodeEnum.CONFLICT,
+				);
+			}
+		}
+
+		if (couponData.validations?.onlyOnUserFirstGlobalPurchase) {
+			const previousSales = await this.saleRepository.getByClientIdStatus({
+				clientId: sale.clientId,
+				status: SalesStatusEnum.DELIVERED,
+				limit: 1,
+			});
+
+			if (previousSales.items.length === 1) {
+				throw new CustomError(
+					"Only valid on the first purchase",
+					StatusCodeEnum.CONFLICT,
+				);
+			}
+		}
+
+		if (couponData.validations?.onlyOnePerUser) {
+			const previousSales = await this.saleRepository.getByStoreIdClientId({
+				storeId: sale.storeId,
+				clientId: sale.clientId,
+				limit: 100,
+			});
+
+			const purchaseWithCoupon = previousSales.items.find(
+				p => p.coupon?.code === couponCode,
+			);
+
+			if (purchaseWithCoupon) {
+				throw new CustomError(
+					"User can only use this coupon once",
+					StatusCodeEnum.CONFLICT,
+				);
+			}
+		}
+
+		const coupon = {
+			code: couponData.code,
+			discountType: couponData.discountType,
+			amount: couponData.amount,
+		};
+
+		const { originalValue, finalValue, products } = this.getProductsAndValues(
+			sale.products,
+			sale.coupon,
+		);
+
+		return this.saleRepository.edit({
+			saleId,
+			coupon,
+			products,
+			originalValue,
+			finalValue,
 		}) as Promise<SaleEntity>;
 	}
 
@@ -158,21 +323,8 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 			);
 		}
 
-		let finalValue = 0;
-
-		const products = sale.products.map(p => {
-			finalValue += p.originalPrice;
-
-			return {
-				...p,
-				finalPrice: p.originalPrice,
-			};
-		});
-
 		await this.saleRepository.edit({
 			saleId,
-			products,
-			finalValue,
 			status: SalesStatusEnum.PENDING,
 		});
 
@@ -181,9 +333,9 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 				return {
 					pixData: await this.pixManager.createPix({
 						saleId,
-						value: finalValue,
+						value: sale.finalValue!,
 					}),
-					finalValue,
+					finalValue: sale.finalValue!,
 				};
 
 			default:
@@ -360,6 +512,52 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 			originalPrice: price,
 			imageUrl: product.imageUrl,
 			deliveryMethod: product.deliveryMethod,
+		};
+	}
+
+	private roundMoney(value: number) {
+		return parseFloat(value.toFixed(2));
+	}
+
+	private applyDiscount(value: number, coupon?: SaleCoupon) {
+		if (!coupon) return value;
+
+		if (coupon.discountType === DiscountTypeEnum.RAW_VALUE) {
+			const discount = value - coupon.amount;
+
+			if (discount < 0.01) return 0.01;
+
+			return discount;
+		}
+
+		const toSub = this.roundMoney((value * coupon.amount) / 100);
+
+		return this.roundMoney(value - toSub);
+	}
+
+	private getProductsAndValues(
+		products: Array<SaleProduct>,
+		coupon?: SaleCoupon,
+	) {
+		let originalValue = 0;
+		let finalValue = 0;
+		const productsFormatted = products.map(p => {
+			const productFinalValue = this.applyDiscount(p.originalPrice, coupon);
+
+			originalValue += p.originalPrice;
+			finalValue += productFinalValue;
+
+			return {
+				...p,
+				originalPrice: p.originalPrice,
+				finalPrice: productFinalValue,
+			};
+		});
+
+		return {
+			originalValue,
+			finalValue,
+			products: productsFormatted,
 		};
 	}
 }

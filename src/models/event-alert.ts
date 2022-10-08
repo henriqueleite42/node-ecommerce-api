@@ -3,7 +3,7 @@ import type { SaleEntity } from "./sale";
 import type { StoreEntity } from "./store";
 
 import type { AlertTypeEnum } from "../types/enums/alert-type";
-import type { AnnouncementPlatformEnum } from "../types/enums/platform";
+import type { PlatformEnum } from "../types/enums/platform";
 import type { ProductTypeEnum } from "../types/enums/product-type";
 
 /**
@@ -14,7 +14,7 @@ import type { ProductTypeEnum } from "../types/enums/product-type";
  * NEW_FEEDBACK: storeId, productId
  */
 interface BaseEventAlert {
-	platform: AnnouncementPlatformEnum;
+	platform: PlatformEnum;
 	alertType: AlertTypeEnum;
 	storeId?: string;
 	productType?: ProductTypeEnum;
@@ -22,21 +22,21 @@ interface BaseEventAlert {
 }
 
 export interface DiscordEventAlert extends BaseEventAlert {
-	platform: AnnouncementPlatformEnum.DISCORD;
+	platform: PlatformEnum.DISCORD;
 	discordGuildId: string;
 	discordChannelId: string;
 	discordRolesToMention: Array<string>;
 }
 
 export interface TelegramEventAlert extends BaseEventAlert {
-	platform: AnnouncementPlatformEnum.DISCORD;
+	platform: PlatformEnum.DISCORD;
 	telegramChannelId: string;
 }
 
 export interface EventAlertEntity
 	extends Partial<Omit<DiscordEventAlert, "platform">>,
 		Partial<Omit<TelegramEventAlert, "platform">> {
-	platform: AnnouncementPlatformEnum;
+	platform: PlatformEnum;
 }
 
 /**
@@ -48,7 +48,7 @@ export interface EventAlertEntity
  */
 
 export interface GetEventsInput {
-	platform: AnnouncementPlatformEnum;
+	platform: PlatformEnum;
 	alertType: AlertTypeEnum;
 	limit: number;
 	cursor?: string;
