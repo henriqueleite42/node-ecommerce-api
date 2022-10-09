@@ -1,6 +1,8 @@
 import { create } from "./store/create";
 import { edit } from "./store/edit";
 import { getByName } from "./store/get-by-name";
+import { getUrlToUploadAvatar } from "./store/get-url-to-upload-avatar";
+import { getUrlToUploadBanner } from "./store/get-url-to-upload-banner";
 import { top } from "./store/top";
 import { total } from "./store/total";
 import type { DomainInput } from "./types";
@@ -17,6 +19,8 @@ export const storeDomain = async ({
 	create(server);
 	edit(server);
 	getByName(server);
+	getUrlToUploadAvatar(server);
+	getUrlToUploadBanner(server);
 	top(server);
 	total(server);
 };

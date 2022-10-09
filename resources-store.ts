@@ -67,6 +67,54 @@ export const resourcesStore: AWS["resources"] = {
 					IgnorePublicAcls : true,
 					RestrictPublicBuckets : true,
 				},
+				NotificationConfiguration: {
+					LambdaConfigurations: [
+						{
+							Event: "s3:ObjectCreated:*",
+							Function: {
+								"Fn::Sub":
+									"arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-update-avatar",
+							},
+							Filter: {
+								S3Key: {
+									Rules: [
+										{
+											Name: "prefix",
+											Value: "avatars",
+										},
+									],
+								},
+							},
+						},
+						{
+							Event: "s3:ObjectCreated:*",
+							Function: {
+								"Fn::Sub":
+									"arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-update-banner",
+							},
+							Filter: {
+								S3Key: {
+									Rules: [
+										{
+											Name: "prefix",
+											Value: "banners",
+										},
+									],
+								},
+							},
+						},
+					],
+				},
+				CorsConfiguration: {
+					CorsRules: [
+						{
+							AllowedOrigins: ["*"],
+							AllowedHeaders: ["*"],
+							AllowedMethods: ["POST"],
+							MaxAge: 3000,
+						},
+					],
+				},
 			},
 		},
 		MediaStorageOriginAccessIdentity: {

@@ -5,7 +5,11 @@ import type { ReadStream } from "fs";
 
 import type { FileManager } from "../../adapters/file-manager";
 import type { QueueManager } from "../../adapters/queue-manager";
-import type { UploadManager, UploadFromUrlInput } from "../upload-manager";
+import type {
+	UploadManager,
+	UploadFromUrlInput,
+	GetUrlToUploadInput,
+} from "../upload-manager";
 
 import { MediaTypeEnum } from "../../types/enums/media-type";
 
@@ -70,7 +74,7 @@ export class UploadManagerProvider implements UploadManager {
 			const { filePath } = await this.fileManager.saveFile({
 				folder,
 				file: readStream,
-				name: `${fileName}.${ext}`,
+				fileName: `${fileName}.${ext}`,
 				metadata: id,
 			});
 
@@ -89,6 +93,10 @@ export class UploadManagerProvider implements UploadManager {
 				},
 			});
 		}
+	}
+
+	public getUrlToUpload(p: GetUrlToUploadInput) {
+		return this.fileManager.getUrlToUpload(p);
 	}
 
 	protected getExt(mediaTypeFromUrl: string) {

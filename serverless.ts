@@ -18,9 +18,11 @@ import { content } from "./src/delivery/queue/content";
 import { discord } from "./src/delivery/queue/discord";
 import { eventAlert } from "./src/delivery/queue/event-alert";
 import { product } from "./src/delivery/queue/product";
-import { store } from "./src/delivery/queue/store";
+import { storeSQS } from "./src/delivery/queue/store";
 import { upload } from "./src/delivery/queue/upload";
 import { wallet } from "./src/delivery/queue/wallet";
+
+import { storeS3 } from "./src/delivery/s3/store";
 
 const baseConfig: Partial<AWS> = {
 	plugins: [
@@ -178,7 +180,10 @@ const storeConfig = {
 		"serverless-webpack",
 	],
 	resources: resourcesStore,
-	functions: store,
+	functions: {
+		...storeSQS,
+		...storeS3,
+	},
 };
 
 const uploadConfig = {

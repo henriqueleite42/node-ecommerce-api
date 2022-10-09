@@ -13,6 +13,7 @@ import type {
 	StoreCreatedMessage,
 	StoreRepository,
 	StoreUseCase,
+	GetUrlToUploadImgInput,
 } from "../models/store";
 import type { UploadManager } from "../providers/upload-manager";
 
@@ -134,6 +135,22 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 		}
 
 		return store;
+	}
+
+	public getUrlToUploadAvatar({ storeId }: GetUrlToUploadImgInput) {
+		return this.uploadManager.getUrlToUpload({
+			folder: process.env.STORE_MEDIA_BUCKET_NAME!,
+			fileName: `avatars/${storeId}`,
+			type: MediaTypeEnum.IMAGE,
+		});
+	}
+
+	public getUrlToUploadBanner({ storeId }: GetUrlToUploadImgInput) {
+		return this.uploadManager.getUrlToUpload({
+			folder: process.env.STORE_MEDIA_BUCKET_NAME!,
+			fileName: `banners/${storeId}`,
+			type: MediaTypeEnum.IMAGE,
+		});
 	}
 
 	public addProductType({ storeId, type }: ProductEntity) {

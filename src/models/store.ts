@@ -1,3 +1,5 @@
+import type { GetUrlToUploadOutput } from "../adapters/file-manager";
+
 import type { ProductEntity } from "./product";
 
 import type { ProductTypeEnum } from "../types/enums/product-type";
@@ -65,6 +67,10 @@ export interface StoreRepository {
  *
  */
 
+export interface GetUrlToUploadImgInput {
+	storeId: string;
+}
+
 export interface IncreaseSalesCountInput {
 	storeId: string;
 }
@@ -82,6 +88,14 @@ export interface StoreUseCase {
 	create: (p: CreateInput) => Promise<StoreEntity>;
 
 	edit: (p: EditInput) => Promise<StoreEntity>;
+
+	getUrlToUploadAvatar: (
+		p: GetUrlToUploadImgInput,
+	) => Promise<GetUrlToUploadOutput>;
+
+	getUrlToUploadBanner: (
+		p: GetUrlToUploadImgInput,
+	) => Promise<GetUrlToUploadOutput>;
 
 	addProductType: (p: ProductEntity) => Promise<void>;
 

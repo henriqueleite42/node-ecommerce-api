@@ -6,12 +6,12 @@ import { removeProductType } from "./store/remove-product-type";
 import { updateAvatar } from "./store/update-avatar";
 import { updateBanner } from "./store/update-banner";
 
-export const store = {
-	storeAddProductType: addProductType,
-	storeIncrementSalesCount: incrementSalesCount,
-	storeIncrementStoresCount: incrementStoresCount,
-	storeIncrementTotalBilled: incrementTotalBilled,
-	storeRemoveProductType: removeProductType,
-	storeUpdateAvatar: updateAvatar,
-	storeUpdateBanner: updateBanner,
+export const storeSQS = {
+	storeSQSAddProductType: addProductType,
+	storeSQSIncrementSalesCount: incrementSalesCount,
+	storeSQSIncrementStoresCount: incrementStoresCount,
+	storeSQSIncrementTotalBilled: incrementTotalBilled,
+	storeSQSRemoveProductType: removeProductType,
+	storeSQSUpdateAvatar: updateAvatar,
+	storeSQSUpdateBanner: updateBanner,
 };
