@@ -21,6 +21,7 @@
 		"change-case": "^4.1.2",
 		"fastify": "^4.6.0",
 		"nanoid": "^4.0.0",
+		"paseto": "^3.1.1",
 		"uid": "^2.0.0"
 	},
 	"devDependencies": {

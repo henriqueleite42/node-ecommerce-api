@@ -6882,6 +6882,11 @@ pascal-case@^3.1.2:
     no-case "^3.0.4"
     tslib "^2.0.3"
 
+paseto@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/paseto/-/paseto-3.1.1.tgz#970ed7b2b5e2815aa0a2619219c00cec5bd02848"
+  integrity sha512-pZmPoGPsR9dBdaKhyKeRLNdvdDbpFA/1Ku/3LuQaY/ssPE4fzSRuNz2+qoSRaIB/mDcbWyzZKjV8ook6AzlsSg==
+
 path-case@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/path-case/-/path-case-3.0.4.tgz#9168645334eb942658375c56f80b4c0cb5f82c6f"

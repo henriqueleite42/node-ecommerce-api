@@ -9,7 +9,6 @@ import {
 	isEmail,
 	isUrl,
 } from "@techmmunity/utils";
-import { validate } from "uuid";
 
 import type { Validations as ValidationsType } from "../../providers/validator";
 
@@ -209,9 +208,9 @@ export class Validations {
 		}
 	}
 
-	// Business
+	// Ids & Tokens
 
-	public static username(key: string, p?: any) {
+	public static id(key: string, p?: any) {
 		if (!p) return;
 
 		if (typeof p !== "string") {
@@ -221,9 +220,9 @@ export class Validations {
 			);
 		}
 
-		if (!/^[a-z0-9-]{1,16}$/i.test(p)) {
+		if (!/^[\w-]{21}$/.test(p)) {
 			throw new CustomError(
-				`${key} must be a valid code`,
+				`${key} must be a valid id`,
 				StatusCodeEnum.BAD_REQUEST,
 			);
 		}
@@ -240,6 +239,44 @@ export class Validations {
 		}
 
 		if (!/^[a-z0-9]{6}$/i.test(p)) {
+			throw new CustomError(
+				`${key} must be a valid code`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+	}
+
+	public static token(key: string, p?: any) {
+		if (!p) return;
+
+		if (typeof p !== "string") {
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+
+		if (!/^[a-z0-9]{32}$/i.test(p)) {
+			throw new CustomError(
+				`${key} must be a valid token`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+	}
+
+	// Business
+
+	public static username(key: string, p?: any) {
+		if (!p) return;
+
+		if (typeof p !== "string") {
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+
+		if (!/^[a-z0-9-]{1,16}$/i.test(p)) {
 			throw new CustomError(
 				`${key} must be a valid code`,
 				StatusCodeEnum.BAD_REQUEST,
@@ -484,25 +521,8 @@ export class Validations {
 			);
 		}
 	}
+
 	// Diversified
-
-	public static uuid(key: string, p?: any) {
-		if (!p) return;
-
-		if (typeof p !== "string") {
-			throw new CustomError(
-				`${key} must be a string`,
-				StatusCodeEnum.BAD_REQUEST,
-			);
-		}
-
-		if (!validate(p)) {
-			throw new CustomError(
-				`${key} must be a valid uuid`,
-				StatusCodeEnum.BAD_REQUEST,
-			);
-		}
-	}
 
 	public static color(key: string, p?: any) {
 		if (!p) return;

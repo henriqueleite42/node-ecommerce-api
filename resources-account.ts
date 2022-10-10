@@ -47,5 +47,93 @@ export const resourcesAccount: AWS["resources"] = {
 				],
 			},
 		},
+		RefreshTokenDynamoDBTable: {
+			DeletionPolicy: "Retain",
+			UpdateReplacePolicy: "Retain",
+			Type: "AWS::DynamoDB::Table",
+			Properties: {
+				TableName: "refresh_tokens",
+				ProvisionedThroughput: PROVISIONED_THROUGHPUT_ACCOUNTS,
+				AttributeDefinitions: [
+					{
+						AttributeName: "token",
+						AttributeType: "S",
+					},
+					{
+						AttributeName: "accountId",
+						AttributeType: "S",
+					},
+				],
+				KeySchema: [
+					{
+						AttributeName: "token",
+						KeyType: "HASH",
+					},
+				],
+				GlobalSecondaryIndexes: [
+					{
+						IndexName: "AccountId",
+						KeySchema: [
+							{
+								AttributeName: "accountId",
+								KeyType: "HASH",
+							},
+						],
+						Projection: {
+							ProjectionType: "ALL"
+						},
+						ProvisionedThroughput: PROVISIONED_THROUGHPUT_ACCOUNTS,
+					}
+				],
+			},
+		},
+		MagicLinkDynamoDBTable: {
+			DeletionPolicy: "Retain",
+			UpdateReplacePolicy: "Retain",
+			Type: "AWS::DynamoDB::Table",
+			Properties: {
+				TableName: "magic_links",
+				ProvisionedThroughput: PROVISIONED_THROUGHPUT_ACCOUNTS,
+				TimeToLiveSpecification: {
+					AttributeName: "ttl",
+					Enabled: true,
+				},
+				AttributeDefinitions: [
+					{
+						AttributeName: "token",
+						AttributeType: "S",
+					},
+					{
+						AttributeName: "accountId",
+						AttributeType: "S",
+					},
+					{
+						AttributeName: "ttl",
+						AttributeType: "N",
+					},
+				],
+				KeySchema: [
+					{
+						AttributeName: "token",
+						KeyType: "HASH",
+					},
+				],
+				GlobalSecondaryIndexes: [
+					{
+						IndexName: "AccountId",
+						KeySchema: [
+							{
+								AttributeName: "accountId",
+								KeyType: "HASH",
+							},
+						],
+						Projection: {
+							ProjectionType: "ALL"
+						},
+						ProvisionedThroughput: PROVISIONED_THROUGHPUT_ACCOUNTS,
+					}
+				],
+			},
+		},
 	},
 };

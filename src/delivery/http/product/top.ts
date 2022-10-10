@@ -1,17 +1,15 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
-
 import { ProductService } from "../../../factories/product";
-import type { DeliveryManager } from "../../../providers/delivery-manager";
-import { AuthManagerProvider } from "../../../providers/implementations/auth-manager";
+import type { HttpManager } from "../../../providers/http-manager";
 
-export const top = (server: DeliveryManager) => {
+export const top = (server: HttpManager) => {
 	server.addRoute<undefined>(
 		{
 			method: "GET",
 			path: "products/top",
+			auth: ["DISCORD"],
 		},
 		route =>
-			route.setAuth(new AuthManagerProvider(["DISCORD"])).setFunc(() => {
+			route.setFunc(() => {
 				const service = new ProductService().getInstance();
 
 				return service.getTop();

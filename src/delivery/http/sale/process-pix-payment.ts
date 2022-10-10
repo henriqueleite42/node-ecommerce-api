@@ -1,26 +1,22 @@
 import { SaleService } from "../../../factories/sale";
-import type { DeliveryManager } from "../../../providers/delivery-manager";
-import { ValidatorProvider } from "../../../providers/implementations/validator";
+import type { HttpManager } from "../../../providers/http-manager";
 
-export const processPixPayment = (server: DeliveryManager) => {
+export const processPixPayment = (server: HttpManager) => {
 	server.addRoute<any>(
 		{
 			method: "POST",
 			path: "sales/webhooks/pix",
+			validations: [
+				{
+					key: "body",
+				},
+			],
 		},
 		route =>
-			route
-				.setValidator(
-					new ValidatorProvider([
-						{
-							key: "body",
-						},
-					]),
-				)
-				.setFunc(p => {
-					const service = new SaleService().getInstance();
+			route.setFunc(p => {
+				const service = new SaleService().getInstance();
 
-					return service.processPixPayment(p);
-				}),
+				return service.processPixPayment(p);
+			}),
 	);
 };

@@ -1,6 +1,9 @@
+import { PasetoAdapter } from "../adapters/implementations/paseto";
 import type { AccountUseCase } from "../models/account";
 import { getDynamoInstance } from "../repository/dynamodb";
 import { AccountRepositoryDynamoDB } from "../repository/dynamodb/account";
+import { MagicLinkRepositoryDynamoDB } from "../repository/dynamodb/magic-link";
+import { RefreshTokenRepositoryDynamoDB } from "../repository/dynamodb/refresh-token";
 import { AccountUseCaseImplementation } from "../usecase/account";
 
 import { Service } from ".";
@@ -14,8 +17,17 @@ export class AccountService extends Service<AccountUseCase> {
 		const dynamodb = getDynamoInstance();
 
 		const accountRepository = new AccountRepositoryDynamoDB(dynamodb);
+		const refreshTokenRepository = new RefreshTokenRepositoryDynamoDB(dynamodb);
+		const magicLinkRepository = new MagicLinkRepositoryDynamoDB(dynamodb);
 
-		const newInstance = new AccountUseCaseImplementation(accountRepository);
+		const accessTokenManager = new PasetoAdapter();
+
+		const newInstance = new AccountUseCaseImplementation(
+			accountRepository,
+			refreshTokenRepository,
+			magicLinkRepository,
+			accessTokenManager,
+		);
 
 		instance = newInstance;
 

@@ -1,19 +1,19 @@
 import { AccountService } from "../../../factories/account";
-import type { AccountEntity } from "../../../models/account";
+import type { CreateMagicLinkInput } from "../../../models/magic-link";
 import type { HttpManager } from "../../../providers/http-manager";
 import { Validations } from "../../../providers/implementations/validations";
 
-export const getByDiscordId = (serverInstance: HttpManager) => {
-	serverInstance.addRoute<AccountEntity>(
+export const createMagicLink = (serverInstance: HttpManager) => {
+	serverInstance.addRoute<CreateMagicLinkInput>(
 		{
-			method: "GET",
-			path: "accounts/discord",
+			method: "POST",
+			path: "accounts/magic-link",
 			auth: ["DISCORD"],
 			validations: [
 				{
-					key: "discordId",
-					loc: "query",
-					validations: [Validations.required, Validations.discordId],
+					key: "accountId",
+					loc: "body",
+					validations: [Validations.required, Validations.id],
 				},
 			],
 		},
@@ -21,7 +21,7 @@ export const getByDiscordId = (serverInstance: HttpManager) => {
 			route.setFunc(p => {
 				const service = new AccountService().getInstance();
 
-				return service.getByDiscordId(p);
+				return service.createMagicLink(p);
 			}),
 	);
 };

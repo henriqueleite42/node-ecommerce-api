@@ -4,74 +4,18 @@
 import type { FastifyInstance } from "fastify";
 import Fastify from "fastify";
 
-import type { ExecFuncInput, RouteMethods } from "../delivery-manager";
-import { DeliveryManager, Route } from "../delivery-manager";
+import type { AccessTokenManager } from "../../adapters/access-token-manager";
+import { PasetoAdapter } from "../../adapters/implementations/paseto";
+import type { HttpRouteConfig } from "../http-manager";
+import { HttpManager, HttpRoute } from "../http-manager";
 
-import { CustomError } from "../../utils/error";
+import { AuthManagerProvider } from "./auth-manager";
+import { ValidatorProvider } from "./validator";
 
-import { StatusCodeEnum } from "../../types/enums/status-code";
-
-interface Config {
-	method: RouteMethods;
-	path: string;
-	statusCode?: StatusCodeEnum;
-}
-
-class FastifyRoute<I = any> extends Route<I> {
-	public constructor(protected readonly config: Config) {
-		super();
-
-		if (this.config.path.startsWith("/")) {
-			throw new Error(`Routes ${this.config.path} cannot start with '/'`);
-		}
-	}
-
-	public async execFunc(params: ExecFuncInput) {
-		try {
-			const result = await super.execFunc(params);
-
-			return {
-				statusCode: this.getStatusCode(),
-				body: result,
-			};
-		} catch (err: any) {
-			if (err instanceof CustomError) {
-				return {
-					statusCode: err.statusCode,
-					body: err.getBody(),
-				};
-			}
-
-			console.error(err);
-
-			return {
-				statusCode: StatusCodeEnum.INTERNAL,
-			};
-		}
-	}
-
-	public getMethod() {
-		return this.config.method;
-	}
-
-	public getPath() {
-		return this.config.path;
-	}
-
-	protected getStatusCode() {
-		if (this.config.statusCode) return this.config.statusCode;
-
-		switch (this.config.method) {
-			case "DELETE":
-				return StatusCodeEnum.NO_CONTENT;
-			default:
-				return StatusCodeEnum.SUCCESS;
-		}
-	}
-}
-
-export class FastifyHttpProvider extends DeliveryManager {
+export class FastifyHttpProvider extends HttpManager {
 	protected readonly fastifyInstance: FastifyInstance;
+
+	protected readonly accessTokenManager: AccessTokenManager;
 
 	public constructor() {
 		super();
@@ -80,13 +24,23 @@ export class FastifyHttpProvider extends DeliveryManager {
 			logger: process.env.NODE_ENV !== "production",
 			exposeHeadRoutes: false,
 		});
+
+		this.accessTokenManager = new PasetoAdapter();
 	}
 
 	public addRoute<I>(
-		config: Config,
-		getRoute: (route: FastifyRoute<I>) => FastifyRoute<I>,
+		config: HttpRouteConfig<I>,
+		getRoute: (route: HttpRoute<I>) => HttpRoute<I>,
 	) {
-		const fastifyRoute = new FastifyRoute(config);
+		const fastifyRoute = new HttpRoute(
+			config.validations
+				? new ValidatorProvider(config.validations)
+				: undefined,
+			config.auth
+				? new AuthManagerProvider(config.auth, this.accessTokenManager)
+				: undefined,
+			config,
+		);
 		const route = getRoute(fastifyRoute);
 
 		const method = route.getMethod().toLowerCase();

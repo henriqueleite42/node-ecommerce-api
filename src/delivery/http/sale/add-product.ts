@@ -1,55 +1,50 @@
 import { SaleService } from "../../../factories/sale";
 import type { AddProductSaleInput } from "../../../models/sale";
-import type { DeliveryManager } from "../../../providers/delivery-manager";
-import { AuthManagerProvider } from "../../../providers/implementations/auth-manager";
+import type { HttpManager } from "../../../providers/http-manager";
 import { Validations } from "../../../providers/implementations/validations";
-import { ValidatorProvider } from "../../../providers/implementations/validator";
 
-export const addProduct = (server: DeliveryManager) => {
+export const addProduct = (server: HttpManager) => {
 	server.addRoute<AddProductSaleInput>(
 		{
 			method: "PATCH",
 			path: "sales/add-product",
+			auth: ["DISCORD_USER"],
+			validations: [
+				{
+					key: "clientId",
+					as: "accountId",
+					loc: "auth",
+					validations: [Validations.required, Validations.id],
+				},
+				{
+					key: "saleId",
+					loc: "body",
+					validations: [Validations.required, Validations.id],
+				},
+				{
+					key: "product",
+					loc: "body",
+					validations: [
+						Validations.required,
+						Validations.obj([
+							{
+								key: "productId",
+								validations: [Validations.required, Validations.code],
+							},
+							{
+								key: "variationId",
+								validations: [Validations.code],
+							},
+						]),
+					],
+				},
+			],
 		},
 		route =>
-			route
-				.setAuth(new AuthManagerProvider(["DISCORD_USER"]))
-				.setValidator(
-					new ValidatorProvider([
-						{
-							key: "clientId",
-							as: "accountId",
-							loc: "auth",
-							validations: [Validations.required, Validations.uuid],
-						},
-						{
-							key: "saleId",
-							loc: "body",
-							validations: [Validations.required, Validations.uuid],
-						},
-						{
-							key: "product",
-							loc: "body",
-							validations: [
-								Validations.required,
-								Validations.obj([
-									{
-										key: "productId",
-										validations: [Validations.required, Validations.code],
-									},
-									{
-										key: "variationId",
-										validations: [Validations.code],
-									},
-								]),
-							],
-						},
-					]),
-				)
-				.setFunc(p => {
-					const service = new SaleService().getInstance();
+			route.setFunc(p => {
+				const service = new SaleService().getInstance();
 
-					return service.addProduct(p);
-				}),
+				return service.addProduct(p);
+			}),
 	);
 };

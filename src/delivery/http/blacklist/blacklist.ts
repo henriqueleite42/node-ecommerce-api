@@ -1,32 +1,27 @@
 import { BlacklistService } from "../../../factories/blacklist";
 import type { CreateInput } from "../../../models/blacklist";
-import type { DeliveryManager } from "../../../providers/delivery-manager";
-import { AuthManagerProvider } from "../../../providers/implementations/auth-manager";
+import type { HttpManager } from "../../../providers/http-manager";
 import { Validations } from "../../../providers/implementations/validations";
-import { ValidatorProvider } from "../../../providers/implementations/validator";
 
-export const blacklist = (server: DeliveryManager) => {
+export const blacklist = (server: HttpManager) => {
 	server.addRoute<CreateInput>(
 		{
 			method: "POST",
 			path: "blacklist",
+			auth: ["DISCORD_ADMIN"],
+			validations: [
+				{
+					key: "accountId",
+					loc: "body",
+					validations: [Validations.required, Validations.discordId],
+				},
+			],
 		},
 		route =>
-			route
-				.setAuth(new AuthManagerProvider(["DISCORD_ADMIN"]))
-				.setValidator(
-					new ValidatorProvider([
-						{
-							key: "accountId",
-							loc: "body",
-							validations: [Validations.required, Validations.discordId],
-						},
-					]),
-				)
-				.setFunc(p => {
-					const service = new BlacklistService().getInstance();
+			route.setFunc(p => {
+				const service = new BlacklistService().getInstance();
 
-					return service.blacklist(p);
-				}),
+				return service.blacklist(p);
+			}),
 	);
 };

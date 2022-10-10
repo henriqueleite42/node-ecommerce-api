@@ -137,6 +137,7 @@
 		"MONGODB",
 		"nestjs",
 		"nodemodules",
+		"paseto",
 		"PASSWORDLESS",
 		"prebuild",
 		"presigner",

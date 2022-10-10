@@ -1,15 +1,15 @@
 import { ProductService } from "../../../factories/product";
-import type { DeliveryManager } from "../../../providers/delivery-manager";
-import { AuthManagerProvider } from "../../../providers/implementations/auth-manager";
+import type { HttpManager } from "../../../providers/http-manager";
 
-export const total = (server: DeliveryManager) => {
+export const total = (server: HttpManager) => {
 	server.addRoute<undefined>(
 		{
 			method: "GET",
 			path: "products/total",
+			auth: ["DISCORD"],
 		},
 		route =>
-			route.setAuth(new AuthManagerProvider(["DISCORD"])).setFunc(() => {
+			route.setFunc(() => {
 				const service = new ProductService().getInstance();
 
 				return service.getProductsCount();

@@ -2,38 +2,33 @@
 
 import { ProductService } from "../../../factories/product";
 import type { GetByIdInput } from "../../../models/product";
-import type { DeliveryManager } from "../../../providers/delivery-manager";
-import { AuthManagerProvider } from "../../../providers/implementations/auth-manager";
+import type { HttpManager } from "../../../providers/http-manager";
 import { Validations } from "../../../providers/implementations/validations";
-import { ValidatorProvider } from "../../../providers/implementations/validator";
 
-export const getById = (server: DeliveryManager) => {
+export const getById = (server: HttpManager) => {
 	server.addRoute<GetByIdInput>(
 		{
 			method: "GET",
 			path: "products",
+			auth: ["DISCORD"],
+			validations: [
+				{
+					key: "storeId",
+					loc: "query",
+					validations: [Validations.required, Validations.id],
+				},
+				{
+					key: "productId",
+					loc: "query",
+					validations: [Validations.required, Validations.code],
+				},
+			],
 		},
 		route =>
-			route
-				.setAuth(new AuthManagerProvider(["DISCORD"]))
-				.setValidator(
-					new ValidatorProvider([
-						{
-							key: "storeId",
-							loc: "query",
-							validations: [Validations.required, Validations.uuid],
-						},
-						{
-							key: "productId",
-							loc: "query",
-							validations: [Validations.required, Validations.code],
-						},
-					]),
-				)
-				.setFunc(p => {
-					const service = new ProductService().getInstance();
+			route.setFunc(p => {
+				const service = new ProductService().getInstance();
 
-					return service.getById(p);
-				}),
+				return service.getById(p);
+			}),
 	);
 };
