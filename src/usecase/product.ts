@@ -14,6 +14,7 @@ import type {
 	DeleteInput,
 	ProductCreatedMessage,
 	ProductDeletedMessage,
+	GetUrlToUploadImgInput,
 } from "../models/product";
 import type { UploadManager } from "../providers/upload-manager";
 
@@ -107,6 +108,14 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 		}
 
 		return product;
+	}
+
+	public getUrlToUploadImg({ storeId, productId }: GetUrlToUploadImgInput) {
+		return this.uploadManager.getUrlToUpload({
+			folder: process.env.PRODUCT_MEDIA_BUCKET_NAME!,
+			fileName: `${storeId}/${productId}`,
+			type: MediaTypeEnum.IMAGE,
+		});
 	}
 
 	public async delete(p: DeleteInput) {

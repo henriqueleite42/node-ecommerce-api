@@ -214,20 +214,6 @@ export const resourcesStore: AWS["resources"] = {
 		 * Queues And Topics
 		 *
 		 */
-		UpdateAvatarQueue: {
-			Type: "AWS::SQS::Queue",
-			Properties: {
-				QueueName:
-					"${self:service}-${opt:stage, 'local'}-update-avatar",
-			},
-		},
-		UpdateBannerQueue: {
-			Type: "AWS::SQS::Queue",
-			Properties: {
-				QueueName:
-					"${self:service}-${opt:stage, 'local'}-update-banner",
-			},
-		},
 		StoreCreatedTopic: {
 			Type: "AWS::SNS::Topic",
 			Properties: {
@@ -349,42 +335,6 @@ export const resourcesStore: AWS["resources"] = {
 								Ref: "AWS::StackName",
 							},
 							"StoreCreatedTopicArn",
-						],
-					],
-				},
-			}
-		},
-		UpdateAvatarQueueUrl: {
-			Value: {
-				Ref: "UpdateAvatarQueue"
-			},
-			Export: {
-				Name: {
-					"Fn::Join": [
-						":",
-						[
-							{
-								Ref: "AWS::StackName",
-							},
-							"UpdateAvatarQueueUrl",
-						],
-					],
-				},
-			}
-		},
-		UpdateBannerQueueUrl: {
-			Value: {
-				Ref: "UpdateBannerQueue"
-			},
-			Export: {
-				Name: {
-					"Fn::Join": [
-						":",
-						[
-							{
-								Ref: "AWS::StackName",
-							},
-							"UpdateBannerQueueUrl",
 						],
 					],
 				},

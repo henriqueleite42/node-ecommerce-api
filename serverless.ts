@@ -17,11 +17,12 @@ import { resourcesWallet } from "./resources-wallet";
 import { content } from "./src/delivery/queue/content";
 import { discord } from "./src/delivery/queue/discord";
 import { eventAlert } from "./src/delivery/queue/event-alert";
-import { product } from "./src/delivery/queue/product";
+import { productSQS } from "./src/delivery/queue/product";
 import { storeSQS } from "./src/delivery/queue/store";
 import { upload } from "./src/delivery/queue/upload";
 import { wallet } from "./src/delivery/queue/wallet";
 
+import { productS3 } from "./src/delivery/s3/product";
 import { storeS3 } from "./src/delivery/s3/store";
 
 const baseConfig: Partial<AWS> = {
@@ -166,7 +167,10 @@ const productConfig = {
 		"serverless-webpack",
 	],
 	resources: resourcesProduct,
-	functions: product,
+	functions: {
+		...productSQS,
+		...productS3
+	},
 };
 
 const saleConfig = {

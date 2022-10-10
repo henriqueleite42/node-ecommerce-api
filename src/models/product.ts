@@ -1,3 +1,5 @@
+import type { GetUrlToUploadOutput } from "../providers/upload-manager";
+
 import type { PaginatedItems } from "./types";
 
 import type { DeliveryMethodEnum } from "../types/enums/delivery-method";
@@ -95,6 +97,11 @@ export interface CreateProductInput extends CreateInput {
 	}>;
 }
 
+export interface GetUrlToUploadImgInput {
+	storeId: string;
+	productId: string;
+}
+
 export interface UpdateImgInput {
 	storeId: string;
 	productId: string;
@@ -122,6 +129,10 @@ export interface ProductUseCase {
 	edit: (p: EditInput) => Promise<ProductEntity>;
 
 	delete: (p: DeleteInput) => Promise<void>;
+
+	getUrlToUploadImg: (
+		p: GetUrlToUploadImgInput,
+	) => Promise<GetUrlToUploadOutput>;
 
 	getProductsByType: (
 		p: GetProductsByTypeInput,

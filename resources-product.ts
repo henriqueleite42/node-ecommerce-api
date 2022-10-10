@@ -96,6 +96,27 @@ export const resourcesProduct: AWS["resources"] = {
 					IgnorePublicAcls : true,
 					RestrictPublicBuckets : true,
 				},
+				NotificationConfiguration: {
+					LambdaConfigurations: [
+						{
+							Event: "s3:ObjectCreated:*",
+							Function: {
+								"Fn::Sub":
+									"arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-update-img",
+							},
+						},
+					],
+				},
+				CorsConfiguration: {
+					CorsRules: [
+						{
+							AllowedOrigins: ["*"],
+							AllowedHeaders: ["*"],
+							AllowedMethods: ["POST"],
+							MaxAge: 3000,
+						},
+					],
+				},
 			},
 		},
 		MediaStorageOriginAccessIdentity: {
@@ -207,13 +228,6 @@ export const resourcesProduct: AWS["resources"] = {
 				TopicName: "${self:service}-${opt:stage, 'local'}-product-deleted",
 			},
 		},
-		UpdateImgQueue: {
-			Type: "AWS::SQS::Queue",
-			Properties: {
-				QueueName:
-					"${self:service}-${opt:stage, 'local'}-update-img",
-			},
-		},
 		IncrementProductsCountQueue: {
 			Type: "AWS::SQS::Queue",
 			Properties: {
@@ -276,24 +290,6 @@ export const resourcesProduct: AWS["resources"] = {
 		},
 	},
 	Outputs: {
-		UpdateImgQueueUrl: {
-			Value: {
-				Ref: "UpdateImgQueue"
-			},
-			Export: {
-				Name: {
-					"Fn::Join": [
-						":",
-						[
-							{
-								Ref: "AWS::StackName",
-							},
-							"UpdateImgQueueUrl",
-						],
-					],
-				},
-			}
-		},
 		ProductCreatedTopicArn: {
 			Value: {
 				Ref: "ProductCreatedTopic"

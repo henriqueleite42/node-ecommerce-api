@@ -63,8 +63,6 @@ export class UploadManagerProvider implements UploadManager {
 				throw new Error("Invalid audio");
 			}
 
-			const ext = this.getExt(mediaTypeFromUrl);
-
 			const readStream = await axios
 				.get(mediaUrl, {
 					responseType: "stream",
@@ -74,7 +72,7 @@ export class UploadManagerProvider implements UploadManager {
 			const { filePath } = await this.fileManager.saveFile({
 				folder,
 				file: readStream,
-				fileName: `${fileName}.${ext}`,
+				fileName,
 				metadata: id,
 			});
 
@@ -97,14 +95,5 @@ export class UploadManagerProvider implements UploadManager {
 
 	public getUrlToUpload(p: GetUrlToUploadInput) {
 		return this.fileManager.getUrlToUpload(p);
-	}
-
-	protected getExt(mediaTypeFromUrl: string) {
-		switch (true) {
-			case mediaTypeFromUrl.startsWith("image/"):
-				return mediaTypeFromUrl.replace("image/", "");
-			default:
-				return mediaTypeFromUrl.split("/").pop()!;
-		}
 	}
 }
