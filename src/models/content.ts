@@ -1,3 +1,5 @@
+import type { GetUrlToUploadOutput } from "../providers/upload-manager";
+
 import type { MediaTypeEnum } from "../types/enums/media-type";
 
 export interface ContentEntity {
@@ -42,6 +44,13 @@ export interface ContentRepository {
  *
  */
 
+export interface GetUrlToUploadRawImgInput {
+	storeId: string;
+	productId: string;
+	contentId: string;
+	type: MediaTypeEnum;
+}
+
 export interface CreateManyWithUrlInput
 	extends Pick<ContentEntity, "productId" | "storeId"> {
 	contents: Array<{
@@ -54,6 +63,10 @@ export interface ContentUseCase {
 	createManyWithUrl: (
 		p: CreateManyWithUrlInput,
 	) => Promise<Array<ContentEntity>>;
+
+	getUrlToUploadRawImg: (
+		p: GetUrlToUploadRawImgInput,
+	) => Promise<GetUrlToUploadOutput>;
 
 	edit: (p: EditInput) => Promise<ContentEntity | null>;
 }

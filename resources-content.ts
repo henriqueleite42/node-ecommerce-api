@@ -75,18 +75,27 @@ export const resourcesContent: AWS["resources"] = {
 					IgnorePublicAcls : true,
 					RestrictPublicBuckets : true,
 				},
-			},
-		},
-		/**
-		 *
-		 * Queues And Topics
-		 *
-		 */
-		UpdateRawImgQueue: {
-			Type: "AWS::SQS::Queue",
-			Properties: {
-				QueueName:
-					"${self:service}-${opt:stage, 'local'}-update-raw-img",
+				NotificationConfiguration: {
+					LambdaConfigurations: [
+						{
+							Event: "s3:ObjectCreated:*",
+							Function: {
+								"Fn::Sub":
+									"arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-update-raw-img",
+							},
+						},
+					],
+				},
+				CorsConfiguration: {
+					CorsRules: [
+						{
+							AllowedOrigins: ["*"],
+							AllowedHeaders: ["*"],
+							AllowedMethods: ["POST"],
+							MaxAge: 3000,
+						},
+					],
+				},
 			},
 		},
 	},
@@ -104,24 +113,6 @@ export const resourcesContent: AWS["resources"] = {
 								Ref: "AWS::StackName",
 							},
 							"RawMediaBucketName",
-						],
-					],
-				},
-			}
-		},
-		UpdateRawImgQueueUrl: {
-			Value: {
-				Ref: "UpdateRawImgQueue"
-			},
-			Export: {
-				Name: {
-					"Fn::Join": [
-						":",
-						[
-							{
-								Ref: "AWS::StackName",
-							},
-							"UpdateRawImgQueueUrl",
 						],
 					],
 				},

@@ -61,7 +61,6 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 
 		if (imageUrl) {
 			await this.uploadManager.uploadFromUrl({
-				queueToNotify: process.env.PRODUCT_UPDATE_IMG_QUEUE_URL!,
 				folder: process.env.PRODUCT_MEDIA_BUCKET_NAME!,
 				fileName: `${p.storeId}/${product.productId}`,
 				id: {
@@ -95,7 +94,6 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 
 		if (imageUrl) {
 			await this.uploadManager.uploadFromUrlBackground({
-				queueToNotify: process.env.PRODUCT_UPDATE_IMG_QUEUE_URL!,
 				folder: process.env.PRODUCT_MEDIA_BUCKET_NAME!,
 				fileName: `${p.storeId}/${p.productId}`,
 				id: {

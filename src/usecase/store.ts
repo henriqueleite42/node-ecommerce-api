@@ -72,7 +72,6 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 				},
 				mediaUrl: avatarUrl,
 				mediaType: MediaTypeEnum.IMAGE,
-				queueToNotify: process.env.STORE_UPDATE_AVATAR_QUEUE_URL!,
 			});
 		}
 
@@ -85,7 +84,6 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 				},
 				mediaUrl: bannerUrl,
 				mediaType: MediaTypeEnum.IMAGE,
-				queueToNotify: process.env.STORE_UPDATE_BANNER_QUEUE_URL!,
 			});
 		}
 
@@ -117,7 +115,6 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 				},
 				mediaUrl: avatarUrl,
 				mediaType: MediaTypeEnum.IMAGE,
-				queueToNotify: process.env.STORE_UPDATE_AVATAR_QUEUE_URL!,
 			});
 		}
 
@@ -130,7 +127,6 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 				},
 				mediaUrl: bannerUrl,
 				mediaType: MediaTypeEnum.IMAGE,
-				queueToNotify: process.env.STORE_UPDATE_BANNER_QUEUE_URL!,
 			});
 		}
 

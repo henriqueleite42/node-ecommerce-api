@@ -6,7 +6,6 @@ export interface UploadFromUrlInput {
 	fileName: string;
 	mediaUrl: string;
 	mediaType: MediaTypeEnum;
-	queueToNotify: string;
 }
 
 export interface FileUploadedMsg {

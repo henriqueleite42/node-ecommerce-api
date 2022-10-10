@@ -14,7 +14,6 @@ import { resourcesStore } from "./resources-store";
 import { resourcesUpload } from "./resources-upload";
 import { resourcesWallet } from "./resources-wallet";
 
-import { content } from "./src/delivery/queue/content";
 import { discord } from "./src/delivery/queue/discord";
 import { eventAlert } from "./src/delivery/queue/event-alert";
 import { productSQS } from "./src/delivery/queue/product";
@@ -22,6 +21,7 @@ import { storeSQS } from "./src/delivery/queue/store";
 import { upload } from "./src/delivery/queue/upload";
 import { wallet } from "./src/delivery/queue/wallet";
 
+import { contentS3 } from "./src/delivery/s3/content";
 import { productS3 } from "./src/delivery/s3/product";
 import { storeS3 } from "./src/delivery/s3/store";
 
@@ -104,7 +104,7 @@ const contentConfig = {
 		"serverless-webpack",
 	],
 	resources: resourcesContent,
-	functions: content,
+	functions: contentS3,
 };
 
 const counterConfig = {

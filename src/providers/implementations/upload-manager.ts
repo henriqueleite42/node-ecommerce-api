@@ -35,7 +35,6 @@ export class UploadManagerProvider implements UploadManager {
 		fileName,
 		mediaUrl,
 		mediaType,
-		queueToNotify,
 	}: UploadFromUrlInput) {
 		try {
 			const mediaTypeFromUrl = await axios
@@ -69,27 +68,14 @@ export class UploadManagerProvider implements UploadManager {
 				})
 				.then(r => r.data as ReadStream);
 
-			const { filePath } = await this.fileManager.saveFile({
+			await this.fileManager.saveFile({
 				folder,
 				file: readStream,
 				fileName,
 				metadata: id,
 			});
-
-			await this.queueManager.sendMsg({
-				to: queueToNotify,
-				message: {
-					filePath,
-					id,
-				},
-			});
 		} catch (err: any) {
-			await this.queueManager.sendMsg({
-				to: queueToNotify,
-				message: {
-					error: err.message,
-				},
-			});
+			console.error(err);
 		}
 	}
 
