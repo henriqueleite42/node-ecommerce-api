@@ -3,6 +3,7 @@ import type { CreateMagicLinkInput, GetMagicLinkInput } from "./magic-link";
 export interface AccountEntity {
 	accountId: string;
 	discordId: string;
+	admin: boolean;
 	createdAt: Date;
 }
 
@@ -19,7 +20,7 @@ export type CreateWithDiscordIdInput = Pick<AccountEntity, "discordId">;
 export interface AccountRepository {
 	createWithDiscordId: (p: CreateWithDiscordIdInput) => Promise<AccountEntity>;
 
-	getByAccountId: (discordId: string) => Promise<AccountEntity | null>;
+	getByAccountId: (accountId: string) => Promise<AccountEntity | null>;
 
 	getByDiscordId: (discordId: string) => Promise<AccountEntity | null>;
 }

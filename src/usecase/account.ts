@@ -83,9 +83,16 @@ export class AccountUseCaseImplementation implements AccountUseCase {
 			refreshToken = newRefreshToken.token;
 		}
 
+		const account = await this.accountRepository.getByAccountId(accountId);
+
+		if (!account) {
+			throw new CustomError("Account not found", StatusCodeEnum.NOT_FOUND);
+		}
+
 		const { accessToken, expiresAt } =
 			await this.accessTokenManager.genAccessToken({
 				accountId,
+				admin: account.admin ? true : undefined,
 			});
 
 		return {

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
+import { cleanObj } from "@techmmunity/utils";
 import { V4, decode } from "paseto";
 
 import type {
@@ -33,7 +34,7 @@ export class PasetoAdapter implements AccessTokenManager {
 	): Promise<GenAccessTokenOutput> {
 		const expiresIn = (new Date().getTime() + this.validFor).toString();
 
-		const token = await this.paseto.sign(p, this.privateKey, {
+		const token = await this.paseto.sign(cleanObj(p), this.privateKey, {
 			...this.defaultOptions,
 			expiresIn,
 		});

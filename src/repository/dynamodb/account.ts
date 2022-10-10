@@ -13,6 +13,7 @@ import { genId } from "../../utils/id/gen-id";
 export interface AccountTable {
 	accountId: string;
 	discordId: string;
+	admin: boolean;
 	createdAt: string;
 }
 
@@ -28,6 +29,7 @@ export class AccountRepositoryDynamoDB
 		const item: AccountEntity = {
 			accountId: await genId(),
 			discordId,
+			admin: false,
 			createdAt: new Date(),
 		};
 
@@ -94,6 +96,7 @@ export class AccountRepositoryDynamoDB
 		return cleanObj({
 			accountId: entity.accountId ? `ACCOUNT#${entity.accountId}` : undefined,
 			discordId: entity.discordId ? `DISCORD#${entity.discordId}` : undefined,
+			admin: entity.admin,
 			createdAt: entity.createdAt?.toISOString(),
 		});
 	}
@@ -102,6 +105,7 @@ export class AccountRepositoryDynamoDB
 		return {
 			accountId: table.accountId.replace("ACCOUNT#", ""),
 			discordId: table.discordId.replace("DISCORD#", ""),
+			admin: table.admin,
 			createdAt: new Date(table.createdAt),
 		};
 	}
