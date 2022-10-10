@@ -3,11 +3,12 @@
 import { PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { cleanObj } from "@techmmunity/utils";
-import { v4 } from "uuid";
 
 import type { AccountRepository, AccountEntity } from "../../models/account";
 
 import { DynamodbRepository } from ".";
+
+import { genId } from "../../utils/id/gen-id";
 
 export interface AccountTable {
 	accountId: string;
@@ -25,7 +26,7 @@ export class AccountRepositoryDynamoDB
 		discordId,
 	}: Pick<AccountEntity, "discordId">) {
 		const item: AccountEntity = {
-			accountId: v4(),
+			accountId: await genId(),
 			discordId,
 			createdAt: new Date(),
 		};

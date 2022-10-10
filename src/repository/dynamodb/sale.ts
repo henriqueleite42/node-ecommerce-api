@@ -8,7 +8,6 @@ import {
 } from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { cleanObj } from "@techmmunity/utils";
-import { v4 } from "uuid";
 
 import type {
 	SaleEntity,
@@ -25,6 +24,8 @@ import type {
 } from "../../models/sale";
 
 import { DynamodbRepository } from ".";
+
+import { genId } from "../../utils/id/gen-id";
 
 import { SalesStatusEnum } from "../../types/enums/sale-status";
 
@@ -62,7 +63,7 @@ export class SaleRepositoryDynamoDB
 				0,
 			),
 			status: SalesStatusEnum.IN_CART,
-			saleId: v4(),
+			saleId: await genId(),
 			createdAt: new Date(),
 		};
 
