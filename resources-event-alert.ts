@@ -21,11 +21,11 @@ export const resourcesEventAlert: AWS["resources"] = {
 				ProvisionedThroughput: PROVISIONED_THROUGHPUT_ACCOUNTS,
 				AttributeDefinitions: [
 					{
-						AttributeName: "pk",
+						AttributeName: "platform_alertType_storeId_productType",
 						AttributeType: "S",
 					},
 					{
-						AttributeName: "platform_alertType",
+						AttributeName: "channelsIds",
 						AttributeType: "S",
 					},
 					{
@@ -36,19 +36,15 @@ export const resourcesEventAlert: AWS["resources"] = {
 						AttributeName: "discordChannelId_alertType_storeId_productType",
 						AttributeType: "S",
 					},
-					{
-						AttributeName: "platform_telegramChannelId",
-						AttributeType: "S",
-					},
-					{
-						AttributeName: "alertType_storeId_productType",
-						AttributeType: "S",
-					},
 				],
 				KeySchema: [
 					{
-						AttributeName: "pk",
+						AttributeName: "platform_alertType_storeId_productType",
 						KeyType: "HASH",
+					},
+					{
+						AttributeName: "channelsIds",
+						KeyType: "RANGE",
 					},
 				],
 				GlobalSecondaryIndexes: [
@@ -62,36 +58,6 @@ export const resourcesEventAlert: AWS["resources"] = {
 							{
 								AttributeName: "discordChannelId_alertType_storeId_productType",
 								KeyType: "RANGE",
-							},
-						],
-						Projection: {
-							ProjectionType: "ALL"
-						},
-						ProvisionedThroughput: PROVISIONED_THROUGHPUT_ACCOUNTS,
-					},
-					{
-						IndexName: "PlatformTelegramChannelIdAlertTypeStoreIdProductType",
-						KeySchema: [
-							{
-								AttributeName: "platform_telegramChannelId",
-								KeyType: "HASH",
-							},
-							{
-								AttributeName: "alertType_storeId_productType",
-								KeyType: "RANGE",
-							},
-						],
-						Projection: {
-							ProjectionType: "ALL"
-						},
-						ProvisionedThroughput: PROVISIONED_THROUGHPUT_ACCOUNTS,
-					},
-					{
-						IndexName: "PlatformAlertType",
-						KeySchema: [
-							{
-								AttributeName: "platform_alertType",
-								KeyType: "HASH",
 							},
 						],
 						Projection: {

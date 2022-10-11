@@ -1,9 +1,13 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable no-await-in-loop */
+
+import { sleep } from "@techmmunity/utils";
 
 import type { QueueManager } from "../adapters/queue-manager";
 import type {
 	EventAlertRepository,
 	EventAlertUseCase,
+	GetEventsInput,
 } from "../models/event-alert";
 import type { ProductEntity } from "../models/product";
 import type { SaleEntity } from "../models/sale";
@@ -29,48 +33,70 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 			storeId: sale.storeId,
 		});
 
-		do {
-			const { items, nextPage } = await this.eventAlertRepository.getEvents({
+		if (!store) return;
+
+		const queries: Array<GetEventsInput> = [
+			{
+				// Event alerts with no filters
 				platform: PlatformEnum.DISCORD,
-				alertType: AlertTypeEnum.NEW_STORE,
+				alertType: AlertTypeEnum.NEW_SALE,
 				limit: 25,
-			});
+			},
+			{
+				// Event alerts with filter for specific store
+				platform: PlatformEnum.DISCORD,
+				alertType: AlertTypeEnum.NEW_SALE,
+				storeId: sale.storeId,
+				limit: 25,
+			},
+			// Event alerts with filter for specific product types
+			...sale.products.map(p => ({
+				platform: PlatformEnum.DISCORD,
+				alertType: AlertTypeEnum.NEW_SALE,
+				productType: p.type,
+				limit: 25,
+			})),
+			// Event alerts with filter for specific store and product types
+			...sale.products.map(p => ({
+				platform: PlatformEnum.DISCORD,
+				alertType: AlertTypeEnum.NEW_SALE,
+				storeId: sale.storeId,
+				productType: p.type,
+				limit: 25,
+			})),
+		];
 
-			if (items.length === 0) {
-				return;
-			}
+		for (const query of queries) {
+			do {
+				const { items, nextPage } = await this.eventAlertRepository.getEvents(
+					query,
+				);
 
-			const alerts = items.filter(i => {
-				if (!i.storeId && !i.productType) return true;
-
-				if (i.storeId && i.storeId !== sale.storeId) return false;
-
-				if (
-					i.productType &&
-					!sale.products.some(p => p.type === i.productType)
-				) {
-					return false;
+				if (items.length === 0) {
+					break;
 				}
 
-				return true;
-			});
-
-			if (alerts.length > 0) {
-				this.queueManager.sendMsg({
+				await this.queueManager.sendMsg({
 					to: process.env.DISCORD_NEW_SALE_ANNOUNCEMENT_QUEUE_URL!,
 					message: {
-						items: alerts,
+						items,
 						sale,
 						store,
 					},
 					delayInSeconds: delay,
 				});
 
-				delay++;
-			}
+				// AWS SQS delay limit of 15 min
+				if (delay === 900) {
+					sleep(10);
+					delay = 0;
+				} else {
+					delay++;
+				}
 
-			cursor = nextPage;
-		} while (cursor);
+				cursor = nextPage;
+			} while (cursor);
+		}
 	}
 
 	public async processDiscordNewStoreEvent(sale: StoreEntity) {
@@ -89,7 +115,7 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 				return;
 			}
 
-			this.queueManager.sendMsg({
+			await this.queueManager.sendMsg({
 				to: process.env.DISCORD_NEW_STORE_ANNOUNCEMENT_QUEUE_URL!,
 				message: {
 					items,
@@ -98,8 +124,15 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 				delayInSeconds: delay,
 			});
 
+			// AWS SQS delay limit of 15 min
+			if (delay === 900) {
+				sleep(10);
+				delay = 0;
+			} else {
+				delay++;
+			}
+
 			cursor = nextPage;
-			delay++;
 		} while (cursor);
 	}
 
@@ -113,42 +146,69 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 			storeId: product.storeId,
 		});
 
-		do {
-			const { items, nextPage } = await this.eventAlertRepository.getEvents({
+		if (!store) return;
+
+		const queries: Array<GetEventsInput> = [
+			{
+				// Event alerts with no filters
 				platform: PlatformEnum.DISCORD,
-				alertType: AlertTypeEnum.NEW_STORE,
+				alertType: AlertTypeEnum.NEW_PRODUCT,
 				limit: 25,
-			});
+			},
+			{
+				// Event alerts with filter for specific store
+				platform: PlatformEnum.DISCORD,
+				alertType: AlertTypeEnum.NEW_PRODUCT,
+				storeId: product.storeId,
+				limit: 25,
+			},
+			{
+				// Event alerts with filter for specific product types
+				platform: PlatformEnum.DISCORD,
+				alertType: AlertTypeEnum.NEW_PRODUCT,
+				productType: product.type,
+				limit: 25,
+			},
+			{
+				// Event alerts with filter for specific store and product types
+				platform: PlatformEnum.DISCORD,
+				alertType: AlertTypeEnum.NEW_PRODUCT,
+				storeId: product.storeId,
+				productType: product.type,
+				limit: 25,
+			},
+		];
 
-			if (items.length === 0) {
-				return;
-			}
+		for (const query of queries) {
+			do {
+				const { items, nextPage } = await this.eventAlertRepository.getEvents(
+					query,
+				);
 
-			const alerts = items.filter(i => {
-				if (!i.storeId && !i.productType) return true;
+				if (items.length === 0) {
+					break;
+				}
 
-				if (i.storeId && i.storeId !== product.storeId) return false;
-
-				if (i.productType && i.productType !== product.type) return false;
-
-				return true;
-			});
-
-			if (alerts.length > 0) {
-				this.queueManager.sendMsg({
+				await this.queueManager.sendMsg({
 					to: process.env.DISCORD_NEW_PRODUCT_ANNOUNCEMENT_QUEUE_URL!,
 					message: {
-						items: alerts,
+						items,
 						product,
 						store,
 					},
 					delayInSeconds: delay,
 				});
 
-				delay++;
-			}
+				// AWS SQS delay limit of 15 min
+				if (delay === 900) {
+					sleep(10);
+					delay = 0;
+				} else {
+					delay++;
+				}
 
-			cursor = nextPage;
-		} while (cursor);
+				cursor = nextPage;
+			} while (cursor);
+		}
 	}
 }

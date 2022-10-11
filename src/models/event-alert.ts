@@ -10,8 +10,8 @@ import type { ProductTypeEnum } from "../types/enums/product-type";
  * Filters allowed:
  * NEW_STORE: --
  * NEW_PRODUCT: storeId
- * NEW_SALE: storeId, productId
- * NEW_FEEDBACK: storeId, productId
+ * NEW_SALE: storeId, productType
+ * NEW_FEEDBACK: storeId, productType
  */
 interface BaseEventAlert {
 	platform: PlatformEnum;
@@ -28,14 +28,8 @@ export interface DiscordEventAlert extends BaseEventAlert {
 	discordRolesToMention: Array<string>;
 }
 
-export interface TelegramEventAlert extends BaseEventAlert {
-	platform: PlatformEnum.DISCORD;
-	telegramChannelId: string;
-}
-
 export interface EventAlertEntity
-	extends Partial<Omit<DiscordEventAlert, "platform">>,
-		Partial<Omit<TelegramEventAlert, "platform">> {
+	extends Partial<Omit<DiscordEventAlert, "platform">> {
 	platform: PlatformEnum;
 }
 
@@ -50,6 +44,8 @@ export interface EventAlertEntity
 export interface GetEventsInput {
 	platform: PlatformEnum;
 	alertType: AlertTypeEnum;
+	storeId?: string;
+	productType?: ProductTypeEnum;
 	limit: number;
 	cursor?: string;
 }
