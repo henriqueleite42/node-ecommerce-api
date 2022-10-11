@@ -6,7 +6,7 @@ import type { TokenData } from "../adapters/access-token-manager";
  * DISCORD = Request from bot
  * REST = Request from frontend
  */
-type AllowedPlatformAuthTypes = "DISCORD" | "REST";
+type AllowedPlatformAuthTypes = "DISCORD_BOT" | "REST";
 
 /**
  * DISCORD_USER = Request from bot by a user that has an account
@@ -20,20 +20,20 @@ type AllowedLoggedAuthTypes = "DISCORD_USER" | "REST_USER";
  */
 type AllowedAdminAuthTypes = "DISCORD_ADMIN" | "REST_ADMIN";
 
-export type AAAAT = Array<AllowedAdminAuthTypes>;
-export type AALAT = Array<AllowedLoggedAuthTypes>;
-export type AALPAT = Array<AllowedPlatformAuthTypes>;
+export type ArrayAllowedAuthTypes =
+	| Array<AllowedAdminAuthTypes | AllowedPlatformAuthTypes>
+	| Array<AllowedLoggedAuthTypes | AllowedPlatformAuthTypes>;
 
 export type AllowedPrefixes = "Bearer" | "Discord";
 
 export abstract class AuthManager {
 	protected prefixAuthType: Record<AllowedPrefixes, (p: string) => boolean> = {
-		Discord: p => p.startsWith("DISCORD"),
+		Discord: p => p.startsWith("DISCORD_BOT"),
 		Bearer: p => p.startsWith("REST"),
 	};
 
 	public constructor(
-		protected readonly allowedAuthTypes: AAAAT | AALAT | AALPAT,
+		protected readonly allowedAuthTypes: ArrayAllowedAuthTypes,
 	) {}
 
 	public abstract isAuthorized(

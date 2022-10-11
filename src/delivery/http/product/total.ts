@@ -6,7 +6,7 @@ export const total = (server: HttpManager) => {
 		{
 			method: "GET",
 			path: "products/total",
-			auth: ["DISCORD"],
+			auth: ["DISCORD_BOT", "REST", "DISCORD_USER", "REST_USER"],
 		},
 		route =>
 			route.setFunc(() => {

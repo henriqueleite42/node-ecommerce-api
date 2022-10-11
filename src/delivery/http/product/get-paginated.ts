@@ -9,7 +9,7 @@ export const getPaginated = (server: HttpManager) => {
 		{
 			method: "GET",
 			path: "products/paginated",
-			auth: ["DISCORD"],
+			auth: ["DISCORD_BOT", "REST", "DISCORD_USER", "REST_USER"],
 			validations: [
 				{
 					key: "storeId",

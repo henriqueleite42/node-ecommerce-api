@@ -2,17 +2,12 @@ import type {
 	AccessTokenManager,
 	TokenData,
 } from "../../adapters/access-token-manager";
-import type {
-	AAAAT,
-	AALAT,
-	AALPAT,
-	AllowedPrefixes,
-} from "../../providers/auth-manager";
+import type { ArrayAllowedAuthTypes } from "../../providers/auth-manager";
 import { AuthManager } from "../../providers/auth-manager";
 
 export class AuthManagerProvider extends AuthManager {
 	public constructor(
-		protected readonly allowedAuthTypes: AAAAT | AALAT | AALPAT,
+		protected readonly allowedAuthTypes: ArrayAllowedAuthTypes,
 		private readonly accessTokenManager: AccessTokenManager,
 	) {
 		super(allowedAuthTypes as any);
@@ -31,9 +26,9 @@ export class AuthManagerProvider extends AuthManager {
 
 		switch (prefix) {
 			case "Discord":
-				return this.isDiscordAuthorized(prefix, credentials);
+				return this.isDiscordAuthorized(credentials);
 			case "Bearer":
-				return this.isRestAuthorized(prefix, credentials);
+				return this.isRestAuthorized(credentials);
 			default:
 				return false;
 		}
@@ -52,22 +47,30 @@ export class AuthManagerProvider extends AuthManager {
 		}
 	}
 
-	private isDiscordAuthorized(prefix: AllowedPrefixes, credentials: string) {
+	private isDiscordAuthorized(credentials: string) {
 		const [, token] = credentials.split("#");
 
 		if (token !== process.env.API_BOT_TOKEN) return false;
 
-		const { accountId, admin } = this.getDiscordData(credentials);
+		const discordData = this.getDiscordData(credentials);
 
-		if (prefix.endsWith("USER")) {
-			return Boolean(accountId);
+		const { accountId, admin } = discordData;
+
+		const results = [] as Array<boolean>;
+
+		if ((this.allowedAuthTypes as Array<string>).includes("DISCORD_BOT")) {
+			results.push(Object.keys(discordData).length === 0);
 		}
 
-		if (prefix.endsWith("ADMIN")) {
-			return Boolean(admin);
+		if ((this.allowedAuthTypes as Array<string>).includes("DISCORD_USER")) {
+			results.push(Boolean(accountId));
 		}
 
-		return true;
+		if ((this.allowedAuthTypes as Array<string>).includes("DISCORD_ADMIN")) {
+			results.push(Boolean(admin));
+		}
+
+		return results.some(Boolean);
 	}
 
 	private getDiscordData(credentials?: string): TokenData {
@@ -78,22 +81,24 @@ export class AuthManagerProvider extends AuthManager {
 		return JSON.parse(dataString);
 	}
 
-	private async isRestAuthorized(prefix: AllowedPrefixes, credentials: string) {
+	private async isRestAuthorized(credentials: string) {
 		if (!(await this.accessTokenManager.isValid(credentials))) {
 			return false;
 		}
 
 		const { accountId, admin } = this.getRestData(credentials);
 
-		if (prefix.endsWith("USER")) {
-			return Boolean(accountId);
+		const results = [] as Array<boolean>;
+
+		if ((this.allowedAuthTypes as Array<string>).includes("REST_USER")) {
+			results.push(Boolean(accountId));
 		}
 
-		if (prefix.endsWith("ADMIN")) {
-			return Boolean(admin);
+		if ((this.allowedAuthTypes as Array<string>).includes("REST_ADMIN")) {
+			results.push(Boolean(admin));
 		}
 
-		return true;
+		return results.some(Boolean);
 	}
 
 	private getRestData(credentials?: string): TokenData {

@@ -8,7 +8,7 @@ export const createMagicLink = (serverInstance: HttpManager) => {
 		{
 			method: "POST",
 			path: "accounts/magic-link",
-			auth: ["DISCORD"],
+			auth: ["DISCORD_BOT"],
 			validations: [
 				{
 					key: "accountId",

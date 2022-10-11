@@ -8,7 +8,7 @@ export const getByDiscordId = (serverInstance: HttpManager) => {
 		{
 			method: "GET",
 			path: "accounts/discord",
-			auth: ["DISCORD"],
+			auth: ["DISCORD_BOT"],
 			validations: [
 				{
 					key: "discordId",

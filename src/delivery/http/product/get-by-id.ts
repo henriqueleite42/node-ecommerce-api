@@ -10,7 +10,7 @@ export const getById = (server: HttpManager) => {
 		{
 			method: "GET",
 			path: "products",
-			auth: ["DISCORD"],
+			auth: ["DISCORD_BOT", "REST", "DISCORD_USER", "REST_USER"],
 			validations: [
 				{
 					key: "storeId",

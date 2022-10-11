@@ -1,4 +1,4 @@
-import type { AAAAT, AALAT, AALPAT, AuthManager } from "./auth-manager";
+import type { ArrayAllowedAuthTypes, AuthManager } from "./auth-manager";
 import { DeliveryManager, Route } from "./delivery-manager";
 import type { Validations, Validator } from "./validator";
 
@@ -12,7 +12,7 @@ export interface HttpRouteConfig<I> {
 	method: RouteMethods;
 	path: string;
 	statusCode?: StatusCodeEnum;
-	auth?: AAAAT | AALAT | AALPAT;
+	auth?: ArrayAllowedAuthTypes;
 	validations?: Array<Validations<I>>;
 }
 

@@ -9,7 +9,7 @@ export const getByName = (server: HttpManager) => {
 		{
 			method: "GET",
 			path: "stores",
-			auth: ["DISCORD"],
+			auth: ["DISCORD_BOT", "REST", "DISCORD_USER", "REST_USER"],
 			validations: [
 				{
 					key: "name",

@@ -11,7 +11,7 @@ export const createWithDiscord = (server: HttpManager) => {
 			method: "POST",
 			path: "accounts/discord",
 			statusCode: StatusCodeEnum.CREATED,
-			auth: ["DISCORD"],
+			auth: ["REST"],
 			validations: [
 				{
 					key: "code",

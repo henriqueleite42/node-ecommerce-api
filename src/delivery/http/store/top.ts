@@ -6,7 +6,7 @@ export const top = (server: HttpManager) => {
 		{
 			method: "GET",
 			path: "stores/top",
-			auth: ["DISCORD"],
+			auth: ["DISCORD_BOT", "REST", "DISCORD_USER", "REST_USER"],
 		},
 		route =>
 			route.setFunc(() => {

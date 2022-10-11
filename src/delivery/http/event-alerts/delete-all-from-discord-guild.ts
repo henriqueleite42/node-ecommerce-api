@@ -8,7 +8,7 @@ export const deleteAllFromDiscordGuild = (server: HttpManager) => {
 		{
 			method: "DELETE",
 			path: "event-alerts/discord-guild",
-			auth: ["DISCORD"],
+			auth: ["DISCORD_BOT"],
 			validations: [
 				{
 					key: "discordGuildId",
