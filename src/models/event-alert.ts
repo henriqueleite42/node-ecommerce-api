@@ -50,13 +50,27 @@ export interface GetEventsInput {
 	cursor?: string;
 }
 
+export interface GetDiscordGuildEventsInput {
+	discordGuildId: string;
+	limit: number;
+	cursor?: string;
+}
+
 export interface GetEventsOutput {
 	items: Array<EventAlertEntity>;
 	nextPage?: string;
 }
 
+export type DeleteEventsInput = Array<EventAlertEntity>;
+
 export interface EventAlertRepository {
 	getEvents: (p: GetEventsInput) => Promise<GetEventsOutput>;
+
+	deleteEvents: (p: DeleteEventsInput) => Promise<void>;
+
+	getDiscordGuildEvents: (
+		p: GetDiscordGuildEventsInput,
+	) => Promise<GetEventsOutput>;
 }
 
 /**
@@ -67,7 +81,15 @@ export interface EventAlertRepository {
  *
  */
 
+export interface DeleteAllFromDiscordGuildInput {
+	discordGuildId: string;
+}
+
 export interface EventAlertUseCase {
+	deleteAllFromDiscordGuild: (
+		p: DeleteAllFromDiscordGuildInput,
+	) => Promise<void>;
+
 	processDiscordNewStoreEvent: (p: StoreEntity) => Promise<void>;
 
 	processDiscordNewProductEvent: (p: ProductEntity) => Promise<void>;

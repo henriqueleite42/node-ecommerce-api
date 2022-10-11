@@ -1,18 +1,21 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
+import { BatchWriteItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { cleanObj } from "@techmmunity/utils";
 
 import type {
+	DeleteEventsInput,
 	EventAlertEntity,
 	EventAlertRepository,
+	GetDiscordGuildEventsInput,
 	GetEventsInput,
 } from "../../models/event-alert";
 
 import { DynamodbRepository } from ".";
 
 import type { AlertTypeEnum } from "../../types/enums/alert-type";
-import type { PlatformEnum } from "../../types/enums/platform";
+import { PlatformEnum } from "../../types/enums/platform";
 import type { ProductTypeEnum } from "../../types/enums/product-type";
 
 export interface EventAlertTable {
@@ -42,6 +45,30 @@ export class EventAlertRepositoryDynamoDB
 		return this.getMultipleItems(this.indexMain(keys), limit, cursor);
 	}
 
+	public getDiscordGuildEvents({
+		cursor,
+		limit,
+		...keys
+	}: GetDiscordGuildEventsInput) {
+		return this.getMultipleItems(this.indexDiscordGuild(keys), limit, cursor);
+	}
+
+	public async deleteEvents(items: DeleteEventsInput) {
+		const itemsTable = items.map(this.entityToTable) as Array<EventAlertTable>;
+
+		await this.dynamodb.send(
+			new BatchWriteItemCommand({
+				RequestItems: {
+					[this.tableName]: itemsTable.map(i => ({
+						DeleteRequest: {
+							Key: this.indexMain(i).Key,
+						},
+					})),
+				},
+			}),
+		);
+	}
+
 	// Keys
 
 	private indexMain({
@@ -69,6 +96,28 @@ export class EventAlertRepositoryDynamoDB
 			}),
 			Key: marshall({
 				platform_alertType_storeId_productType: value,
+			}),
+		};
+	}
+
+	private indexDiscordGuild({
+		discordGuildId,
+	}: Pick<EventAlertEntity, "discordGuildId">) {
+		const platform_discordGuildId = `PLATFORM#${PlatformEnum.DISCORD}#DISCORD_GUILD#${discordGuildId}`;
+
+		return {
+			Index:
+				"PlatformDiscordGuildIdDiscordChannelIdAlertTypeStoreIdProductType",
+			KeyConditionExpression:
+				"#platform_discordGuildId = :platform_discordGuildId",
+			ExpressionAttributeNames: {
+				"#platform_discordGuildId": "platform_discordGuildId",
+			},
+			ExpressionAttributeValues: marshall({
+				":platform_discordGuildId": platform_discordGuildId,
+			}),
+			Key: marshall({
+				platform_discordGuildId,
 			}),
 		};
 	}

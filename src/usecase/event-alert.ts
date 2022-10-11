@@ -5,6 +5,7 @@ import { sleep } from "@techmmunity/utils";
 
 import type { QueueManager } from "../adapters/queue-manager";
 import type {
+	DeleteAllFromDiscordGuildInput,
 	EventAlertRepository,
 	EventAlertUseCase,
 	GetEventsInput,
@@ -22,6 +23,29 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 		private readonly storeRepository: StoreRepository,
 		private readonly queueManager: QueueManager,
 	) {}
+
+	public async deleteAllFromDiscordGuild({
+		discordGuildId,
+	}: DeleteAllFromDiscordGuildInput) {
+		let cursor: string | undefined;
+
+		do {
+			const { items, nextPage } =
+				await this.eventAlertRepository.getDiscordGuildEvents({
+					discordGuildId,
+					limit: 100,
+					cursor,
+				});
+
+			if (items.length === 0) {
+				break;
+			}
+
+			await this.eventAlertRepository.deleteEvents(items);
+
+			cursor = nextPage;
+		} while (cursor);
+	}
 
 	// eslint-disable-next-line sonarjs/cognitive-complexity
 	public async processDiscordNewSaleEvent(sale: SaleEntity) {
