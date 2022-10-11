@@ -18,12 +18,12 @@ export interface AccessTable {
 	storeId: string;
 	productId: string;
 	variationId?: string;
+	contentId?: string;
 	createdAt: string;
-	expiresAt?: string;
 
-	accountId_storeId_productId_variationId: string;
+	pk: string;
 	accountId_storeId: string;
-	createdAt_productId_variationId: string;
+	createdAt_sk: string;
 }
 
 export class AccessRepositoryDynamoDB
@@ -66,8 +66,7 @@ export class AccessRepositoryDynamoDB
 						[this.tableName]: itemsTable.map(i => ({
 							DeleteRequest: {
 								Key: marshall({
-									accountId_storeId_productId_variationId:
-										i.accountId_storeId_productId_variationId,
+									pk: i.pk,
 								}),
 							},
 						})),
@@ -92,29 +91,33 @@ export class AccessRepositoryDynamoDB
 	private indexAccountIdStoreIdProductIdVariationId(
 		entity: Pick<
 			AccessEntity,
-			"accountId" | "productId" | "storeId" | "variationId"
+			"accountId" | "contentId" | "productId" | "storeId" | "variationId"
 		>,
 	) {
 		const accountId = `ACCOUNT#${entity.accountId}`;
 		const storeId = `STORE#${entity.storeId}`;
 		const productId = `PRODUCT#${entity.productId}`;
-		const variationId = `VARIATION#${entity.variationId || ""}`;
+		const variationId = entity.variationId
+			? `VARIATION#${entity.variationId}`
+			: undefined;
+		const contentId = entity.contentId
+			? `CONTENT#${entity.contentId}`
+			: undefined;
 
-		const key = `${accountId}#${storeId}#${productId}#${variationId}`;
+		const pk = [accountId, storeId, productId, variationId, contentId]
+			.filter(Boolean)
+			.join("#");
 
 		return {
-			IndexName: "AccountIdStoreIdProductIdVariationId",
-			KeyConditionExpression:
-				"#accountId_storeId_productId_variationId = :accountId_storeId_productId_variationId",
+			KeyConditionExpression: "#pk = :pk",
 			ExpressionAttributeNames: {
-				"#accountId_storeId_productId_variationId":
-					"accountId_storeId_productId_variationId",
+				"#pk": "pk",
 			},
 			ExpressionAttributeValues: marshall({
-				":accountId_storeId_productId_variationId": key,
+				":pk": pk,
 			}),
 			Key: marshall({
-				accountId_storeId_productId_variationId: key,
+				pk,
 			}),
 		};
 	}
@@ -132,11 +135,22 @@ export class AccessRepositoryDynamoDB
 		const variationId = entity.variationId
 			? `VARIATION#${entity.variationId}`
 			: undefined;
+		const contentId = entity.contentId
+			? `CONTENT#${entity.contentId}`
+			: undefined;
 		const createdAt = entity.createdAt?.toISOString();
 
-		const primaryKey = [accountId, storeId, productId, variationId]
-			.filter(Boolean)
-			.join("#");
+		const pk =
+			[accountId, storeId, productId, variationId, contentId]
+				.filter(Boolean)
+				.join("#") || undefined;
+
+		const createdAt_sk =
+			createdAt && productId
+				? [createdAt, productId, variationId, contentId]
+						.filter(Boolean)
+						.join("#")
+				: undefined;
 
 		return cleanObj({
 			accountId,
@@ -144,9 +158,9 @@ export class AccessRepositoryDynamoDB
 			productId,
 			variationId,
 			createdAt,
-			expiresAt: entity.expiresAt?.toISOString(),
 
-			accountId_storeId_productId_variationId: primaryKey || undefined,
+			pk,
+			createdAt_sk,
 			accountId_storeId:
 				accountId && storeId ? `${accountId}#${storeId}` : undefined,
 			createdAt_productId_variationId:
@@ -162,8 +176,8 @@ export class AccessRepositoryDynamoDB
 			storeId: table.storeId.replace("STORE#", ""),
 			productId: table.productId.replace("PRODUCT#", ""),
 			variationId: table.variationId?.replace("VARIATION#", ""),
+			contentId: table.contentId?.replace("CONTENT#", ""),
 			createdAt: new Date(table.createdAt),
-			expiresAt: table.expiresAt ? new Date(table.expiresAt) : undefined,
 		};
 	}
 }

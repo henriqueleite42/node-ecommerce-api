@@ -18,16 +18,16 @@ import type { ProductTypeEnum } from "../../types/enums/product-type";
 export interface EventAlertTable {
 	platform: PlatformEnum;
 	alertType: AlertTypeEnum;
-	storeId?: string;
-	productType?: ProductTypeEnum;
+	storeId?: string | "ALL";
+	productType?: ProductTypeEnum | "ALL";
 	createdAt: string;
 	// DISCORD
 	discordGuildId?: string;
 	discordChannelId?: string;
 	discordRolesToMention?: Array<string>;
 
-	platform_alertType_storeId_productType: string;
-	channelsIds: string;
+	pk: string;
+	sk: string;
 	platform_discordGuildId?: string;
 	discordChannelId_alertType_storeId_productType?: string;
 }
@@ -49,8 +49,10 @@ export class EventAlertRepositoryDynamoDB
 		alertType,
 		storeId,
 		productType,
-	}: Partial<Pick<EventAlertEntity, "productType" | "storeId">> &
-		Pick<EventAlertEntity, "alertType" | "platform">) {
+	}: Pick<
+		EventAlertEntity,
+		"alertType" | "platform" | "productType" | "storeId"
+	>) {
 		const value = `PLATFORM#${platform}#ALERT_TYPE#${alertType}#STORE#${
 			storeId || "ALL"
 		}#PRODUCT_TYPE#${productType || "ALL"}`;
@@ -76,17 +78,21 @@ export class EventAlertRepositoryDynamoDB
 	protected entityToTable(
 		entity: Partial<EventAlertEntity>,
 	): Partial<EventAlertTable> {
-		const platform = `PLATFORM#${entity.platform}`;
-		const alertType = `ALERT_TYPE#${entity.alertType}`;
-		const storeId = `STORE#${entity.storeId || "ALL"}`;
-		const productType = `PRODUCT_TYPE#${entity.productType || "ALL"}`;
+		const platform = entity.platform
+			? `PLATFORM#${entity.platform}`
+			: undefined;
+		const alertType = entity.alertType
+			? `ALERT_TYPE#${entity.alertType}`
+			: undefined;
+		const storeId = entity.storeId ? `STORE#${entity.storeId}` : undefined;
+		const productType = entity.storeId
+			? `PRODUCT_TYPE#${entity.productType}`
+			: undefined;
 
-		const platform_alertType_storeId_productType = [
-			platform,
-			alertType,
-			storeId,
-			productType,
-		].join("#");
+		const pk =
+			platform && alertType && storeId && productType
+				? [platform, alertType, storeId, productType].join("#")
+				: undefined;
 
 		const discordGuildId = entity.discordGuildId
 			? `DISCORD_GUILD#${entity.discordGuildId}`
@@ -95,9 +101,19 @@ export class EventAlertRepositoryDynamoDB
 			? `DISCORD_CHANNEL#${entity.discordChannelId}`
 			: undefined;
 
-		const channelsIds = [discordGuildId, discordChannelId]
-			.filter(Boolean)
-			.join("#");
+		const sk =
+			discordGuildId && discordChannelId
+				? [discordGuildId, discordChannelId].filter(Boolean).join("#")
+				: undefined;
+
+		const platform_discordGuildId =
+			platform && discordGuildId
+				? [platform, discordGuildId].join("#")
+				: undefined;
+		const discordChannelId_alertType_storeId_productType =
+			discordChannelId && alertType && storeId && productType
+				? [discordChannelId, alertType, storeId, productType].join("#")
+				: undefined;
 
 		return cleanObj({
 			platform: entity.platform,
@@ -110,15 +126,11 @@ export class EventAlertRepositoryDynamoDB
 			discordChannelId,
 			discordRolesToMention: entity.discordRolesToMention,
 
-			platform_alertType_storeId_productType,
-			channelsIds,
+			pk,
+			sk,
 			// DISCORD
-			platform_discordGuildId: discordGuildId
-				? [platform, discordGuildId].join("#")
-				: undefined,
-			discordChannelId_alertType_storeId_productType: discordChannelId
-				? [discordChannelId, alertType, storeId, productType].join("#")
-				: undefined,
+			platform_discordGuildId,
+			discordChannelId_alertType_storeId_productType,
 		});
 	}
 

@@ -1,6 +1,6 @@
 import type { AWS } from "@serverless/typescript";
 
-const PROVISIONED_THROUGHPUT_ACCOUNTS = {
+const PROVISIONED_THROUGHPUT_EVENTS_ALERTS = {
 	ReadCapacityUnits: 5,
 	WriteCapacityUnits: 1,
 };
@@ -18,14 +18,14 @@ export const resourcesEventAlert: AWS["resources"] = {
 			Type: "AWS::DynamoDB::Table",
 			Properties: {
 				TableName: "events_alerts",
-				ProvisionedThroughput: PROVISIONED_THROUGHPUT_ACCOUNTS,
+				ProvisionedThroughput: PROVISIONED_THROUGHPUT_EVENTS_ALERTS,
 				AttributeDefinitions: [
 					{
-						AttributeName: "platform_alertType_storeId_productType",
+						AttributeName: "pk",
 						AttributeType: "S",
 					},
 					{
-						AttributeName: "channelsIds",
+						AttributeName: "sk",
 						AttributeType: "S",
 					},
 					{
@@ -39,11 +39,11 @@ export const resourcesEventAlert: AWS["resources"] = {
 				],
 				KeySchema: [
 					{
-						AttributeName: "platform_alertType_storeId_productType",
+						AttributeName: "pk",
 						KeyType: "HASH",
 					},
 					{
-						AttributeName: "channelsIds",
+						AttributeName: "sk",
 						KeyType: "RANGE",
 					},
 				],
@@ -63,7 +63,7 @@ export const resourcesEventAlert: AWS["resources"] = {
 						Projection: {
 							ProjectionType: "ALL"
 						},
-						ProvisionedThroughput: PROVISIONED_THROUGHPUT_ACCOUNTS,
+						ProvisionedThroughput: PROVISIONED_THROUGHPUT_EVENTS_ALERTS,
 					},
 				],
 			},

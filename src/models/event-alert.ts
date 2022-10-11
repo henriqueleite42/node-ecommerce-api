@@ -16,8 +16,8 @@ import type { ProductTypeEnum } from "../types/enums/product-type";
 interface BaseEventAlert {
 	platform: PlatformEnum;
 	alertType: AlertTypeEnum;
-	storeId?: string;
-	productType?: ProductTypeEnum;
+	storeId?: string | "ALL";
+	productType?: ProductTypeEnum | "ALL";
 	createdAt: Date;
 }
 
@@ -44,8 +44,8 @@ export interface EventAlertEntity
 export interface GetEventsInput {
 	platform: PlatformEnum;
 	alertType: AlertTypeEnum;
-	storeId?: string;
-	productType?: ProductTypeEnum;
+	storeId?: string | "ALL";
+	productType?: ProductTypeEnum | "ALL";
 	limit: number;
 	cursor?: string;
 }

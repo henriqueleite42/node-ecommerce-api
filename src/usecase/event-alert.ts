@@ -40,6 +40,8 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 				// Event alerts with no filters
 				platform: PlatformEnum.DISCORD,
 				alertType: AlertTypeEnum.NEW_SALE,
+				storeId: "ALL",
+				productType: "ALL",
 				limit: 25,
 			},
 			{
@@ -47,12 +49,14 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 				platform: PlatformEnum.DISCORD,
 				alertType: AlertTypeEnum.NEW_SALE,
 				storeId: sale.storeId,
+				productType: "ALL",
 				limit: 25,
 			},
 			// Event alerts with filter for specific product types
 			...sale.products.map(p => ({
 				platform: PlatformEnum.DISCORD,
 				alertType: AlertTypeEnum.NEW_SALE,
+				storeId: "ALL",
 				productType: p.type,
 				limit: 25,
 			})),
@@ -153,6 +157,8 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 				// Event alerts with no filters
 				platform: PlatformEnum.DISCORD,
 				alertType: AlertTypeEnum.NEW_PRODUCT,
+				storeId: "ALL",
+				productType: "ALL",
 				limit: 25,
 			},
 			{
@@ -160,12 +166,14 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 				platform: PlatformEnum.DISCORD,
 				alertType: AlertTypeEnum.NEW_PRODUCT,
 				storeId: product.storeId,
+				productType: "ALL",
 				limit: 25,
 			},
 			{
 				// Event alerts with filter for specific product types
 				platform: PlatformEnum.DISCORD,
 				alertType: AlertTypeEnum.NEW_PRODUCT,
+				storeId: "ALL",
 				productType: product.type,
 				limit: 25,
 			},

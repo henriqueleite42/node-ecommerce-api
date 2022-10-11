@@ -1,5 +1,6 @@
 #!/bin/bash
 
+API_MODULE="ACCESS" yarn deploy:production && \
 API_MODULE="ACCOUNT" yarn deploy:production && \
 API_MODULE="BLACKLIST" yarn deploy:production && \
 API_MODULE="CONTENT" yarn deploy:production && \

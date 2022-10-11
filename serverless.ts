@@ -1,6 +1,7 @@
 import type { AWS } from "@serverless/typescript";
 import { merge } from "lodash";
 
+import { resourcesAccess } from "./resources-access";
 import { resourcesAccount } from "./resources-account";
 import { resourcesBlacklist } from "./resources-blacklist";
 import { resourcesContent } from "./resources-content";
@@ -91,6 +92,11 @@ const baseConfig: Partial<AWS> = {
 			environment: "${opt:stage, 'local'}",
 		},
 	},
+};
+
+const accessConfig = {
+	service: "access",
+	resources: resourcesAccess,
 };
 
 const accountConfig = {
@@ -217,6 +223,9 @@ const walletConfig = {
  */
 const getConfig = () => {
 	switch (process.env.API_MODULE) {
+		case "ACCESS":
+			return merge(baseConfig, accessConfig);
+
 		case "ACCOUNT":
 			return merge(baseConfig, accountConfig);
 

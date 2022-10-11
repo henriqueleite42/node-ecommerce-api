@@ -1,6 +1,6 @@
 import type { AWS } from "@serverless/typescript";
 
-const PROVISIONED_THROUGHPUT_COUNTERS = {
+const PROVISIONED_THROUGHPUT_COUPONS = {
 	ReadCapacityUnits: 3,
 	WriteCapacityUnits: 1,
 };
@@ -13,7 +13,7 @@ export const resourcesCoupon: AWS["resources"] = {
 			Type: "AWS::DynamoDB::Table",
 			Properties: {
 				TableName: "coupons",
-				ProvisionedThroughput: PROVISIONED_THROUGHPUT_COUNTERS,
+				ProvisionedThroughput: PROVISIONED_THROUGHPUT_COUPONS,
 				AttributeDefinitions: [
 					{
 						AttributeName: "storeId",

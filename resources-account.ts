@@ -5,6 +5,16 @@ const PROVISIONED_THROUGHPUT_ACCOUNTS = {
 	WriteCapacityUnits: 1,
 };
 
+const PROVISIONED_THROUGHPUT_REFRESH_TOKENS = {
+	ReadCapacityUnits: 3,
+	WriteCapacityUnits: 1,
+};
+
+const PROVISIONED_THROUGHPUT_MAGIC_LINKS = {
+	ReadCapacityUnits: 3,
+	WriteCapacityUnits: 1,
+};
+
 export const resourcesAccount: AWS["resources"] = {
 	Resources: {
 		AccountDynamoDBTable: {
@@ -53,7 +63,7 @@ export const resourcesAccount: AWS["resources"] = {
 			Type: "AWS::DynamoDB::Table",
 			Properties: {
 				TableName: "refresh_tokens",
-				ProvisionedThroughput: PROVISIONED_THROUGHPUT_ACCOUNTS,
+				ProvisionedThroughput: PROVISIONED_THROUGHPUT_REFRESH_TOKENS,
 				AttributeDefinitions: [
 					{
 						AttributeName: "token",
@@ -82,7 +92,7 @@ export const resourcesAccount: AWS["resources"] = {
 						Projection: {
 							ProjectionType: "ALL"
 						},
-						ProvisionedThroughput: PROVISIONED_THROUGHPUT_ACCOUNTS,
+						ProvisionedThroughput: PROVISIONED_THROUGHPUT_REFRESH_TOKENS,
 					}
 				],
 			},
@@ -93,7 +103,7 @@ export const resourcesAccount: AWS["resources"] = {
 			Type: "AWS::DynamoDB::Table",
 			Properties: {
 				TableName: "magic_links",
-				ProvisionedThroughput: PROVISIONED_THROUGHPUT_ACCOUNTS,
+				ProvisionedThroughput: PROVISIONED_THROUGHPUT_MAGIC_LINKS,
 				TimeToLiveSpecification: {
 					AttributeName: "ttl",
 					Enabled: true,
@@ -130,7 +140,7 @@ export const resourcesAccount: AWS["resources"] = {
 						Projection: {
 							ProjectionType: "ALL"
 						},
-						ProvisionedThroughput: PROVISIONED_THROUGHPUT_ACCOUNTS,
+						ProvisionedThroughput: PROVISIONED_THROUGHPUT_MAGIC_LINKS,
 					}
 				],
 			},

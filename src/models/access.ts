@@ -3,8 +3,8 @@ export interface AccessEntity {
 	storeId: string;
 	productId: string;
 	variationId?: string;
+	contentId?: string;
 	createdAt: Date;
-	expiresAt?: Date;
 }
 
 /**
@@ -23,6 +23,7 @@ export interface CreateManyInput {
 		storeId: string;
 		productId: string;
 		variationId?: string;
+		contentId?: string;
 	}>;
 }
 

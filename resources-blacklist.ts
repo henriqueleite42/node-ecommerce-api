@@ -1,6 +1,6 @@
 import type { AWS } from "@serverless/typescript";
 
-const PROVISIONED_THROUGHPUT_COUNTERS = {
+const PROVISIONED_THROUGHPUT_BLACKLISTS = {
 	ReadCapacityUnits: 3,
 	WriteCapacityUnits: 1,
 };
@@ -13,7 +13,7 @@ export const resourcesBlacklist: AWS["resources"] = {
 			Type: "AWS::DynamoDB::Table",
 			Properties: {
 				TableName: "blacklists",
-				ProvisionedThroughput: PROVISIONED_THROUGHPUT_COUNTERS,
+				ProvisionedThroughput: PROVISIONED_THROUGHPUT_BLACKLISTS,
 				AttributeDefinitions: [
 					{
 						AttributeName: "accountId",
