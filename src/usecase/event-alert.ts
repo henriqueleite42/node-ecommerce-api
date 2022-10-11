@@ -5,6 +5,7 @@ import { sleep } from "@techmmunity/utils";
 
 import type { QueueManager } from "../adapters/queue-manager";
 import type {
+	DeleteAllFromDiscordChannelInput,
 	DeleteAllFromDiscordGuildInput,
 	EventAlertRepository,
 	EventAlertUseCase,
@@ -33,6 +34,31 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 			const { items, nextPage } =
 				await this.eventAlertRepository.getDiscordGuildEvents({
 					discordGuildId,
+					limit: 100,
+					cursor,
+				});
+
+			if (items.length === 0) {
+				break;
+			}
+
+			await this.eventAlertRepository.deleteEvents(items);
+
+			cursor = nextPage;
+		} while (cursor);
+	}
+
+	public async deleteAllFromDiscordChannel({
+		discordGuildId,
+		discordChannelId,
+	}: DeleteAllFromDiscordChannelInput) {
+		let cursor: string | undefined;
+
+		do {
+			const { items, nextPage } =
+				await this.eventAlertRepository.getDiscordChannelEvents({
+					discordGuildId,
+					discordChannelId,
 					limit: 100,
 					cursor,
 				});

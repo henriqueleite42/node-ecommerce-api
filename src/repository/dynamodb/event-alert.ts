@@ -8,6 +8,7 @@ import type {
 	DeleteEventsInput,
 	EventAlertEntity,
 	EventAlertRepository,
+	GetDiscordChannelEventsInput,
 	GetDiscordGuildEventsInput,
 	GetEventsInput,
 } from "../../models/event-alert";
@@ -51,6 +52,14 @@ export class EventAlertRepositoryDynamoDB
 		...keys
 	}: GetDiscordGuildEventsInput) {
 		return this.getMultipleItems(this.indexDiscordGuild(keys), limit, cursor);
+	}
+
+	public getDiscordChannelEvents({
+		cursor,
+		limit,
+		...keys
+	}: GetDiscordChannelEventsInput) {
+		return this.getMultipleItems(this.indexDiscordChannel(keys), limit, cursor);
 	}
 
 	public async deleteEvents(items: DeleteEventsInput) {
@@ -116,8 +125,28 @@ export class EventAlertRepositoryDynamoDB
 			ExpressionAttributeValues: marshall({
 				":platform_discordGuildId": platform_discordGuildId,
 			}),
-			Key: marshall({
-				platform_discordGuildId,
+		};
+	}
+
+	private indexDiscordChannel({
+		discordGuildId,
+		discordChannelId,
+	}: Pick<EventAlertEntity, "discordChannelId" | "discordGuildId">) {
+		const platform_discordGuildId = `PLATFORM#${PlatformEnum.DISCORD}#DISCORD_GUILD#${discordGuildId}`;
+
+		return {
+			Index:
+				"PlatformDiscordGuildIdDiscordChannelIdAlertTypeStoreIdProductType",
+			KeyConditionExpression:
+				"#platform_discordGuildId = :platform_discordGuildId AND begins_with(#discordChannelId_alertType_storeId_productType, :discordChannelId_alertType_storeId_productType)",
+			ExpressionAttributeNames: {
+				"#platform_discordGuildId": "platform_discordGuildId",
+				"#discordChannelId_alertType_storeId_productType":
+					"discordChannelId_alertType_storeId_productType",
+			},
+			ExpressionAttributeValues: marshall({
+				":platform_discordGuildId": platform_discordGuildId,
+				":discordChannelId_alertType_storeId_productType": `DISCORD_CHANNEL#${discordChannelId}`,
 			}),
 		};
 	}

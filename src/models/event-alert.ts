@@ -56,6 +56,13 @@ export interface GetDiscordGuildEventsInput {
 	cursor?: string;
 }
 
+export interface GetDiscordChannelEventsInput {
+	discordGuildId: string;
+	discordChannelId: string;
+	limit: number;
+	cursor?: string;
+}
+
 export interface GetEventsOutput {
 	items: Array<EventAlertEntity>;
 	nextPage?: string;
@@ -71,6 +78,10 @@ export interface EventAlertRepository {
 	getDiscordGuildEvents: (
 		p: GetDiscordGuildEventsInput,
 	) => Promise<GetEventsOutput>;
+
+	getDiscordChannelEvents: (
+		p: GetDiscordChannelEventsInput,
+	) => Promise<GetEventsOutput>;
 }
 
 /**
@@ -85,9 +96,18 @@ export interface DeleteAllFromDiscordGuildInput {
 	discordGuildId: string;
 }
 
+export interface DeleteAllFromDiscordChannelInput {
+	discordGuildId: string;
+	discordChannelId: string;
+}
+
 export interface EventAlertUseCase {
 	deleteAllFromDiscordGuild: (
 		p: DeleteAllFromDiscordGuildInput,
+	) => Promise<void>;
+
+	deleteAllFromDiscordChannel: (
+		p: DeleteAllFromDiscordChannelInput,
 	) => Promise<void>;
 
 	processDiscordNewStoreEvent: (p: StoreEntity) => Promise<void>;
