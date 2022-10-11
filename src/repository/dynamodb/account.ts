@@ -4,7 +4,12 @@ import { PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { cleanObj } from "@techmmunity/utils";
 
-import type { AccountRepository, AccountEntity } from "../../models/account";
+import type {
+	AccountRepository,
+	AccountEntity,
+	CreateWithDiscordIdInput,
+	CreateWithDiscordInput,
+} from "../../models/account";
 
 import { DynamodbRepository } from ".";
 
@@ -12,8 +17,13 @@ import { genId } from "../../utils/id/gen-id";
 
 export interface AccountTable {
 	accountId: string;
-	discordId: string;
 	admin: boolean;
+	discordId: string;
+	discord?: {
+		accessToken: string;
+		refreshToken: string;
+		expiresAt: string;
+	};
 	createdAt: string;
 }
 
@@ -23,9 +33,31 @@ export class AccountRepositoryDynamoDB
 {
 	protected readonly tableName = "accounts";
 
-	public async createWithDiscordId({
+	public async createWithDiscord({
 		discordId,
-	}: Pick<AccountEntity, "discordId">) {
+		discord,
+	}: CreateWithDiscordInput) {
+		const item: AccountEntity = {
+			accountId: await genId(),
+			admin: false,
+			discordId,
+			discord,
+			createdAt: new Date(),
+		};
+
+		await this.dynamodb.send(
+			new PutItemCommand({
+				// eslint-disable-next-line @typescript-eslint/naming-convention
+				TableName: this.tableName,
+				// eslint-disable-next-line @typescript-eslint/naming-convention
+				Item: marshall(this.entityToTable(item)),
+			}),
+		);
+
+		return item;
+	}
+
+	public async createWithDiscordId({ discordId }: CreateWithDiscordIdInput) {
 		const item: AccountEntity = {
 			accountId: await genId(),
 			discordId,
@@ -95,8 +127,14 @@ export class AccountRepositoryDynamoDB
 	): Partial<AccountTable> {
 		return cleanObj({
 			accountId: entity.accountId ? `ACCOUNT#${entity.accountId}` : undefined,
-			discordId: entity.discordId ? `DISCORD#${entity.discordId}` : undefined,
 			admin: entity.admin,
+			discordId: entity.discordId ? `DISCORD#${entity.discordId}` : undefined,
+			discord: entity.discord
+				? {
+						...entity.discord,
+						expiresAt: entity.discord.expiresAt.toISOString(),
+				  }
+				: undefined,
 			createdAt: entity.createdAt?.toISOString(),
 		});
 	}
@@ -104,8 +142,14 @@ export class AccountRepositoryDynamoDB
 	protected tableToEntity(table: AccountTable): AccountEntity {
 		return {
 			accountId: table.accountId.replace("ACCOUNT#", ""),
-			discordId: table.discordId.replace("DISCORD#", ""),
 			admin: table.admin,
+			discordId: table.discordId.replace("DISCORD#", ""),
+			discord: table.discord
+				? {
+						...table.discord,
+						expiresAt: new Date(table.discord.expiresAt),
+				  }
+				: undefined,
 			createdAt: new Date(table.createdAt),
 		};
 	}

@@ -10,6 +10,32 @@ import type {
 	SendMessageInput,
 } from "../discord-manager";
 
+interface ExchangeCodeAPIOutput {
+	access_token: string;
+	token_type: string;
+	expires_in: number;
+	refresh_token: string;
+	scope: string;
+}
+
+interface GetUserDataAPIOutput {
+	id: string;
+	username: string;
+	discriminator: string;
+	avatar?: string;
+	banner?: string;
+	bot: boolean;
+	system: boolean;
+	mfa_enabled: boolean;
+	accent_color: number;
+	locale: string;
+	verified: boolean;
+	email: string;
+	flags: number;
+	premium_type: number;
+	public_flags: number;
+}
+
 export class DiscordJSAdapter implements DiscordManager {
 	protected discordjs: REST;
 
@@ -55,11 +81,61 @@ export class DiscordJSAdapter implements DiscordManager {
 		});
 	}
 
-	protected getColorNumber(color: string) {
+	public async exchangeCode(code: string) {
+		const result = (await this.discordjs.post(Routes.oauth2TokenExchange(), {
+			body: {
+				client_id: process.env.DISCORD_BOT_CLIENT_ID!,
+				client_secret: process.env.DISCORD_BOT_CLIENT_SECRET!,
+				code,
+				redirect_uri: process.env.DISCORD_REDIRECT_URI!,
+			},
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+			},
+		})) as ExchangeCodeAPIOutput;
+
+		return {
+			accessToken: result.access_token,
+			refreshToken: result.refresh_token,
+			scopes: result.scope.split(" "),
+			// eslint-disable-next-line @typescript-eslint/no-magic-numbers
+			expiresAt: new Date(Date.now() + (result.expires_in - 60) * 1000),
+		};
+	}
+
+	public async getUserData(accessToken: string) {
+		const result = (await this.discordjs.get(Routes.user(), {
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+			},
+		})) as GetUserDataAPIOutput;
+
+		return {
+			id: result.id,
+			avatar: result.avatar
+				? this.getAvatarUrl(result.id, result.avatar)
+				: undefined,
+			banner: result.banner
+				? this.getBannerUrl(result.id, result.banner)
+				: undefined,
+		};
+	}
+
+	// Private
+
+	private getAvatarUrl(discordId: string, hash: string) {
+		return `https://cdn.discordapp.com/avatars/${discordId}/${hash}?size=4096`;
+	}
+
+	private getBannerUrl(discordId: string, hash: string) {
+		return `https://cdn.discordapp.com/banners/${discordId}/${hash}?size=4096`;
+	}
+
+	private getColorNumber(color: string) {
 		return parseInt(color.replace("#", ""), 16);
 	}
 
-	protected embedToDiscordEmbed(embed: Embed) {
+	private embedToDiscordEmbed(embed: Embed) {
 		return {
 			type: "rich",
 			title: embed.title,
@@ -93,7 +169,7 @@ export class DiscordJSAdapter implements DiscordManager {
 		};
 	}
 
-	protected componentRowToDiscordComponentRow(
+	private componentRowToDiscordComponentRow(
 		componentsRow: Array<AnyComponent>,
 	) {
 		return {

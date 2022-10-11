@@ -29,6 +29,7 @@ export const func = s3Manager
 			productId,
 			contentId,
 			rawContentPath: data.key,
+			processedContentPath: data.key,
 		});
 	})
 	.getFunc();

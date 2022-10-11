@@ -1,10 +1,13 @@
 import type { AccessTokenManager } from "../adapters/access-token-manager";
+import type { DiscordManager } from "../adapters/discord-manager";
 import type {
 	AccountUseCase,
 	AccountRepository,
 	CreateWithDiscordIdInput,
 	GetByDiscordIdInput,
 	AuthOutput,
+	CreateAccountWithDiscordInput,
+	AccountEntity,
 } from "../models/account";
 import type {
 	CreateMagicLinkInput,
@@ -18,12 +21,52 @@ import { CustomError } from "../utils/error";
 import { StatusCodeEnum } from "../types/enums/status-code";
 
 export class AccountUseCaseImplementation implements AccountUseCase {
+	private readonly necessaryDiscordScopes = [
+		"identify",
+		"email",
+		"gdm.join",
+		"guilds",
+		"guilds.members.read",
+	] as Array<string>;
+
 	public constructor(
 		private readonly accountRepository: AccountRepository,
 		private readonly refreshTokenRepository: RefreshTokenRepository,
 		private readonly magicLinkRepository: MagicLinkRepository,
 		private readonly accessTokenManager: AccessTokenManager,
+		private readonly discordManager: DiscordManager,
 	) {}
+
+	public async createWithDiscord({ code }: CreateAccountWithDiscordInput) {
+		const { scopes, accessToken, refreshToken, expiresAt } =
+			await this.discordManager.exchangeCode(code);
+
+		if (!this.necessaryDiscordScopes.every(s => scopes.includes(s))) {
+			throw new CustomError("Missing scopes", StatusCodeEnum.BAD_REQUEST);
+		}
+
+		const { id } = await this.discordManager.getUserData(accessToken);
+
+		const oldAccount = await this.accountRepository.getByDiscordId(id);
+
+		if (oldAccount) {
+			throw new CustomError(
+				"An account with the same DiscordID already exists",
+				StatusCodeEnum.CONFLICT,
+			);
+		}
+
+		const account = await this.accountRepository.createWithDiscord({
+			discordId: id,
+			discord: {
+				accessToken,
+				refreshToken,
+				expiresAt,
+			},
+		});
+
+		return this.genAuthData(account);
+	}
 
 	public async createWithDiscordId(p: CreateWithDiscordIdInput) {
 		const account = await this.accountRepository.getByDiscordId(p.discordId);
@@ -58,15 +101,24 @@ export class AccountUseCaseImplementation implements AccountUseCase {
 		const magicLink = await this.magicLinkRepository.get(p);
 
 		if (!magicLink) {
-			throw new CustomError("Not Found", StatusCodeEnum.NOT_FOUND);
+			throw new CustomError("Magic link not Found", StatusCodeEnum.NOT_FOUND);
 		}
 
 		const { accountId } = magicLink;
 
-		return this.genAuthData(accountId);
+		const account = await this.accountRepository.getByAccountId(accountId);
+
+		if (!account) {
+			throw new CustomError("Account not Found", StatusCodeEnum.NOT_FOUND);
+		}
+
+		return this.genAuthData(account);
 	}
 
-	private async genAuthData(accountId: string): Promise<AuthOutput> {
+	private async genAuthData({
+		accountId,
+		admin,
+	}: AccountEntity): Promise<AuthOutput> {
 		let refreshToken: string;
 
 		const oldRefreshToken = await this.refreshTokenRepository.getByAccountId({
@@ -83,16 +135,10 @@ export class AccountUseCaseImplementation implements AccountUseCase {
 			refreshToken = newRefreshToken.token;
 		}
 
-		const account = await this.accountRepository.getByAccountId(accountId);
-
-		if (!account) {
-			throw new CustomError("Account not found", StatusCodeEnum.NOT_FOUND);
-		}
-
 		const { accessToken, expiresAt } =
 			await this.accessTokenManager.genAccessToken({
 				accountId,
-				admin: account.admin ? true : undefined,
+				admin: admin ? true : undefined,
 			});
 
 		return {

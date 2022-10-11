@@ -1,10 +1,10 @@
 import { AccountService } from "../../../factories/account";
-import type { AccountEntity } from "../../../models/account";
+import type { CreateWithDiscordIdInput } from "../../../models/account";
 import type { HttpManager } from "../../../providers/http-manager";
 import { Validations } from "../../../providers/implementations/validations";
 
 export const getByDiscordId = (serverInstance: HttpManager) => {
-	serverInstance.addRoute<AccountEntity>(
+	serverInstance.addRoute<CreateWithDiscordIdInput>(
 		{
 			method: "GET",
 			path: "accounts/discord",

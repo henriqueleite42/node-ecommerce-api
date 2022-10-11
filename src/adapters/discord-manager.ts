@@ -57,6 +57,23 @@ export interface SendMessageInput {
 	components?: Array<Array<Component>>;
 }
 
+export interface ExchangeCodeOutput {
+	scopes: Array<string>;
+	accessToken: string;
+	refreshToken: string;
+	expiresAt: Date;
+}
+
+export interface GetUserDataOutput {
+	id: string;
+	avatar?: string;
+	banner?: string;
+}
+
 export interface DiscordManager {
 	sendMessage: (p: SendMessageInput) => Promise<void>;
+
+	exchangeCode: (code: string) => Promise<ExchangeCodeOutput>;
+
+	getUserData: (accessToken: string) => Promise<GetUserDataOutput>;
 }
