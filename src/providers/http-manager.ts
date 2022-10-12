@@ -64,7 +64,10 @@ export class HttpRoute<I = any> extends Route<HttpRouteFunc<I>> {
 			return {
 				statusCode: this.getStatusCode(),
 				body: result,
-				headers: Object.fromEntries(headers.entries()),
+				headers: Object.fromEntries(headers.entries()) as Record<
+					string,
+					string
+				>,
 			};
 		} catch (err: any) {
 			if (err instanceof CustomError) {

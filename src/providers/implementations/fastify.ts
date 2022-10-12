@@ -47,12 +47,16 @@ export class FastifyHttpProvider extends HttpManager {
 		const path = route.getPath();
 
 		this.fastifyInstance[method as "get"](`/${path}`, async (req, res) => {
-			const { statusCode, body } = await route.execFunc({
+			const { statusCode, body, headers } = await route.execFunc({
 				body: req.body as any,
 				query: req.query as any,
 				headers: req.headers as any,
 				path: req.params as any,
 			});
+
+			if (headers) {
+				res.headers(headers);
+			}
 
 			res.status(statusCode).send(body);
 		});
