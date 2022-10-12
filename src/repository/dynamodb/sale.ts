@@ -27,6 +27,7 @@ import { DynamodbRepository } from ".";
 
 import { genId } from "../../utils/id/gen-id";
 
+import type { SaleOriginEnum } from "../../types/enums/origin";
 import { SalesStatusEnum } from "../../types/enums/sale-status";
 
 export interface SaleTable {
@@ -35,7 +36,7 @@ export interface SaleTable {
 	clientId: string;
 	status: SalesStatusEnum;
 	products: SaleEntity["products"];
-	origin: SaleEntity["origin"];
+	origin: `${SaleOriginEnum}#${string}`;
 	coupon: SaleEntity["coupon"];
 	originalValue: number;
 	finalValue?: number;

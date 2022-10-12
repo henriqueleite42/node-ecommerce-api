@@ -4,15 +4,10 @@ import type { PaginatedItems } from "./types";
 
 import type { DeliveryMethodEnum } from "../types/enums/delivery-method";
 import type { DiscountTypeEnum } from "../types/enums/discount-type";
+import type { SaleOriginEnum } from "../types/enums/origin";
 import type { PaymentMethodEnum } from "../types/enums/payment-method";
-import type { PlatformEnum } from "../types/enums/platform";
 import type { ProductTypeEnum } from "../types/enums/product-type";
 import type { SalesStatusEnum } from "../types/enums/sale-status";
-
-export interface SaleOrigin {
-	platform: PlatformEnum;
-	id: string;
-}
 
 export interface SaleCoupon {
 	code: string;
@@ -38,7 +33,7 @@ export interface SaleEntity {
 	storeId: string;
 	clientId: string;
 	coupon?: SaleCoupon;
-	origin: SaleOrigin;
+	origin: `${SaleOriginEnum}#${string}`;
 	status: SalesStatusEnum;
 	products: Array<SaleProduct>;
 	originalValue: number;
