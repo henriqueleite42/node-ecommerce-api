@@ -60,7 +60,7 @@ export interface GetContentFileInput {
 	contentId: string;
 }
 
-export interface GetUrlToUploadRawImgInput {
+export interface GetUrlToUploadRawMediaInput {
 	storeId: string;
 	productId: string;
 	contentId: string;
@@ -80,8 +80,8 @@ export interface ContentUseCase {
 		p: CreateManyWithUrlInput,
 	) => Promise<Array<ContentEntity>>;
 
-	getUrlToUploadRawImg: (
-		p: GetUrlToUploadRawImgInput,
+	getUrlToUploadRawMedia: (
+		p: GetUrlToUploadRawMediaInput,
 	) => Promise<GetUrlToUploadOutput>;
 
 	getContentFile: (p: GetContentFileInput) => Promise<GetFileOutput>;

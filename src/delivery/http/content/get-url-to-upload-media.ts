@@ -1,48 +1,44 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { ContentService } from "../../../factories/content";
-import type { GetContentFileInput } from "../../../models/content";
+import type { GetUrlToUploadRawMediaInput } from "../../../models/content";
 import type { HttpManager } from "../../../providers/http-manager";
 import { Validations } from "../../../providers/implementations/validations";
 
-export const getContentFile = (server: HttpManager) => {
-	server.addRoute<GetContentFileInput>(
+export const getUrlToUploadMedia = (server: HttpManager) => {
+	server.addRoute<GetUrlToUploadRawMediaInput>(
 		{
 			method: "GET",
-			path: "content/:storeId/:productId/:contentId",
+			path: "content/upload-media",
 			auth: ["REST_USER"],
 			validations: [
 				{
-					key: "accountId",
+					key: "storeId",
 					loc: "auth",
 					validations: [Validations.required, Validations.id],
 				},
 				{
-					key: "storeId",
-					loc: "path",
-					validations: [Validations.required, Validations.id],
-				},
-				{
 					key: "productId",
-					loc: "path",
+					loc: "query",
 					validations: [Validations.required, Validations.code],
 				},
 				{
 					key: "contentId",
-					loc: "path",
+					loc: "query",
 					validations: [Validations.required, Validations.id],
+				},
+				{
+					key: "type",
+					loc: "query",
+					validations: [Validations.required, Validations.mediaType],
 				},
 			],
 		},
 		route =>
-			route.setFunc(async (p, headers) => {
+			route.setFunc(p => {
 				const service = new ContentService().getInstance();
 
-				const { contentType, file } = await service.getContentFile(p);
-
-				headers.set("content-type", contentType);
-
-				return file;
+				return service.getUrlToUploadRawMedia(p);
 			}),
 	);
 };

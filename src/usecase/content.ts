@@ -6,7 +6,7 @@ import type {
 	CreateManyWithUrlInput,
 	EditInput,
 	GetContentFileInput,
-	GetUrlToUploadRawImgInput,
+	GetUrlToUploadRawMediaInput,
 } from "../models/content";
 import type { UploadManager } from "../providers/upload-manager";
 
@@ -44,12 +44,12 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 		return contents;
 	}
 
-	public getUrlToUploadRawImg({
+	public getUrlToUploadRawMedia({
 		storeId,
 		productId,
 		contentId,
 		type,
-	}: GetUrlToUploadRawImgInput) {
+	}: GetUrlToUploadRawMediaInput) {
 		return this.uploadManager.getUrlToUpload({
 			folder: process.env.CONTENT_RAW_MEDIA_BUCKET_NAME!,
 			fileName: `${storeId}/${productId}/${contentId}`,
