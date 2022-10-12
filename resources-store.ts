@@ -220,6 +220,12 @@ export const resourcesStore: AWS["resources"] = {
 				TopicName: "${self:service}-${opt:stage, 'local'}-store-created",
 			},
 		},
+		StoreVerifiedTopic: {
+			Type: "AWS::SNS::Topic",
+			Properties: {
+				TopicName: "${self:service}-${opt:stage, 'local'}-store-verified",
+			},
+		},
 		IncrementStoresCountQueue: {
 			Type: "AWS::SQS::Queue",
 			Properties: {
@@ -335,6 +341,24 @@ export const resourcesStore: AWS["resources"] = {
 								Ref: "AWS::StackName",
 							},
 							"StoreCreatedTopicArn",
+						],
+					],
+				},
+			}
+		},
+		StoreVerifiedTopicArn: {
+			Value: {
+				Ref: "StoreVerifiedTopic"
+			},
+			Export: {
+				Name: {
+					"Fn::Join": [
+						":",
+						[
+							{
+								Ref: "AWS::StackName",
+							},
+							"StoreVerifiedTopicArn",
 						],
 					],
 				},

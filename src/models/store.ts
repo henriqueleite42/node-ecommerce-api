@@ -13,6 +13,7 @@ export interface StoreEntity {
 	color?: string;
 	bannerUrl?: string;
 	avatarUrl?: string;
+	verified: boolean;
 	createdAt: Date;
 }
 
@@ -67,6 +68,10 @@ export interface StoreRepository {
  *
  */
 
+export interface VerifyInput {
+	storeId: string;
+}
+
 export interface GetUrlToUploadImgInput {
 	storeId: string;
 }
@@ -88,6 +93,8 @@ export interface StoreUseCase {
 	create: (p: CreateInput) => Promise<StoreEntity>;
 
 	edit: (p: EditInput) => Promise<StoreEntity>;
+
+	verify: (p: VerifyInput) => Promise<void>;
 
 	getUrlToUploadAvatar: (
 		p: GetUrlToUploadImgInput,

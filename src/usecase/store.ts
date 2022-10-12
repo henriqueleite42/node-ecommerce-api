@@ -14,6 +14,7 @@ import type {
 	StoreRepository,
 	StoreUseCase,
 	GetUrlToUploadImgInput,
+	VerifyInput,
 } from "../models/store";
 import type { UploadManager } from "../providers/upload-manager";
 
@@ -131,6 +132,18 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 		}
 
 		return store;
+	}
+
+	public async verify({ storeId }: VerifyInput) {
+		const store = await this.edit({
+			storeId,
+			verified: true,
+		});
+
+		await this.topicManager.sendMsg({
+			to: process.env.STORE_STORE_VERIFIED_TOPIC_ARN!,
+			message: store,
+		});
 	}
 
 	public getUrlToUploadAvatar({ storeId }: GetUrlToUploadImgInput) {

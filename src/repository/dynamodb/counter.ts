@@ -47,7 +47,7 @@ export interface CounterTable {
 }
 
 export class CounterRepositoryDynamoDB
-	extends DynamodbRepository<CounterTable, undefined>
+	extends DynamodbRepository<CounterTable, CounterTable>
 	implements CounterRepository
 {
 	protected readonly tableName = "counters";
@@ -210,7 +210,7 @@ export class CounterRepositoryDynamoDB
 		throw new Error("NOT_IMPLEMENTED");
 	}
 
-	protected tableToEntity(): undefined {
+	protected tableToEntity(): CounterTable {
 		throw new Error("NOT_IMPLEMENTED");
 	}
 }

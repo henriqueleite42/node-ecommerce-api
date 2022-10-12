@@ -28,6 +28,7 @@ export interface StoreTable {
 	color?: string;
 	bannerPath?: string;
 	avatarPath?: string;
+	verified: boolean;
 	createdAt: string;
 }
 
@@ -54,6 +55,7 @@ export class StoreRepositoryDynamoDB
 			color,
 			bannerUrl,
 			avatarUrl,
+			verified: false,
 			createdAt: new Date(),
 		};
 
@@ -67,23 +69,12 @@ export class StoreRepositoryDynamoDB
 		return item;
 	}
 
-	public edit({
-		storeId,
-		description,
-		color,
-		bannerUrl,
-		avatarUrl,
-	}: EditInput) {
+	public edit({ storeId, ...data }: EditInput) {
 		return this.update(
 			this.indexStoreId({
 				storeId,
 			}).Key,
-			{
-				description,
-				color,
-				bannerUrl,
-				avatarUrl,
-			},
+			data,
 		);
 	}
 
@@ -208,6 +199,7 @@ export class StoreRepositoryDynamoDB
 			bannerUrl: table.bannerPath
 				? `${process.env.STORE_MEDIA_STORAGE_CLOUDFRONT_URL}/${table.bannerPath}`
 				: undefined,
+			verified: table.verified,
 			createdAt: new Date(table.createdAt),
 		};
 	}

@@ -129,7 +129,7 @@ export const resourcesEventAlert: AWS["resources"] = {
 				},
 				Region: "${self:custom.region.${opt:stage, 'local'}}",
 				TopicArn: {
-					"Fn::ImportValue": "store-${opt:stage, 'local'}:StoreCreatedTopicArn"
+					"Fn::ImportValue": "store-${opt:stage, 'local'}:StoreVerifiedTopicArn"
 				},
 			},
 		},

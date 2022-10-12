@@ -25,7 +25,10 @@ export const getDynamoInstance = (config: DynamoDBClientConfig = {}) => {
 	return new DynamoDBClient(config);
 };
 
-export abstract class DynamodbRepository<TableType, EntityType> {
+export abstract class DynamodbRepository<
+	TableType,
+	EntityType extends Record<string, any>,
+> {
 	protected tableName: string;
 
 	public constructor(protected readonly dynamodb: DynamoDBClient) {}
@@ -98,8 +101,8 @@ export abstract class DynamodbRepository<TableType, EntityType> {
 		);
 	}
 
-	protected async update(keys: Record<string, any>, data: Record<string, any>) {
-		const dataToUpdate = cleanObj(data);
+	protected async update(keys: Record<string, any>, data: Partial<EntityType>) {
+		const dataToUpdate = cleanObj<Partial<EntityType>>(data);
 
 		const result = await this.dynamodb.send(
 			new UpdateItemCommand({
@@ -129,7 +132,7 @@ export abstract class DynamodbRepository<TableType, EntityType> {
 
 	// Internal Methods
 
-	private getUpdateData(d: Record<string, any>) {
+	private getUpdateData(d: Partial<EntityType>) {
 		const updateExpression = [] as Array<string>;
 		const expressionAttributeNames = {} as Record<string, string>;
 		const expressionAttributeValues = {} as Record<string, any>;
