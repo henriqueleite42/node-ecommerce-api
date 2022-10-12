@@ -1,3 +1,5 @@
+import type { SalePaidMessage } from "./sale";
+
 export interface AccessEntity {
 	accountId: string;
 	storeId: string;
@@ -42,7 +44,7 @@ export interface AccessRepository {
  */
 
 export interface AccessUseCase {
-	createMany: (p: CreateManyInput) => Promise<void>;
+	giveAccessAfterSale: (p: SalePaidMessage) => Promise<void>;
 
 	get: (p: AccessIds) => Promise<AccessEntity>;
 }

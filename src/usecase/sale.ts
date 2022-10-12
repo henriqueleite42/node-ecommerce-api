@@ -18,7 +18,7 @@ import type {
 	SaleRepository,
 	SaleUseCase,
 	CheckoutSaleInput,
-	PaymentProcessedMessage,
+	SalePaidMessage,
 	SaleCreatedMessage,
 	SetProductAsDeliveredInput,
 	SaleDeliveredMessage,
@@ -375,8 +375,8 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 			status: SalesStatusEnum.PAID,
 		});
 
-		await this.topicManager.sendMsg<PaymentProcessedMessage>({
-			to: process.env.SALE_PAYMENT_PROCESSED_TOPIC_ARN!,
+		await this.topicManager.sendMsg<SalePaidMessage>({
+			to: process.env.SALE_SALE_PAID_TOPIC_ARN!,
 			message: sale,
 		});
 	}

@@ -220,7 +220,7 @@ export interface SaleUseCase {
 
 export type SaleCreatedMessage = SaleEntity;
 
-export type PaymentProcessedMessage = SaleEntity;
+export type SalePaidMessage = SaleEntity;
 
 export type SaleDeliveredMessage = SaleEntity;
 

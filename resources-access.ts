@@ -55,5 +55,25 @@ export const resourcesAccess: AWS["resources"] = {
 				],
 			},
 		},
+		GiveAccessAfterSaleQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'local'}-increment-products-count",
+			},
+		},
+		GiveAccessAfterSaleSubscription: {
+			Type: "AWS::SNS::Subscription",
+			Properties: {
+				Protocol: "sqs",
+				Endpoint: {
+					"Fn::GetAtt": ["GiveAccessAfterSaleQueue", "Arn"],
+				},
+				Region: "${self:custom.region.${opt:stage, 'local'}}",
+				TopicArn: {
+					"Fn::ImportValue": "sale-${opt:stage, 'local'}:SalePaidTopicArn"
+				},
+			},
+		},
 	},
 };

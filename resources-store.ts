@@ -256,7 +256,7 @@ export const resourcesStore: AWS["resources"] = {
 				},
 				Region: "${self:custom.region.${opt:stage, 'local'}}",
 				TopicArn: {
-					"Fn::ImportValue": "sale-${opt:stage, 'local'}:PaymentProcessedTopicArn"
+					"Fn::ImportValue": "sale-${opt:stage, 'local'}:SalePaidTopicArn"
 				},
 			},
 		},
@@ -276,7 +276,7 @@ export const resourcesStore: AWS["resources"] = {
 				},
 				Region: "${self:custom.region.${opt:stage, 'local'}}",
 				TopicArn: {
-					"Fn::ImportValue": "sale-${opt:stage, 'local'}:PaymentProcessedTopicArn"
+					"Fn::ImportValue": "sale-${opt:stage, 'local'}:SalePaidTopicArn"
 				},
 			},
 		},

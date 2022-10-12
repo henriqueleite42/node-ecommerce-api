@@ -1,4 +1,3 @@
-import { SNSAdapter } from "../adapters/implementations/sns";
 import type { AccessUseCase } from "../models/access";
 import { getDynamoInstance } from "../repository/dynamodb";
 import { AccessRepositoryDynamoDB } from "../repository/dynamodb/access";
@@ -13,11 +12,10 @@ export class AccessService extends Service<AccessUseCase> {
 		if (instance) return instance;
 
 		const dynamodb = getDynamoInstance();
-		const sns = new SNSAdapter();
 
 		const accessRepository = new AccessRepositoryDynamoDB(dynamodb);
 
-		const newInstance = new AccessUseCaseImplementation(accessRepository, sns);
+		const newInstance = new AccessUseCaseImplementation(accessRepository);
 
 		instance = newInstance;
 
