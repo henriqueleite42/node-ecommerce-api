@@ -9,6 +9,7 @@ import type {
 	ContentRepository,
 	CreateManyInput,
 	EditInput,
+	GetContentInput,
 } from "../../models/content";
 
 import { DynamodbRepository } from ".";
@@ -85,7 +86,7 @@ export class ContentRepositoryDynamoDB
 
 	public edit({ storeId, productId, contentId, ...data }: EditInput) {
 		return this.update(
-			this.indexStoreIdProductIdContentId({
+			this.indexMain({
 				storeId,
 				productId,
 				contentId,
@@ -94,15 +95,18 @@ export class ContentRepositoryDynamoDB
 		);
 	}
 
+	public getContent(keys: GetContentInput) {
+		return this.getSingleItem(this.indexMain(keys));
+	}
+
 	// Keys
 
-	private indexStoreIdProductIdContentId({
+	private indexMain({
 		storeId,
 		productId,
 		contentId,
 	}: Pick<ContentEntity, "contentId" | "productId" | "storeId">) {
 		return {
-			IndexName: "StoreIdProductIdContentId",
 			KeyConditionExpression:
 				"#storeId_productId_contentId = :storeId_productId_contentId",
 			ExpressionAttributeNames: {

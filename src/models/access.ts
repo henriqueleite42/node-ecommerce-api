@@ -4,7 +4,6 @@ export interface AccessEntity {
 	accountId: string;
 	storeId: string;
 	productId: string;
-	variationId?: string;
 	contentId?: string;
 	createdAt: Date;
 }
@@ -17,14 +16,13 @@ export interface AccessEntity {
  *
  */
 
-export type AccessIds = Omit<AccessEntity, "createdAt" | "expiresAt">;
+export type AccessId = Omit<AccessEntity, "createdAt" | "expiresAt">;
 
 export interface CreateManyInput {
 	accountId: string;
 	accesses: Array<{
 		storeId: string;
 		productId: string;
-		variationId?: string;
 		contentId?: string;
 	}>;
 }
@@ -32,7 +30,7 @@ export interface CreateManyInput {
 export interface AccessRepository {
 	createMany: (p: CreateManyInput) => Promise<Array<AccessEntity>>;
 
-	get: (p: AccessIds) => Promise<AccessEntity | null>;
+	get: (p: AccessId) => Promise<AccessEntity | null>;
 }
 
 /**
@@ -46,7 +44,7 @@ export interface AccessRepository {
 export interface AccessUseCase {
 	giveAccessAfterSale: (p: SalePaidMessage) => Promise<void>;
 
-	get: (p: AccessIds) => Promise<AccessEntity>;
+	get: (p: AccessId) => Promise<AccessEntity>;
 }
 
 /**

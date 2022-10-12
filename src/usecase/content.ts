@@ -1,16 +1,25 @@
+import type { FileManager } from "../adapters/file-manager";
+import type { AccessRepository } from "../models/access";
 import type {
 	ContentRepository,
 	ContentUseCase,
 	CreateManyWithUrlInput,
 	EditInput,
+	GetContentFileInput,
 	GetUrlToUploadRawImgInput,
 } from "../models/content";
 import type { UploadManager } from "../providers/upload-manager";
 
+import { CustomError } from "../utils/error";
+
+import { StatusCodeEnum } from "../types/enums/status-code";
+
 export class ContentUseCaseImplementation implements ContentUseCase {
 	public constructor(
 		private readonly contentRepository: ContentRepository,
+		private readonly accessRepository: AccessRepository,
 		private readonly uploadManager: UploadManager,
+		private readonly fileManager: FileManager,
 	) {}
 
 	public async createManyWithUrl(p: CreateManyWithUrlInput) {
@@ -50,5 +59,54 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 
 	public edit(p: EditInput) {
 		return this.contentRepository.edit(p);
+	}
+
+	public async getContentFile({
+		accountId,
+		storeId,
+		productId,
+		contentId,
+	}: GetContentFileInput) {
+		const [content, ...accesses] = await Promise.all([
+			this.contentRepository.getContent({
+				storeId,
+				productId,
+				contentId,
+			}),
+
+			// Access to specific content
+			this.accessRepository.get({
+				accountId,
+				storeId,
+				productId,
+				contentId,
+			}),
+
+			// Access to all contents of a product
+			this.accessRepository.get({
+				accountId,
+				storeId,
+				productId,
+			}),
+		]);
+
+		if (accesses.filter(Boolean).length === 0) {
+			throw new CustomError("Forbidden", StatusCodeEnum.FORBIDDEN);
+		}
+
+		if (!content?.rawContentPath) {
+			throw new CustomError("Not found", StatusCodeEnum.NOT_FOUND);
+		}
+
+		const file = await this.fileManager.getFile({
+			folder: process.env.CONTENT_RAW_MEDIA_BUCKET_NAME!,
+			fileName: content.rawContentPath,
+		});
+
+		if (!file) {
+			throw new CustomError("Not found", StatusCodeEnum.NOT_FOUND);
+		}
+
+		return file;
 	}
 }

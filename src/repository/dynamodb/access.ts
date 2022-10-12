@@ -6,7 +6,7 @@ import { cleanObj } from "@techmmunity/utils";
 
 import type {
 	AccessEntity,
-	AccessIds,
+	AccessId,
 	AccessRepository,
 	CreateManyInput,
 } from "../../models/access";
@@ -17,7 +17,6 @@ export interface AccessTable {
 	accountId: string;
 	storeId: string;
 	productId: string;
-	variationId?: string;
 	contentId?: string;
 	createdAt: string;
 
@@ -36,11 +35,10 @@ export class AccessRepositoryDynamoDB
 		const createdAt = new Date();
 
 		const items: Array<AccessEntity> = accesses.map(
-			({ storeId, productId, variationId }) => ({
+			({ storeId, productId }) => ({
 				accountId,
 				productId,
 				storeId,
-				variationId,
 				createdAt,
 			}),
 		);
@@ -80,31 +78,26 @@ export class AccessRepositoryDynamoDB
 		return items;
 	}
 
-	public get(keys: AccessIds) {
-		return this.getSingleItem(
-			this.indexAccountIdStoreIdProductIdVariationId(keys),
-		);
+	public get(keys: AccessId) {
+		return this.getSingleItem(this.indexAccountIdStoreIdProductId(keys));
 	}
 
 	// Keys
 
-	private indexAccountIdStoreIdProductIdVariationId(
+	private indexAccountIdStoreIdProductId(
 		entity: Pick<
 			AccessEntity,
-			"accountId" | "contentId" | "productId" | "storeId" | "variationId"
+			"accountId" | "contentId" | "productId" | "storeId"
 		>,
 	) {
 		const accountId = `ACCOUNT#${entity.accountId}`;
 		const storeId = `STORE#${entity.storeId}`;
 		const productId = `PRODUCT#${entity.productId}`;
-		const variationId = entity.variationId
-			? `VARIATION#${entity.variationId}`
-			: undefined;
 		const contentId = entity.contentId
 			? `CONTENT#${entity.contentId}`
 			: undefined;
 
-		const pk = [accountId, storeId, productId, variationId, contentId]
+		const pk = [accountId, storeId, productId, contentId]
 			.filter(Boolean)
 			.join("#");
 
@@ -132,41 +125,30 @@ export class AccessRepositoryDynamoDB
 		const productId = entity.productId
 			? `PRODUCT#${entity.productId}`
 			: undefined;
-		const variationId = entity.variationId
-			? `VARIATION#${entity.variationId}`
-			: undefined;
 		const contentId = entity.contentId
 			? `CONTENT#${entity.contentId}`
 			: undefined;
 		const createdAt = entity.createdAt?.toISOString();
 
 		const pk =
-			[accountId, storeId, productId, variationId, contentId]
-				.filter(Boolean)
-				.join("#") || undefined;
+			[accountId, storeId, productId, contentId].filter(Boolean).join("#") ||
+			undefined;
 
 		const createdAt_sk =
 			createdAt && productId
-				? [createdAt, productId, variationId, contentId]
-						.filter(Boolean)
-						.join("#")
+				? [createdAt, productId, contentId].filter(Boolean).join("#")
 				: undefined;
 
 		return cleanObj({
 			accountId,
 			storeId,
 			productId,
-			variationId,
 			createdAt,
 
 			pk,
 			createdAt_sk,
 			accountId_storeId:
 				accountId && storeId ? `${accountId}#${storeId}` : undefined,
-			createdAt_productId_variationId:
-				createdAt && productId && variationId
-					? `${createdAt}#${productId}#${variationId}`
-					: undefined,
 		});
 	}
 
@@ -175,7 +157,6 @@ export class AccessRepositoryDynamoDB
 			accountId: table.accountId.replace("ACCOUNT#", ""),
 			storeId: table.storeId.replace("STORE#", ""),
 			productId: table.productId.replace("PRODUCT#", ""),
-			variationId: table.variationId?.replace("VARIATION#", ""),
 			contentId: table.contentId?.replace("CONTENT#", ""),
 			createdAt: new Date(table.createdAt),
 		};

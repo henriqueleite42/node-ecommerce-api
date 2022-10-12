@@ -6,7 +6,12 @@ import { CustomError } from "../utils/error";
 
 import { StatusCodeEnum } from "../types/enums/status-code";
 
-export type RouteMethods = "DELETE" | "GET" | "PATCH" | "POST" | "PUT";
+type RouteMethods = "DELETE" | "GET" | "PATCH" | "POST" | "PUT";
+
+type HttpRouteFunc<I> = (
+	p: I,
+	headers: Map<string, string>,
+) => Promise<Record<string, any>> | Record<string, any> | undefined;
 
 export interface HttpRouteConfig<I> {
 	method: RouteMethods;
@@ -23,7 +28,7 @@ export interface ExecFuncInput {
 	path?: Record<string, string>;
 }
 
-export class HttpRoute<I = any> extends Route<I> {
+export class HttpRoute<I = any> extends Route<HttpRouteFunc<I>> {
 	public constructor(
 		protected readonly validatorManager: Validator<I> | undefined,
 		protected readonly authManager: AuthManager | undefined,
@@ -53,11 +58,13 @@ export class HttpRoute<I = any> extends Route<I> {
 				? this.validatorManager.validate(input)
 				: input);
 
-			const result = await this.func(validatedData as any);
+			const headers = new Map();
+			const result = await this.func(validatedData as any, headers);
 
 			return {
 				statusCode: this.getStatusCode(),
 				body: result,
+				headers: Object.fromEntries(headers.entries()),
 			};
 		} catch (err: any) {
 			if (err instanceof CustomError) {

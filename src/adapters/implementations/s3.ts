@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { S3Client } from "@aws-sdk/client-s3";
+import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
 
 import type {
 	FileManager,
+	GetFileInput,
 	GetUrlToUploadInput,
 	SaveFileInput,
 } from "../../adapters/file-manager";
@@ -65,6 +66,22 @@ export class S3Adapter implements FileManager {
 		return {
 			url,
 			headers: fields,
+		};
+	}
+
+	public async getFile({ folder, fileName }: GetFileInput) {
+		const result = await this.s3.send(
+			new GetObjectCommand({
+				Bucket: folder,
+				Key: fileName,
+			}),
+		);
+
+		if (!result) return;
+
+		return {
+			file: result.Body as ReadableStream,
+			contentType: result.ContentType as string,
 		};
 	}
 }

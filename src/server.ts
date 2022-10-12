@@ -5,6 +5,7 @@ import { CloudformationAdapter } from "./adapters/implementations/cloudfront";
 import { SSMAdapter } from "./adapters/implementations/ssm";
 import { accountDomain } from "./delivery/http/account";
 import { blacklistDomain } from "./delivery/http/blacklist";
+import { contentDomain } from "./delivery/http/content";
 import { eventAlertDomainDomain } from "./delivery/http/event-alert";
 import { productDomain } from "./delivery/http/product";
 import { saleDomain } from "./delivery/http/sale";
@@ -26,6 +27,7 @@ const bootstrap = async () => {
 
 	await accountDomain(params);
 	await blacklistDomain(params);
+	await contentDomain(params);
 	await eventAlertDomainDomain(params);
 	await productDomain(params);
 	await saleDomain(params);

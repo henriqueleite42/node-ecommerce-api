@@ -1,5 +1,5 @@
 import type {
-	AccessIds,
+	AccessId,
 	AccessRepository,
 	AccessUseCase,
 } from "../models/access";
@@ -32,7 +32,7 @@ export class AccessUseCaseImplementation implements AccessUseCase {
 		});
 	}
 
-	public async get(p: AccessIds) {
+	public async get(p: AccessId) {
 		const access = await this.accessRepository.get(p);
 
 		if (!access) {

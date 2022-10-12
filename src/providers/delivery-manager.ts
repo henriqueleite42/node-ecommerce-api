@@ -1,11 +1,12 @@
-type Func<I> = (
+export type BaseRouteFunc<I> = (
 	p: I,
+	...extra: any
 ) => Promise<Record<string, any>> | Record<string, any> | undefined;
 
-export abstract class Route<I> {
-	protected func: Func<I>;
+export abstract class Route<F> {
+	protected func: F;
 
-	public setFunc(func: Func<I>) {
+	public setFunc(func: F) {
 		this.func = func;
 
 		return this;
@@ -19,6 +20,6 @@ export abstract class DeliveryManager {
 
 	public abstract addRoute<I>(
 		config: any,
-		r: (route: Route<I>) => Route<I>,
+		r: (route: Route<BaseRouteFunc<I>>) => Route<BaseRouteFunc<I>>,
 	): this;
 }

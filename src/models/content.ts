@@ -1,3 +1,4 @@
+import type { GetFileOutput } from "../adapters/file-manager";
 import type { GetUrlToUploadOutput } from "../providers/upload-manager";
 
 import type { MediaTypeEnum } from "../types/enums/media-type";
@@ -30,10 +31,18 @@ export interface CreateManyInput
 export type EditInput = Partial<Omit<ContentEntity, "createdAt" | "type">> &
 	Pick<ContentEntity, "contentId" | "productId" | "storeId">;
 
+export interface GetContentInput {
+	storeId: string;
+	productId: string;
+	contentId: string;
+}
+
 export interface ContentRepository {
 	createMany: (p: CreateManyWithUrlInput) => Promise<Array<ContentEntity>>;
 
 	edit: (p: EditInput) => Promise<ContentEntity | null>;
+
+	getContent: (p: GetContentInput) => Promise<ContentEntity | null>;
 }
 
 /**
@@ -43,6 +52,13 @@ export interface ContentRepository {
  *
  *
  */
+
+export interface GetContentFileInput {
+	accountId: string;
+	storeId: string;
+	productId: string;
+	contentId: string;
+}
 
 export interface GetUrlToUploadRawImgInput {
 	storeId: string;
@@ -67,6 +83,8 @@ export interface ContentUseCase {
 	getUrlToUploadRawImg: (
 		p: GetUrlToUploadRawImgInput,
 	) => Promise<GetUrlToUploadOutput>;
+
+	getContentFile: (p: GetContentFileInput) => Promise<GetFileOutput>;
 
 	edit: (p: EditInput) => Promise<ContentEntity | null>;
 }

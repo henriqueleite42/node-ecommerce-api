@@ -1,5 +1,4 @@
 import type { TopicManager } from "../adapters/topic-manager";
-import type { ContentUseCase } from "../models/content";
 import type { CounterRepository } from "../models/counter";
 import type {
 	CreateProductInput,
@@ -29,7 +28,6 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 	public constructor(
 		private readonly productRepository: ProductRepository,
 		private readonly counterRepository: CounterRepository,
-		private readonly contentUseCase: ContentUseCase,
 		private readonly uploadManager: UploadManager,
 		private readonly topicManager: TopicManager,
 	) {}
@@ -69,14 +67,6 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 				},
 				mediaUrl: imageUrl,
 				mediaType: MediaTypeEnum.IMAGE,
-			});
-		}
-
-		if (p.contents && p.contents.length > 0) {
-			await this.contentUseCase.createManyWithUrl({
-				productId: product.productId,
-				storeId: product.storeId,
-				contents: p.contents,
 			});
 		}
 

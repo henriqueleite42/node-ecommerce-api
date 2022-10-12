@@ -24,8 +24,20 @@ export interface GetUrlToUploadOutput {
 	headers: Record<string, string>;
 }
 
+export interface GetFileInput {
+	folder: string;
+	fileName: string;
+}
+
+export interface GetFileOutput {
+	file: ReadableStream;
+	contentType: string;
+}
+
 export interface FileManager {
 	saveFile: (p: SaveFileInput) => Promise<SaveFileOutput>;
 
 	getUrlToUpload: (p: GetUrlToUploadInput) => Promise<GetUrlToUploadOutput>;
+
+	getFile: (p: GetFileInput) => Promise<GetFileOutput | void>;
 }
