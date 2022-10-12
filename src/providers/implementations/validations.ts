@@ -264,6 +264,24 @@ export class Validations {
 		}
 	}
 
+	public static refreshToken(key: string, p?: any) {
+		if (!p) return;
+
+		if (typeof p !== "string") {
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+
+		if (!/^[a-z0-9!@#$%^&*()_+-=,./;<>?~]{64}$/i.test(p)) {
+			throw new CustomError(
+				`${key} must be a valid refresh token`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+	}
+
 	// Business
 
 	public static username(key: string, p?: any) {

@@ -8,6 +8,7 @@ import type {
 	AuthOutput,
 	CreateAccountWithDiscordInput,
 	AccountEntity,
+	RefreshInput,
 } from "../models/account";
 import type {
 	CreateMagicLinkInput,
@@ -114,6 +115,28 @@ export class AccountUseCaseImplementation implements AccountUseCase {
 
 		return this.genAuthData(account);
 	}
+
+	public async refresh(p: RefreshInput) {
+		const refreshToken = await this.refreshTokenRepository.getByToken({
+			token: p.refreshToken,
+		});
+
+		if (!refreshToken) {
+			throw new CustomError("Magic link not Found", StatusCodeEnum.NOT_FOUND);
+		}
+
+		const { accountId } = refreshToken;
+
+		const account = await this.accountRepository.getByAccountId(accountId);
+
+		if (!account) {
+			throw new CustomError("Account not Found", StatusCodeEnum.NOT_FOUND);
+		}
+
+		return this.genAuthData(account);
+	}
+
+	// Private
 
 	private async genAuthData({
 		accountId,

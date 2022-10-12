@@ -66,6 +66,10 @@ export interface CreateMagicLinkOutput {
 	token: string;
 }
 
+export interface RefreshInput {
+	refreshToken: string;
+}
+
 export interface AccountUseCase {
 	createWithDiscord: (p: CreateAccountWithDiscordInput) => Promise<AuthOutput>;
 
@@ -76,4 +80,6 @@ export interface AccountUseCase {
 	createMagicLink: (p: CreateMagicLinkInput) => Promise<CreateMagicLinkOutput>;
 
 	signInWithMagicLink: (p: GetMagicLinkInput) => Promise<AuthOutput>;
+
+	refresh: (p: RefreshInput) => Promise<AuthOutput>;
 }
