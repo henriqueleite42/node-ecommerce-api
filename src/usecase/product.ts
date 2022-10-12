@@ -1,7 +1,7 @@
 import type { TopicManager } from "../adapters/topic-manager";
 import type { CounterRepository } from "../models/counter";
 import type {
-	CreateProductInput,
+	CreateInput,
 	EditInput,
 	GetProductsByTypeInput,
 	ProductRepository,
@@ -32,7 +32,7 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 		private readonly topicManager: TopicManager,
 	) {}
 
-	public async create({ imageUrl, ...p }: CreateProductInput) {
+	public async create(p: CreateInput) {
 		if (p.variations && p.price) {
 			throw new CustomError(
 				"The product cannot have a prive if it has variations",
@@ -51,48 +51,22 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 
 		await this.topicManager.sendMsg<ProductCreatedMessage>({
 			to: process.env.PRODUCT_PRODUCT_CREATED_TOPIC_ARN!,
-			message: {
-				...product,
-				imageUrl,
-			},
+			message: product,
 		});
-
-		if (imageUrl) {
-			await this.uploadManager.uploadFromUrl({
-				folder: process.env.PRODUCT_MEDIA_BUCKET_NAME!,
-				fileName: `${p.storeId}/${product.productId}`,
-				id: {
-					storeId: product.storeId,
-					productId: product.productId,
-				},
-				mediaUrl: imageUrl,
-				mediaType: MediaTypeEnum.IMAGE,
-			});
-		}
 
 		return product;
 	}
 
-	public async edit({ imageUrl, ...p }: EditInput) {
-		const product = await (Object.keys(p).length === 0
-			? this.productRepository.getById(p)
-			: this.productRepository.edit(p));
+	public async edit(p: EditInput) {
+		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
+		if (Object.keys(p).length === 2) {
+			throw new CustomError("Nothing to edit", StatusCodeEnum.BAD_REQUEST);
+		}
+
+		const product = await this.productRepository.edit(p);
 
 		if (!product) {
 			throw new CustomError("Not found", StatusCodeEnum.NOT_FOUND);
-		}
-
-		if (imageUrl) {
-			await this.uploadManager.uploadFromUrlBackground({
-				folder: process.env.PRODUCT_MEDIA_BUCKET_NAME!,
-				fileName: `${p.storeId}/${p.productId}`,
-				id: {
-					storeId: p.storeId,
-					productId: p.productId,
-				},
-				mediaUrl: imageUrl,
-				mediaType: MediaTypeEnum.IMAGE,
-			});
 		}
 
 		return product;

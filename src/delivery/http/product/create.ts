@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
 import { ProductService } from "../../../factories/product";
-import type { CreateProductInput } from "../../../models/product";
+import type { CreateInput } from "../../../models/product";
 import type { HttpManager } from "../../../providers/http-manager";
 import { Validations } from "../../../providers/implementations/validations";
 
 import { StatusCodeEnum } from "../../../types/enums/status-code";
 
 export const create = (server: HttpManager) => {
-	server.addRoute<CreateProductInput>(
+	server.addRoute<CreateInput>(
 		{
 			method: "POST",
 			path: "products",
@@ -52,11 +52,6 @@ export const create = (server: HttpManager) => {
 					validations: [Validations.productPrice],
 				},
 				{
-					key: "imageUrl",
-					loc: "body",
-					validations: [Validations.url],
-				},
-				{
 					key: "variations",
 					loc: "body",
 					validations: [
@@ -80,25 +75,6 @@ export const create = (server: HttpManager) => {
 							},
 						]),
 						Validations.arrayUnique("name"),
-					],
-				},
-				{
-					key: "contents",
-					loc: "body",
-					validations: [
-						Validations.minLength(1),
-						Validations.maxLength(500),
-						Validations.arrOfObj([
-							{
-								key: "type",
-								validations: [Validations.required, Validations.mediaType],
-							},
-							{
-								key: "mediaUrl",
-								validations: [Validations.required, Validations.url],
-							},
-						]),
-						Validations.arrayUnique("mediaUrl"),
 					],
 				},
 			],

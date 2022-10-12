@@ -24,7 +24,7 @@ export const func = s3Manager
 	.setFunc(async ({ service, data }) => {
 		const [productId, storeId] = data.key.split("/").reverse();
 
-		await service.edit({
+		await service.updateImg({
 			storeId,
 			productId,
 			imageUrl: data.key,

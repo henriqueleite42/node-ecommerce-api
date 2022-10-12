@@ -3,7 +3,6 @@ import type { GetUrlToUploadOutput } from "../providers/upload-manager";
 import type { PaginatedItems } from "./types";
 
 import type { DeliveryMethodEnum } from "../types/enums/delivery-method";
-import type { MediaTypeEnum } from "../types/enums/media-type";
 import type { ProductTypeEnum } from "../types/enums/product-type";
 
 interface ProductVariation {
@@ -88,14 +87,7 @@ export interface ProductRepository {
  *
  *
  */
-
-export interface CreateProductInput extends CreateInput {
-	imageUrl: ProductEntity["imageUrl"];
-	contents?: Array<{
-		type: MediaTypeEnum;
-		mediaUrl: string;
-	}>;
-}
+export type EditProductInput = Omit<EditInput, "imageUrl">;
 
 export interface GetUrlToUploadImgInput {
 	storeId: string;
@@ -124,9 +116,9 @@ export interface GetProductsCountOutput {
 }
 
 export interface ProductUseCase {
-	create: (p: CreateProductInput) => Promise<ProductEntity>;
+	create: (p: CreateInput) => Promise<ProductEntity>;
 
-	edit: (p: EditInput) => Promise<ProductEntity>;
+	edit: (p: EditProductInput) => Promise<ProductEntity>;
 
 	delete: (p: DeleteInput) => Promise<void>;
 

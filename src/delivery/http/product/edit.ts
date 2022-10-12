@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
 import { ProductService } from "../../../factories/product";
-import type { EditInput } from "../../../models/product";
+import type { EditProductInput } from "../../../models/product";
 import type { HttpManager } from "../../../providers/http-manager";
 import { Validations } from "../../../providers/implementations/validations";
 
 export const edit = (server: HttpManager) => {
-	server.addRoute<EditInput>(
+	server.addRoute<EditProductInput>(
 		{
 			method: "PATCH",
 			path: "products",
@@ -42,11 +42,6 @@ export const edit = (server: HttpManager) => {
 					key: "price",
 					loc: "body",
 					validations: [Validations.productPrice],
-				},
-				{
-					key: "imageUrl",
-					loc: "body",
-					validations: [Validations.url],
 				},
 			],
 		},
