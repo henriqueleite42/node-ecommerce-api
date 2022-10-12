@@ -1,5 +1,6 @@
 import { create } from "./store/create";
 import { edit } from "./store/edit";
+import { getById } from "./store/get-by-id";
 import { getByName } from "./store/get-by-name";
 import { getUrlToUploadAvatar } from "./store/get-url-to-upload-avatar";
 import { getUrlToUploadBanner } from "./store/get-url-to-upload-banner";
@@ -18,6 +19,7 @@ export const storeDomain = async ({
 
 	create(server);
 	edit(server);
+	getById(server);
 	getByName(server);
 	getUrlToUploadAvatar(server);
 	getUrlToUploadBanner(server);

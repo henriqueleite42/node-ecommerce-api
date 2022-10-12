@@ -108,6 +108,8 @@ export interface StoreUseCase {
 
 	removeProductType: (p: ProductEntity) => Promise<void>;
 
+	getById: (p: GetByIdInput) => Promise<StoreEntity>;
+
 	getByName: (p: GetByNameInput) => Promise<StoreEntity>;
 
 	getTop: () => Promise<Array<StoreEntity>>;

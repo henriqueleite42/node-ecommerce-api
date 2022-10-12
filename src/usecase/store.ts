@@ -15,6 +15,7 @@ import type {
 	StoreUseCase,
 	GetUrlToUploadImgInput,
 	VerifyInput,
+	GetByIdInput,
 } from "../models/store";
 import type { UploadManager } from "../providers/upload-manager";
 
@@ -190,6 +191,16 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 				productType: type,
 			});
 		}
+	}
+
+	public async getById(p: GetByIdInput) {
+		const store = await this.storeRepository.getById(p);
+
+		if (!store) {
+			throw new CustomError("Store not found", StatusCodeEnum.NOT_FOUND);
+		}
+
+		return store;
 	}
 
 	public async getByName(p: GetByNameInput) {
