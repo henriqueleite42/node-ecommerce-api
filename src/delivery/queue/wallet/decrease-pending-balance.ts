@@ -13,7 +13,7 @@ import { SQSProvider } from "../../../providers/implementations/sqs";
 
 const sqsManager = new SQSProvider<SaleEntity, WalletUseCase>({
 	from: "TOPIC",
-	queue: "IncrementBalance",
+	queue: "DecreasePendingBalance",
 }).setService(new WalletService());
 
 /**
@@ -24,9 +24,9 @@ const sqsManager = new SQSProvider<SaleEntity, WalletUseCase>({
 
 export const func = sqsManager
 	.setFunc(async ({ service, data }) => {
-		await service.incrementBalance({
+		await service.incrementPendingBalance({
 			accountId: data.storeId,
-			amount: data.finalValue!,
+			amount: -data.finalValue!,
 		});
 	})
 	.getFunc();
@@ -37,4 +37,7 @@ export const func = sqsManager
  *
  */
 
-export const incrementBalance = sqsManager.getHandler(__dirname, __filename);
+export const decreasePendingBalance = sqsManager.getHandler(
+	__dirname,
+	__filename,
+);

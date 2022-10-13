@@ -178,10 +178,22 @@ export const resourcesSale: AWS["resources"] = {
 				TopicName: "${self:service}-${opt:stage, 'local'}-sale-delivered",
 			},
 		},
+		SaleDeliveryConfirmedTopic: {
+			Type: "AWS::SNS::Topic",
+			Properties: {
+				TopicName: "${self:service}-${opt:stage, 'local'}-sale-delivery-confirmed",
+			},
+		},
 		SalesExpiredTopic: {
 			Type: "AWS::SNS::Topic",
 			Properties: {
 				TopicName: "${self:service}-${opt:stage, 'local'}-sales-expired",
+			},
+		},
+		SaleRefundedTopic: {
+			Type: "AWS::SNS::Topic",
+			Properties: {
+				TopicName: "${self:service}-${opt:stage, 'local'}-sales-refunded",
 			},
 		},
 	},
@@ -240,6 +252,24 @@ export const resourcesSale: AWS["resources"] = {
 				},
 			}
 		},
+		SaleDeliveryConfirmedTopicArn: {
+			Value: {
+				Ref: "SaleDeliveryConfirmedTopic"
+			},
+			Export: {
+				Name: {
+					"Fn::Join": [
+						":",
+						[
+							{
+								Ref: "AWS::StackName",
+							},
+							"SaleDeliveryConfirmedTopicArn",
+						],
+					],
+				},
+			}
+		},
 		SalesExpiredTopicArn: {
 			Value: {
 				Ref: "SalesExpiredTopic"
@@ -253,6 +283,24 @@ export const resourcesSale: AWS["resources"] = {
 								Ref: "AWS::StackName",
 							},
 							"SalesExpiredTopicArn",
+						],
+					],
+				},
+			}
+		},
+		SaleRefundedTopicArn: {
+			Value: {
+				Ref: "SaleRefundedTopic"
+			},
+			Export: {
+				Name: {
+					"Fn::Join": [
+						":",
+						[
+							{
+								Ref: "AWS::StackName",
+							},
+							"SaleRefundedTopicArn",
 						],
 					],
 				},

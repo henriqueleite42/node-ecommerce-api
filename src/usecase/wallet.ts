@@ -3,10 +3,11 @@
 import type {
 	WalletUseCase,
 	WalletRepository,
-	IncrementBalanceInput,
+	IncrementPendingBalanceInput,
 	AdminWithdrawalInput,
 	CreateInput,
 	AddWWMPixInput,
+	ReleasePendingBalanceInput,
 } from "../models/wallet";
 
 import { CustomError } from "../utils/error";
@@ -30,24 +31,57 @@ export class WalletUseCaseImplementation implements WalletUseCase {
 		return this.walletRepository.create(p);
 	}
 
-	public async incrementBalance({ accountId, amount }: IncrementBalanceInput) {
+	public async incrementPendingBalance({
+		accountId,
+		amount,
+	}: IncrementPendingBalanceInput) {
 		const { monetizzerProfit, gnFee, storeProfit } =
 			this.getFeeTaxProfit(amount);
 
 		await Promise.all([
-			this.walletRepository.incrementBalance({
+			this.walletRepository.incrementPendingBalance({
 				accountId: "OFFICIAL",
 				amount: monetizzerProfit,
 			}),
-			this.walletRepository.incrementBalance({
+			this.walletRepository.incrementPendingBalance({
 				accountId: "GERENCIANET",
 				amount: gnFee,
 			}),
-			this.walletRepository.incrementBalance({
+			this.walletRepository.incrementPendingBalance({
 				accountId,
 				amount: storeProfit,
 			}),
 		]);
+	}
+
+	public async releasePendingBalance({
+		accountId,
+		amount,
+	}: ReleasePendingBalanceInput) {
+		const wallet = await this.walletRepository.getById({ accountId });
+
+		if (!wallet) {
+			throw new CustomError("Wallet not found", StatusCodeEnum.NOT_FOUND);
+		}
+
+		if (wallet.pendingBalance < amount) {
+			throw new CustomError(
+				"Insufficient pending funds",
+				StatusCodeEnum.NOT_ACCEPTABLE,
+			);
+		}
+
+		await this.walletRepository
+			.releasePendingBalance({
+				accountId,
+				amount,
+			})
+			.catch(() => {
+				throw new CustomError(
+					"Insufficient pending funds",
+					StatusCodeEnum.NOT_ACCEPTABLE,
+				);
+			});
 	}
 
 	public async adminWithdrawal({
@@ -62,11 +96,11 @@ export class WalletUseCaseImplementation implements WalletUseCase {
 		}
 
 		await Promise.all([
-			this.walletRepository.incrementBalance({
+			this.walletRepository.incrementPendingBalance({
 				accountId: adminId,
 				amount,
 			}),
-			this.walletRepository.incrementBalance({
+			this.walletRepository.incrementPendingBalance({
 				accountId,
 				amount: -amount,
 			}),

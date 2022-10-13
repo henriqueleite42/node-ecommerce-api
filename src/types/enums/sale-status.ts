@@ -6,7 +6,15 @@ export enum SalesStatusEnum {
 	PENDING = "PENDING",
 	PAID = "PAID",
 	DELIVERED = "DELIVERED",
+
+	// Ended in a happy way
+	DELIVERY_CONFIRMED = "DELIVERY_CONFIRMED",
+
+	// Ended in a sad way
 	CANCELED = "CANCELED",
 	REFUNDED = "REFUNDED",
 	EXPIRED = "EXPIRED",
+
+	// A problem occurred and we are trying to solve
+	IN_DISPUTE = "IN_DISPUTE",
 }

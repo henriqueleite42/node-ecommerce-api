@@ -7,6 +7,11 @@ const PROVISIONED_THROUGHPUT_WALLETS = {
 
 export const resourcesWallet: AWS["resources"] = {
 	Resources: {
+		/**
+		 *
+		 * Database
+		 *
+		 */
 		WalletDynamoDBTable: {
 			DeletionPolicy: "Retain",
 			UpdateReplacePolicy: "Retain",
@@ -28,6 +33,11 @@ export const resourcesWallet: AWS["resources"] = {
 				],
 			},
 		},
+		/**
+		 *
+		 * Queues And Topics
+		 *
+		 */
 		CreateWalletQueue: {
 			Type: "AWS::SQS::Queue",
 			Properties: {
@@ -48,23 +58,63 @@ export const resourcesWallet: AWS["resources"] = {
 				},
 			},
 		},
-		IncrementBalanceQueue: {
+		DecreasePendingBalanceQueue: {
 			Type: "AWS::SQS::Queue",
 			Properties: {
 				QueueName:
-					"${self:service}-${opt:stage, 'local'}-increment-balance",
+					"${self:service}-${opt:stage, 'local'}-decrease-pending-balance",
 			},
 		},
-		IncrementBalanceSubscription: {
+		DecreasePendingBalanceSubscription: {
 			Type: "AWS::SNS::Subscription",
 			Properties: {
 				Protocol: "sqs",
 				Endpoint: {
-					"Fn::GetAtt": ["IncrementBalanceQueue", "Arn"],
+					"Fn::GetAtt": ["DecreasePendingBalanceQueue", "Arn"],
+				},
+				Region: "${self:custom.region.${opt:stage, 'local'}}",
+				TopicArn: {
+					"Fn::ImportValue": "sale-${opt:stage, 'local'}:SaleRefundedTopicArn"
+				},
+			},
+		},
+		IncrementPendingBalanceQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'local'}-increment-pending-balance",
+			},
+		},
+		IncrementPendingBalanceSubscription: {
+			Type: "AWS::SNS::Subscription",
+			Properties: {
+				Protocol: "sqs",
+				Endpoint: {
+					"Fn::GetAtt": ["IncrementPendingBalanceQueue", "Arn"],
 				},
 				Region: "${self:custom.region.${opt:stage, 'local'}}",
 				TopicArn: {
 					"Fn::ImportValue": "sale-${opt:stage, 'local'}:SaleDeliveredTopicArn"
+				},
+			},
+		},
+		ReleasePendingBalanceQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'local'}-release-pending-balance",
+			},
+		},
+		ReleasePendingBalanceSubscription: {
+			Type: "AWS::SNS::Subscription",
+			Properties: {
+				Protocol: "sqs",
+				Endpoint: {
+					"Fn::GetAtt": ["ReleasePendingBalanceQueue", "Arn"],
+				},
+				Region: "${self:custom.region.${opt:stage, 'local'}}",
+				TopicArn: {
+					"Fn::ImportValue": "sale-${opt:stage, 'local'}:SaleDeliveryConfirmedTopicArn"
 				},
 			},
 		},

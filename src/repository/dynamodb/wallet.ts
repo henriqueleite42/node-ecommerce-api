@@ -8,10 +8,11 @@ import type {
 	WalletEntity,
 	WalletRepository,
 	GetByIdInput,
-	IncrementBalanceInput,
+	IncrementPendingBalanceInput,
 	WithdrawalInput,
 	CreateInput,
 	AddWWMInput,
+	ReleasePendingBalanceInput,
 } from "../../models/wallet";
 
 import { DynamodbRepository } from ".";
@@ -19,6 +20,7 @@ import { DynamodbRepository } from ".";
 export interface WalletTable {
 	accountId: string;
 	balance: number;
+	pendingBalance: number;
 	withdrawalMethods: WalletEntity["withdrawalMethods"];
 }
 
@@ -32,6 +34,7 @@ export class WalletRepositoryDynamoDB
 		const item: WalletEntity = {
 			accountId,
 			balance: 0,
+			pendingBalance: 0,
 			withdrawalMethods: [],
 		};
 
@@ -45,12 +48,37 @@ export class WalletRepositoryDynamoDB
 		return item;
 	}
 
-	public async incrementBalance({ accountId, amount }: IncrementBalanceInput) {
+	public async incrementPendingBalance({
+		accountId,
+		amount,
+	}: IncrementPendingBalanceInput) {
 		await this.dynamodb.send(
 			new UpdateItemCommand({
 				TableName: this.tableName,
-				UpdateExpression: "SET #balance = #balance + :amount",
+				UpdateExpression: "SET #pendingBalance = #pendingBalance + :amount",
 				ExpressionAttributeNames: {
+					"#pendingBalance": "pendingBalance",
+				},
+				ExpressionAttributeValues: marshall({
+					":amount": amount,
+				}),
+				Key: this.indexAccountId({ accountId }).Key,
+			}),
+		);
+	}
+
+	public async releasePendingBalance({
+		accountId,
+		amount,
+	}: ReleasePendingBalanceInput) {
+		await this.dynamodb.send(
+			new UpdateItemCommand({
+				TableName: this.tableName,
+				UpdateExpression:
+					"SET #pendingBalance = #pendingBalance - :amount, #balance = #balance + :amount",
+				ConditionExpression: "#pendingBalance >= :amount",
+				ExpressionAttributeNames: {
+					"#pendingBalance": "pendingBalance",
 					"#balance": "balance",
 				},
 				ExpressionAttributeValues: marshall({
@@ -128,6 +156,7 @@ export class WalletRepositoryDynamoDB
 		return cleanObj({
 			accountId: entity.accountId ? `ACCOUNT#${entity.accountId}` : undefined,
 			balance: entity.balance,
+			pendingBalance: entity.pendingBalance,
 			withdrawalMethods: entity.withdrawalMethods,
 		});
 	}
@@ -136,6 +165,7 @@ export class WalletRepositoryDynamoDB
 		return {
 			accountId: table.accountId.replace("ACCOUNT#", ""),
 			balance: table.balance,
+			pendingBalance: table.pendingBalance,
 			withdrawalMethods: table.withdrawalMethods,
 		};
 	}
