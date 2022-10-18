@@ -1,6 +1,10 @@
 import type { GetFileOutput } from "../adapters/file-manager";
 import type { GetUrlToUploadOutput } from "../providers/upload-manager";
 
+import type { AccountAccessStoreEntity } from "./access-content";
+import type { SalePaidMessage } from "./sale";
+import type { PaginatedItems } from "./types";
+
 import type { MediaTypeEnum } from "../types/enums/media-type";
 
 export interface ContentEntity {
@@ -37,12 +41,23 @@ export interface GetContentInput {
 	contentId: string;
 }
 
+export interface GetFromProductInput {
+	storeId: string;
+	productId: string;
+	limit: number;
+	cursor?: string;
+}
+
 export interface ContentRepository {
 	createMany: (p: CreateManyWithUrlInput) => Promise<Array<ContentEntity>>;
 
 	edit: (p: EditInput) => Promise<ContentEntity | null>;
 
 	getContent: (p: GetContentInput) => Promise<ContentEntity | null>;
+
+	getFromProduct: (
+		p: GetFromProductInput,
+	) => Promise<PaginatedItems<ContentEntity>>;
 }
 
 /**
@@ -75,6 +90,12 @@ export interface CreateManyWithUrlInput
 	}>;
 }
 
+export interface GetUserAccessStoresInput {
+	accountId: string;
+	limit: number;
+	cursor: string;
+}
+
 export interface ContentUseCase {
 	createManyWithUrl: (
 		p: CreateManyWithUrlInput,
@@ -87,4 +108,10 @@ export interface ContentUseCase {
 	getContentFile: (p: GetContentFileInput) => Promise<GetFileOutput>;
 
 	edit: (p: EditInput) => Promise<ContentEntity | null>;
+
+	getUserAccessStores: (
+		p: GetUserAccessStoresInput,
+	) => Promise<PaginatedItems<AccountAccessStoreEntity>>;
+
+	giveAccessAfterSale: (p: SalePaidMessage) => Promise<void>;
 }

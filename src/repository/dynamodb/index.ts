@@ -67,8 +67,9 @@ export abstract class DynamodbRepository<
 
 		if (!result.Items) {
 			return {
-				items: [],
+				items: [] as Array<EntityType>,
 				curPage: continueFrom,
+				nextPage: undefined,
 			};
 		}
 

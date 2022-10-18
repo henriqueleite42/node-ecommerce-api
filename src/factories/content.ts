@@ -3,8 +3,10 @@ import { SQSAdapter } from "../adapters/implementations/sqs";
 import type { ContentUseCase } from "../models/content";
 import { UploadManagerProvider } from "../providers/implementations/upload-manager";
 import { getDynamoInstance } from "../repository/dynamodb";
-import { AccessRepositoryDynamoDB } from "../repository/dynamodb/access";
+import { AccessContentRepositoryDynamoDB } from "../repository/dynamodb/access-content";
+import { AccountAccessStoreRepositoryDynamoDB } from "../repository/dynamodb/account-access-store";
 import { ContentRepositoryDynamoDB } from "../repository/dynamodb/content";
+import { StoreRepositoryDynamoDB } from "../repository/dynamodb/store";
 import { ContentUseCaseImplementation } from "../usecase/content";
 
 import { Service } from ".";
@@ -20,13 +22,18 @@ export class ContentService extends Service<ContentUseCase> {
 		const s3 = new S3Adapter();
 
 		const contentRepository = new ContentRepositoryDynamoDB(dynamodb);
-		const accessRepository = new AccessRepositoryDynamoDB(dynamodb);
+		const accessRepository = new AccessContentRepositoryDynamoDB(dynamodb);
+		const accountAccessStoreRepository =
+			new AccountAccessStoreRepositoryDynamoDB(dynamodb);
+		const storeRepository = new StoreRepositoryDynamoDB(dynamodb);
 
 		const uploadManager = new UploadManagerProvider(sqs, s3);
 
 		const newInstance = new ContentUseCaseImplementation(
 			contentRepository,
 			accessRepository,
+			accountAccessStoreRepository,
+			storeRepository,
 			uploadManager,
 			s3,
 		);

@@ -15,6 +15,7 @@ import { resourcesStore } from "./resources-store";
 import { resourcesUpload } from "./resources-upload";
 import { resourcesWallet } from "./resources-wallet";
 
+import { contentSQS } from "./src/delivery/queue/content";
 import { discord } from "./src/delivery/queue/discord";
 import { eventAlert } from "./src/delivery/queue/event-alert";
 import { productSQS } from "./src/delivery/queue/product";
@@ -110,7 +111,10 @@ const contentConfig = {
 		"serverless-webpack",
 	],
 	resources: resourcesContent,
-	functions: contentS3,
+	functions: {
+		...contentS3,
+		...contentSQS
+	},
 };
 
 const counterConfig = {

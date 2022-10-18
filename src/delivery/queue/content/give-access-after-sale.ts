@@ -6,15 +6,15 @@
  *
  */
 
-import { AccessService } from "../../../factories/access";
-import type { AccessUseCase } from "../../../models/access";
+import { ContentService } from "../../../factories/content";
+import type { ContentUseCase } from "../../../models/content";
 import type { SalePaidMessage } from "../../../models/sale";
 import { SQSProvider } from "../../../providers/implementations/sqs";
 
-const sqsManager = new SQSProvider<SalePaidMessage, AccessUseCase>({
+const sqsManager = new SQSProvider<SalePaidMessage, ContentUseCase>({
 	from: "TOPIC",
 	queue: "GiveAccessAfterSale",
-}).setService(new AccessService());
+}).setService(new ContentService());
 
 /**
  *

@@ -10,6 +10,7 @@ import type {
 	CreateManyInput,
 	EditInput,
 	GetContentInput,
+	GetFromProductInput,
 } from "../../models/content";
 
 import { DynamodbRepository } from ".";
@@ -99,6 +100,10 @@ export class ContentRepositoryDynamoDB
 		return this.getSingleItem(this.indexMain(keys));
 	}
 
+	public getFromProduct({ limit, cursor, ...keys }: GetFromProductInput) {
+		return this.getMultipleItems(this.indexFromProduct(keys), limit, cursor);
+	}
+
 	// Keys
 
 	private indexMain({
@@ -117,6 +122,22 @@ export class ContentRepositoryDynamoDB
 			}),
 			Key: marshall({
 				storeId_productId_contentId: `STORE#${storeId}#PRODUCT#${productId}#CONTENT#${contentId}`,
+			}),
+		};
+	}
+
+	private indexFromProduct({
+		storeId,
+		productId,
+	}: Pick<ContentEntity, "productId" | "storeId">) {
+		return {
+			Index: "StoreIdProductIdCreatedAtContentId",
+			KeyConditionExpression: "#storeId_productId = :storeId_productId",
+			ExpressionAttributeNames: {
+				"#storeId_productId": "storeId_productId",
+			},
+			ExpressionAttributeValues: marshall({
+				":storeId_productId": `STORE#${storeId}#PRODUCT#${productId}`,
 			}),
 		};
 	}
