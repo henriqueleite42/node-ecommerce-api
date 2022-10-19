@@ -7,6 +7,11 @@ const PROVISIONED_THROUGHPUT_SALES = {
 
 export const resourcesSale: AWS["resources"] = {
 	Resources: {
+		/**
+		 *
+		 * Database
+		 *
+		 */
 		SaleDynamoDBTable: {
 			DeletionPolicy: "Retain",
 			UpdateReplacePolicy: "Retain",
@@ -160,6 +165,11 @@ export const resourcesSale: AWS["resources"] = {
 				],
 			},
 		},
+		/**
+		 *
+		 * Queues And Topics
+		 *
+		 */
 		SaleCreatedTopic: {
 			Type: "AWS::SNS::Topic",
 			Properties: {
@@ -194,6 +204,66 @@ export const resourcesSale: AWS["resources"] = {
 			Type: "AWS::SNS::Topic",
 			Properties: {
 				TopicName: "${self:service}-${opt:stage, 'local'}-sales-refunded",
+			},
+		},
+		HandleSaleDeliveryQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'local'}-handle-sale-delivery",
+			},
+		},
+		HandleSaleDeliverySubscription: {
+			Type: "AWS::SNS::Subscription",
+			Properties: {
+				Protocol: "sqs",
+				Endpoint: {
+					"Fn::GetAtt": ["HandleSaleDeliveryQueue", "Arn"],
+				},
+				Region: "${self:custom.region.${opt:stage, 'local'}}",
+				TopicArn: {
+					Ref: "SalePaidTopic",
+				},
+			},
+		},
+		SetSaleProductAsDeliveredQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'local'}-setSaleProductAsDelivered",
+			},
+		},
+		SetSaleProductAsDeliveredSubscription: {
+			Type: "AWS::SNS::Subscription",
+			Properties: {
+				Protocol: "sqs",
+				Endpoint: {
+					"Fn::GetAtt": ["SetSaleProductAsDeliveredQueue", "Arn"],
+				},
+				Region: "${self:custom.region.${opt:stage, 'local'}}",
+				TopicArn: {
+					"Fn::ImportValue": "content-${opt:stage, 'local'}:AccessGrantedTopicArn"
+				},
+			},
+		},
+		NotifySellerSaleDeliveryConfirmedQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'local'}-notify-seller-sale-delivery-confirmed",
+			},
+		},
+		NotifySellerSaleDeliveryConfirmedSubscription: {
+			Type: "AWS::SNS::Subscription",
+			Properties: {
+				Protocol: "sqs",
+				Endpoint: {
+					"Fn::GetAtt": ["NotifySellerSaleDeliveryConfirmedQueue", "Arn"],
+				},
+				Region: "${self:custom.region.${opt:stage, 'local'}}",
+				TopicArn: {
+					Ref: "SalePaidTopic",
+				},
 			},
 		},
 	},

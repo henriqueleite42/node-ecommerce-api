@@ -1,8 +1,11 @@
 import type { CreateMagicLinkInput, GetMagicLinkInput } from "./magic-link";
 
+import type { PlatformEnum } from "../types/enums/platform";
+
 export interface AccountEntity {
 	accountId: string;
 	admin: boolean;
+	notifyThrough: PlatformEnum;
 	discordId?: string;
 	discord?: {
 		accessToken: string;

@@ -98,6 +98,24 @@ export const resourcesContent: AWS["resources"] = {
 				},
 			},
 		},
+		/**
+		 *
+		 * Queues And Topics
+		 *
+		 */
+		GiveBuyerAccessToSaleProductsQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'local'}-give-buyer-access-to-sale-products",
+			},
+		},
+		AccessGrantedTopic: {
+			Type: "AWS::SNS::Topic",
+			Properties: {
+				TopicName: "${self:service}-${opt:stage, 'local'}-access-granted",
+			},
+		},
 	},
 	Outputs: {
 		RawMediaBucketName: {
@@ -113,6 +131,42 @@ export const resourcesContent: AWS["resources"] = {
 								Ref: "AWS::StackName",
 							},
 							"RawMediaBucketName",
+						],
+					],
+				},
+			}
+		},
+		GiveBuyerAccessToSaleProductsUrl: {
+			Value: {
+				Ref: "GiveBuyerAccessToSaleProducts"
+			},
+			Export: {
+				Name: {
+					"Fn::Join": [
+						":",
+						[
+							{
+								Ref: "AWS::StackName",
+							},
+							"GiveBuyerAccessToSaleProductsUrl",
+						],
+					],
+				},
+			}
+		},
+		AccessGrantedArn: {
+			Value: {
+				Ref: "AccessGranted"
+			},
+			Export: {
+				Name: {
+					"Fn::Join": [
+						":",
+						[
+							{
+								Ref: "AWS::StackName",
+							},
+							"AccessGrantedArn",
 						],
 					],
 				},

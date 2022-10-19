@@ -33,7 +33,7 @@ export interface SaleEntity {
 	storeId: string;
 	clientId: string;
 	coupon?: SaleCoupon;
-	origin: `${SaleOriginEnum}#${string}`;
+	origin: `${SaleOriginEnum}#${string | "PV"}`;
 	status: SalesStatusEnum;
 	products: Array<SaleProduct>;
 	originalValue: number;
@@ -203,6 +203,8 @@ export interface SaleUseCase {
 	) => Promise<PaginatedItems<SaleEntity>>;
 
 	setExpiredStatus: () => Promise<void>;
+
+	handleSaleDelivery: (p: SalePaidMessage) => Promise<void>;
 }
 
 /**
@@ -218,6 +220,8 @@ export type SaleCreatedMessage = SaleEntity;
 export type SalePaidMessage = SaleEntity;
 
 export type SaleDeliveredMessage = SaleEntity;
+
+export type SaleDeliveryConfirmedMessage = SaleEntity;
 
 export interface SaleExpiredMessage {
 	sales: Array<SaleEntity>;

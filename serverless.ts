@@ -19,6 +19,7 @@ import { contentSQS } from "./src/delivery/queue/content";
 import { discord } from "./src/delivery/queue/discord";
 import { eventAlert } from "./src/delivery/queue/event-alert";
 import { productSQS } from "./src/delivery/queue/product";
+import { saleSQS } from "./src/delivery/queue/sale";
 import { storeSQS } from "./src/delivery/queue/store";
 import { upload } from "./src/delivery/queue/upload";
 import { wallet } from "./src/delivery/queue/wallet";
@@ -186,6 +187,7 @@ const productConfig = {
 const saleConfig = {
 	service: "sale",
 	resources: resourcesSale,
+	functions: saleSQS,
 };
 
 const storeConfig = {

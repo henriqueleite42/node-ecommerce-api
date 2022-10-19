@@ -15,10 +15,13 @@ import { DynamodbRepository } from ".";
 
 import { genId } from "../../utils/id/gen-id";
 
+import { PlatformEnum } from "../../types/enums/platform";
+
 export interface AccountTable {
 	accountId: string;
 	admin: boolean;
-	discordId: string;
+	notifyThrough: PlatformEnum;
+	discordId?: string;
 	discord?: {
 		accessToken: string;
 		refreshToken: string;
@@ -42,6 +45,7 @@ export class AccountRepositoryDynamoDB
 			admin: false,
 			discordId,
 			discord,
+			notifyThrough: PlatformEnum.DISCORD,
 			createdAt: new Date(),
 		};
 
@@ -62,6 +66,7 @@ export class AccountRepositoryDynamoDB
 			accountId: await genId(),
 			discordId,
 			admin: false,
+			notifyThrough: PlatformEnum.DISCORD,
 			createdAt: new Date(),
 		};
 
@@ -128,6 +133,7 @@ export class AccountRepositoryDynamoDB
 		return cleanObj({
 			accountId: entity.accountId ? `ACCOUNT#${entity.accountId}` : undefined,
 			admin: entity.admin,
+			notifyThrough: entity.notifyThrough,
 			discordId: entity.discordId ? `DISCORD#${entity.discordId}` : undefined,
 			discord: entity.discord
 				? {
@@ -143,7 +149,8 @@ export class AccountRepositoryDynamoDB
 		return {
 			accountId: table.accountId.replace("ACCOUNT#", ""),
 			admin: table.admin,
-			discordId: table.discordId.replace("DISCORD#", ""),
+			notifyThrough: table.notifyThrough,
+			discordId: table.discordId?.replace("DISCORD#", ""),
 			discord: table.discord
 				? {
 						...table.discord,

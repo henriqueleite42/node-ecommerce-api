@@ -41,3 +41,29 @@ export interface DiscordUseCase {
 		p: SendNewProductAnnouncementMessagesInput,
 	) => Promise<void>;
 }
+
+/**
+ *
+ *
+ * Topic Messages
+ *
+ *
+ */
+
+export interface DiscordNotifySellerCustomProductsSaleMessage {
+	sale: SaleEntity;
+	accountId: string;
+	discordId: string;
+}
+
+export interface DiscordNotifySellerLiveProductsSaleMessage {
+	sale: SaleEntity;
+	accountId: string;
+	discordId: string;
+}
+
+export interface DiscordNotifySellerSaleDeliveryConfirmedMessage {
+	sale: SaleEntity;
+	accountId: string;
+	discordId: string;
+}

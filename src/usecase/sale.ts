@@ -3,9 +3,17 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 
 import type { PixManager } from "../adapters/pix-manager";
+import type { QueueManager } from "../adapters/queue-manager";
 import type { TopicManager } from "../adapters/topic-manager";
+import type { AccountRepository } from "../models/account";
 import type { BlacklistRepository } from "../models/blacklist";
+import type { GiveBuyerAccessToSaleMessage } from "../models/content";
 import type { CouponRepository } from "../models/coupon";
+import type {
+	DiscordNotifySellerCustomProductsSaleMessage,
+	DiscordNotifySellerLiveProductsSaleMessage,
+	DiscordNotifySellerSaleDeliveryConfirmedMessage,
+} from "../models/discord";
 import type { ProductEntity, ProductRepository } from "../models/product";
 import type {
 	AddProductSaleInput,
@@ -25,6 +33,7 @@ import type {
 	SaleExpiredMessage,
 	AddCouponInput,
 	SaleCoupon,
+	SaleDeliveryConfirmedMessage,
 } from "../models/sale";
 
 import { CustomError } from "../utils/error";
@@ -32,6 +41,11 @@ import { CustomError } from "../utils/error";
 import { isManualDelivery } from "../types/enums/delivery-method";
 import { DiscountTypeEnum } from "../types/enums/discount-type";
 import { PaymentMethodEnum } from "../types/enums/payment-method";
+import {
+	isCustomProduct,
+	isLiveProduct,
+	isPreMadeProduct,
+} from "../types/enums/product-type";
 import { SalesStatusEnum } from "../types/enums/sale-status";
 import { StatusCodeEnum } from "../types/enums/status-code";
 
@@ -41,7 +55,9 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		private readonly blacklistRepository: BlacklistRepository,
 		private readonly productRepository: ProductRepository,
 		private readonly couponRepository: CouponRepository,
+		private readonly accountRepository: AccountRepository,
 		private readonly topicManager: TopicManager,
+		private readonly queueManager: QueueManager,
 		private readonly pixManager: PixManager,
 	) {}
 
@@ -378,6 +394,9 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		await this.topicManager.sendMsg<SalePaidMessage>({
 			to: process.env.SALE_SALE_PAID_TOPIC_ARN!,
 			message: sale,
+			metadata: {
+				origin: sale.origin,
+			},
 		});
 	}
 
@@ -426,15 +445,27 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 
 		// If all products of the sale where delivered, we must set the sale as delivered
 		if (sale.products.length === productsDelivered) {
-			await this.saleRepository.edit({
-				saleId,
-				status: SalesStatusEnum.DELIVERED,
-			});
+			if (sale.products.every(p => isPreMadeProduct(p.type))) {
+				await this.saleRepository.edit({
+					saleId,
+					status: SalesStatusEnum.DELIVERY_CONFIRMED,
+				});
 
-			await this.topicManager.sendMsg<SaleDeliveredMessage>({
-				to: process.env.SALE_SALE_DELIVERED_TOPIC_ARN!,
-				message: sale,
-			});
+				await this.topicManager.sendMsg<SaleDeliveredMessage>({
+					to: process.env.SALE_SALE_DELIVERY_CONFIRMED_TOPIC_ARN!,
+					message: sale,
+				});
+			} else {
+				await this.saleRepository.edit({
+					saleId,
+					status: SalesStatusEnum.DELIVERED,
+				});
+
+				await this.topicManager.sendMsg<SaleDeliveredMessage>({
+					to: process.env.SALE_SALE_DELIVERED_TOPIC_ARN!,
+					message: sale,
+				});
+			}
 		}
 
 		return saleUpdated!;
@@ -486,6 +517,83 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 
 			cursor = nextPage;
 		} while (cursor);
+	}
+
+	public async handleSaleDelivery(sale: SalePaidMessage) {
+		const hasPreMadeProducts = sale.products.some(p =>
+			isPreMadeProduct(p.type),
+		);
+		const hasCustomMadeProducts = sale.products.some(p =>
+			isCustomProduct(p.type),
+		);
+		const hasLiveProducts = sale.products.some(p => isLiveProduct(p.type));
+
+		if (hasPreMadeProducts) {
+			await this.queueManager.sendMsg<GiveBuyerAccessToSaleMessage>({
+				to: process.env.CONTENT_GIVE_BUYER_ACCESS_TO_SALE_PRODUCTS!,
+				message: sale,
+			});
+		}
+
+		const sellerAccount = await this.accountRepository.getByAccountId(
+			sale.storeId,
+		);
+
+		if (!sellerAccount) return;
+
+		if (hasCustomMadeProducts) {
+			await this.queueManager.sendMsg<DiscordNotifySellerCustomProductsSaleMessage>(
+				{
+					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+					to: process.env[
+						`${sellerAccount?.notifyThrough}_NOTIFY_SELLER_CUSTOM_PRODUCTS_SALE`
+					]!,
+					message: {
+						sale,
+						accountId: sellerAccount.accountId,
+						discordId: sellerAccount.discordId!,
+					},
+				},
+			);
+		}
+
+		if (hasLiveProducts) {
+			await this.queueManager.sendMsg<DiscordNotifySellerLiveProductsSaleMessage>(
+				{
+					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+					to: process.env[
+						`${sellerAccount?.notifyThrough}_NOTIFY_SELLER_LIVE_PRODUCTS_SALE`
+					]!,
+					message: {
+						sale,
+						accountId: sellerAccount.accountId,
+						discordId: sellerAccount.discordId!,
+					},
+				},
+			);
+		}
+	}
+
+	public async notifySellerSaleDelivered(sale: SaleDeliveryConfirmedMessage) {
+		const sellerAccount = await this.accountRepository.getByAccountId(
+			sale.storeId,
+		);
+
+		if (!sellerAccount) return;
+
+		await this.queueManager.sendMsg<DiscordNotifySellerSaleDeliveryConfirmedMessage>(
+			{
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+				to: process.env[
+					`${sellerAccount?.notifyThrough}_NOTIFY_SELLER_SALE_DELIVERY_CONFIRMED`
+				]!,
+				message: {
+					sale,
+					accountId: sellerAccount.accountId,
+					discordId: sellerAccount.discordId!,
+				},
+			},
+		);
 	}
 
 	// Internal Methods

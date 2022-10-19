@@ -7,6 +7,9 @@ import type { QueueManager } from "../adapters/queue-manager";
 import type {
 	DeleteAllFromDiscordChannelInput,
 	DeleteAllFromDiscordGuildInput,
+	DiscordNewProductAnnouncementMessage,
+	DiscordNewSaleAnnouncementMessage,
+	DiscordNewStoreAnnouncementMessage,
 	EventAlertRepository,
 	EventAlertUseCase,
 	GetEventsInput,
@@ -130,7 +133,7 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 					break;
 				}
 
-				await this.queueManager.sendMsg({
+				await this.queueManager.sendMsg<DiscordNewSaleAnnouncementMessage>({
 					to: process.env.DISCORD_NEW_SALE_ANNOUNCEMENT_QUEUE_URL!,
 					message: {
 						items,
@@ -153,7 +156,7 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 		}
 	}
 
-	public async processDiscordNewStoreEvent(sale: StoreEntity) {
+	public async processDiscordNewStoreEvent(store: StoreEntity) {
 		let cursor;
 
 		let delay = 0;
@@ -169,11 +172,11 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 				return;
 			}
 
-			await this.queueManager.sendMsg({
+			await this.queueManager.sendMsg<DiscordNewStoreAnnouncementMessage>({
 				to: process.env.DISCORD_NEW_STORE_ANNOUNCEMENT_QUEUE_URL!,
 				message: {
 					items,
-					sale,
+					store,
 				},
 				delayInSeconds: delay,
 			});
@@ -247,7 +250,7 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 					break;
 				}
 
-				await this.queueManager.sendMsg({
+				await this.queueManager.sendMsg<DiscordNewProductAnnouncementMessage>({
 					to: process.env.DISCORD_NEW_PRODUCT_ANNOUNCEMENT_QUEUE_URL!,
 					message: {
 						items,

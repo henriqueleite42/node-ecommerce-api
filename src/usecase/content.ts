@@ -1,6 +1,7 @@
 /* eslint-disable max-depth */
 /* eslint-disable no-await-in-loop */
 import type { FileManager } from "../adapters/file-manager";
+import type { TopicManager } from "../adapters/topic-manager";
 import type {
 	AccessContentRepository,
 	AccountAccessesStoresRepository,
@@ -32,6 +33,7 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 		private readonly storeRepository: StoreRepository,
 		private readonly uploadManager: UploadManager,
 		private readonly fileManager: FileManager,
+		private readonly topicManager: TopicManager,
 	) {}
 
 	public async createManyWithUrl(p: CreateManyWithUrlInput) {
@@ -108,9 +110,11 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 
 	// eslint-disable-next-line sonarjs/cognitive-complexity
 	public async giveAccessAfterSale({
+		saleId,
 		clientId,
 		storeId,
 		products,
+		origin,
 	}: SalePaidMessage) {
 		const packs = [] as Array<SaleProduct>;
 		const medias = [] as Array<SaleProduct>;
@@ -169,6 +173,18 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 
 					cursor = nextPage;
 				} while (cursor);
+
+				await this.topicManager.sendMsg({
+					to: process.env.CONTENT_ACCESS_GRANTED!,
+					message: {
+						saleId,
+						clientId,
+						product: pack,
+					},
+					metadata: {
+						origin,
+					},
+				});
 			}
 		}
 
@@ -195,6 +211,18 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 						processedContentPath: content.processedContentPath!,
 					},
 				]);
+
+				await this.topicManager.sendMsg({
+					to: process.env.CONTENT_ACCESS_GRANTED!,
+					message: {
+						saleId,
+						clientId,
+						product: media,
+					},
+					metadata: {
+						origin,
+					},
+				});
 			}
 		}
 

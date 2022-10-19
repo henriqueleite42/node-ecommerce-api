@@ -1,10 +1,10 @@
-export interface SendMsgInput {
+export interface SendMsgInput<T> {
 	to: string;
-	message: Record<string, any>;
+	message: T;
 	metadata?: Record<string, number | string>;
 	delayInSeconds?: number;
 }
 
 export interface QueueManager {
-	sendMsg: (p: SendMsgInput) => Promise<void>;
+	sendMsg: <T extends Record<string, any>>(p: SendMsgInput<T>) => Promise<void>;
 }

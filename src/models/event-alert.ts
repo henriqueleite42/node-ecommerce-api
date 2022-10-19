@@ -116,3 +116,28 @@ export interface EventAlertUseCase {
 
 	processDiscordNewSaleEvent: (p: SaleEntity) => Promise<void>;
 }
+
+/**
+ *
+ *
+ * Topic Messages
+ *
+ *
+ */
+
+export interface DiscordNewSaleAnnouncementMessage {
+	items: Array<EventAlertEntity>;
+	sale: SaleEntity;
+	store: StoreEntity;
+}
+
+export interface DiscordNewStoreAnnouncementMessage {
+	items: Array<EventAlertEntity>;
+	store: StoreEntity;
+}
+
+export interface DiscordNewProductAnnouncementMessage {
+	items: Array<EventAlertEntity>;
+	store: StoreEntity;
+	product: ProductEntity;
+}

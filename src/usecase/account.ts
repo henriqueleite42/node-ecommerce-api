@@ -51,10 +51,7 @@ export class AccountUseCaseImplementation implements AccountUseCase {
 		const oldAccount = await this.accountRepository.getByDiscordId(id);
 
 		if (oldAccount) {
-			throw new CustomError(
-				"An account with the same DiscordID already exists",
-				StatusCodeEnum.CONFLICT,
-			);
+			return this.genAuthData(oldAccount);
 		}
 
 		const account = await this.accountRepository.createWithDiscord({

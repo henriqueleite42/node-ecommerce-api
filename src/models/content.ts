@@ -2,7 +2,7 @@ import type { GetFileOutput } from "../adapters/file-manager";
 import type { GetUrlToUploadOutput } from "../providers/upload-manager";
 
 import type { AccountAccessStoreEntity } from "./access-content";
-import type { SalePaidMessage } from "./sale";
+import type { SaleEntity, SalePaidMessage, SaleProduct } from "./sale";
 import type { PaginatedItems } from "./types";
 
 import type { MediaTypeEnum } from "../types/enums/media-type";
@@ -114,4 +114,20 @@ export interface ContentUseCase {
 	) => Promise<PaginatedItems<AccountAccessStoreEntity>>;
 
 	giveAccessAfterSale: (p: SalePaidMessage) => Promise<void>;
+}
+
+/**
+ *
+ *
+ * Topic Messages
+ *
+ *
+ */
+
+export type GiveBuyerAccessToSaleMessage = SaleEntity;
+
+export interface AccessGrantedMessage {
+	saleId: string;
+	clientId: string;
+	product: SaleProduct;
 }
