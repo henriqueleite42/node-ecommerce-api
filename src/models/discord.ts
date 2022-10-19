@@ -9,7 +9,12 @@
 import type { AccessGrantedMessage } from "./content";
 import type { EventAlertEntity } from "./event-alert";
 import type { ProductEntity } from "./product";
-import type { SaleDeliveredMessage, SaleEntity, SalePaidMessage } from "./sale";
+import type {
+	SaleDeliveredMessage,
+	SaleDeliveryConfirmedMessage,
+	SaleEntity,
+	SalePaidMessage,
+} from "./sale";
 import type { StoreEntity } from "./store";
 
 export interface SendNewSaleAnnouncementMessagesInput {
@@ -51,6 +56,12 @@ export interface DiscordUseCase {
 	sendBuyerAccessGrantedMessage: (p: AccessGrantedMessage) => Promise<void>;
 
 	sendBuyerSaleDeliveredMessage: (p: SaleDeliveredMessage) => Promise<void>;
+
+	sendBuyerSaleDeliveryConfirmedMessage: ({
+		saleId,
+		clientId,
+		products,
+	}: SaleDeliveryConfirmedMessage) => Promise<void>;
 }
 
 /**

@@ -19,7 +19,11 @@ import type {
 } from "../models/discord";
 import type { EventAlertEntity } from "../models/event-alert";
 import type { ProductEntity } from "../models/product";
-import type { SaleDeliveredMessage, SalePaidMessage } from "../models/sale";
+import type {
+	SaleDeliveredMessage,
+	SaleDeliveryConfirmedMessage,
+	SalePaidMessage,
+} from "../models/sale";
 
 import { colors } from "../config/colors";
 import { images } from "../config/images";
@@ -414,6 +418,57 @@ Caso você não tenha recebido seus conteúdos ou teve algum problema com a comp
 							name: "Id da compra",
 							value: saleId,
 						},
+					],
+					color: colors.blue,
+					iconUrl: images.maiteAvatar,
+				},
+			],
+			components: [
+				[
+					{
+						style: "primary",
+						customId: `CONFIRM_SALE_DELIVERY/${saleId}`,
+						label: "Confirmar recebimento",
+						emoji: "👍",
+					},
+					{
+						style: "link",
+						url: urls.discordServerSupportInvite(),
+						label: "Preciso de ajuda",
+						emoji: "❓",
+					},
+				],
+			],
+		});
+	}
+
+	public async sendBuyerSaleDeliveryConfirmedMessage({
+		saleId,
+		clientId,
+		products,
+	}: SaleDeliveryConfirmedMessage) {
+		const buyerAccount = await this.accountRepository.getByAccountId(clientId);
+
+		if (!buyerAccount?.discordId) return;
+
+		const dmChannelId = await this.discordManager.getUserDmChannelId(
+			buyerAccount.discordId,
+		);
+
+		await this.discordManager.sendMessage({
+			channelId: dmChannelId,
+			embeds: [
+				{
+					title: "Tudo prontinho! 🤩",
+					description: [
+						"Como você confirmou que recebeu seus conteúdos (ou demorou mais de 48h para dizquer que aconteceu algum problema), nós finalizamos a venda e o dinheiro foi liberado para a vendedora.",
+						["**Conteúdos:**", ...products.map(p => `- ${p.name}`)].join("\n"),
+					].join("\n\n"),
+					fields: [
+						{
+							name: "Id da compra",
+							value: saleId,
+						},
 						{
 							name: "Que tal dar um feedback sobre o conteúdo que vc comprou? 🥰",
 							value: "É só clicar no botão aqui embaixo ⬇️",
@@ -430,12 +485,6 @@ Caso você não tenha recebido seus conteúdos ou teve algum problema com a comp
 						customId: `SALE_FEEDBACK/${saleId}`,
 						label: "Dar um feedback",
 						emoji: "⭐️",
-					},
-					{
-						style: "link",
-						url: urls.discordServerSupportInvite(),
-						label: "Preciso de ajuda",
-						emoji: "❓",
 					},
 				],
 			],

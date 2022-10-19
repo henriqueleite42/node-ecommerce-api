@@ -67,6 +67,10 @@ export const create = (server: HttpManager) => {
 								key: "variationId",
 								validations: [Validations.required, Validations.code],
 							},
+							{
+								key: "buyerMessage",
+								validations: [Validations.buyerMessage],
+							},
 						]),
 					],
 				},

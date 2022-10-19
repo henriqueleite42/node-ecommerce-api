@@ -34,7 +34,7 @@ export class Validations {
 	}
 
 	public static string(key: string, p?: any) {
-		if (!p) return p;
+		if (typeof p === "undefined") return;
 
 		if (typeof p !== "string") {
 			throw new CustomError(
@@ -45,7 +45,7 @@ export class Validations {
 	}
 
 	public static limit(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (p < 1 || p > 100) {
 			throw new CustomError(
@@ -56,7 +56,7 @@ export class Validations {
 	}
 
 	public static cursor(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (!/^{.*}$/.test(p)) {
 			throw new CustomError(
@@ -77,7 +77,7 @@ export class Validations {
 
 	public static minLength(minLength: number) {
 		return (key: string, p?: any) => {
-			if (!p) return;
+			if (typeof p === "undefined") return;
 
 			if (p.length < minLength) {
 				throw new CustomError(
@@ -90,11 +90,11 @@ export class Validations {
 
 	public static maxLength(maxLength: number) {
 		return (key: string, p?: any) => {
-			if (!p) return;
+			if (typeof p === "undefined") return;
 
 			if (p.length > maxLength) {
 				throw new CustomError(
-					`${key} must have a length of at least ${maxLength}`,
+					`${key} must have a length of at most ${maxLength}`,
 					StatusCodeEnum.BAD_REQUEST,
 				);
 			}
@@ -102,7 +102,7 @@ export class Validations {
 	}
 
 	public static array(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (!Array.isArray(p)) {
 			throw new CustomError(
@@ -114,7 +114,7 @@ export class Validations {
 
 	public static arrOfObj(vArr: Array<Omit<ValidationsType<any>, "loc">>) {
 		return (key: string, p?: any) => {
-			if (!p) return;
+			if (typeof p === "undefined") return;
 
 			if (!Array.isArray(p)) {
 				throw new CustomError(
@@ -149,7 +149,7 @@ export class Validations {
 
 	public static obj(vArr: Array<Omit<ValidationsType<any>, "loc">>) {
 		return (key: string, p?: any) => {
-			if (!p) return;
+			if (typeof p === "undefined") return;
 
 			try {
 				new ValidatorProvider(vArr as any).validate(p);
@@ -173,7 +173,7 @@ export class Validations {
 
 	public static arrayUnique(prop?: string) {
 		return (key: string, p?: any) => {
-			if (!p) return;
+			if (typeof p === "undefined") return;
 
 			const values = prop ? p?.map((v: any) => v?.[prop]) : p;
 
@@ -191,7 +191,7 @@ export class Validations {
 	// Third Party
 
 	public static discordId(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (typeof p !== "string") {
 			throw new CustomError(
@@ -211,7 +211,7 @@ export class Validations {
 	// Ids & Tokens
 
 	public static id(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (typeof p !== "string") {
 			throw new CustomError(
@@ -229,7 +229,7 @@ export class Validations {
 	}
 
 	public static code(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (typeof p !== "string") {
 			throw new CustomError(
@@ -247,7 +247,7 @@ export class Validations {
 	}
 
 	public static token(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (typeof p !== "string") {
 			throw new CustomError(
@@ -265,7 +265,7 @@ export class Validations {
 	}
 
 	public static refreshToken(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (typeof p !== "string") {
 			throw new CustomError(
@@ -285,7 +285,7 @@ export class Validations {
 	// Business
 
 	public static username(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (typeof p !== "string") {
 			throw new CustomError(
@@ -303,7 +303,7 @@ export class Validations {
 	}
 
 	public static storeDescription(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (typeof p !== "string") {
 			throw new CustomError(
@@ -316,7 +316,7 @@ export class Validations {
 	}
 
 	public static productName(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (typeof p !== "string") {
 			throw new CustomError(
@@ -334,7 +334,7 @@ export class Validations {
 	}
 
 	public static productDescription(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (typeof p !== "string") {
 			throw new CustomError(
@@ -367,7 +367,7 @@ export class Validations {
 	}
 
 	public static variationName(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (typeof p !== "string") {
 			throw new CustomError(
@@ -385,7 +385,7 @@ export class Validations {
 	}
 
 	public static variationDescription(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (typeof p !== "string") {
 			throw new CustomError(
@@ -403,7 +403,7 @@ export class Validations {
 	}
 
 	public static pixKey(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (typeof p !== "string") {
 			throw new CustomError(
@@ -421,7 +421,7 @@ export class Validations {
 	}
 
 	public static couponCode(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (typeof p !== "string") {
 			throw new CustomError(
@@ -438,10 +438,28 @@ export class Validations {
 		}
 	}
 
+	public static buyerMessage(key: string, p?: any) {
+		if (typeof p === "undefined") return;
+
+		if (typeof p !== "string") {
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+
+		if (p.length > 500) {
+			throw new CustomError(
+				`${key} must have a length of at most 500`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+	}
+
 	// Enums
 
 	public static deliveryMethod(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (typeof p !== "string") {
 			throw new CustomError(
@@ -461,7 +479,7 @@ export class Validations {
 	}
 
 	public static productType(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (typeof p !== "string") {
 			throw new CustomError(
@@ -481,7 +499,7 @@ export class Validations {
 	}
 
 	public static mediaType(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (typeof p !== "string") {
 			throw new CustomError(
@@ -501,7 +519,7 @@ export class Validations {
 	}
 
 	public static paymentMethod(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (typeof p !== "string") {
 			throw new CustomError(
@@ -521,7 +539,7 @@ export class Validations {
 	}
 
 	public static platform(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (typeof p !== "string") {
 			throw new CustomError(
@@ -543,7 +561,7 @@ export class Validations {
 	// Diversified
 
 	public static color(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (typeof p !== "string") {
 			throw new CustomError(
@@ -561,7 +579,7 @@ export class Validations {
 	}
 
 	public static url(key: string, p?: any) {
-		if (!p) return;
+		if (typeof p === "undefined") return;
 
 		if (typeof p !== "string") {
 			throw new CustomError(

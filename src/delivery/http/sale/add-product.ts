@@ -39,7 +39,7 @@ export const addProduct = (server: HttpManager) => {
 							},
 							{
 								key: "buyerMessage",
-								validations: [Validations.string, Validations.maxLength(500)],
+								validations: [Validations.buyerMessage],
 							},
 						]),
 					],

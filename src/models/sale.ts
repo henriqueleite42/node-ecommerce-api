@@ -145,6 +145,7 @@ export interface CreateSaleInput extends Omit<CreateInput, "products"> {
 	products: Array<{
 		productId: string;
 		variationId?: string;
+		buyerMessage?: string;
 	}>;
 }
 

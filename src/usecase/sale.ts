@@ -84,6 +84,13 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		const saleProducts = productsData.map(product => {
 			const data = products.find(p => p.productId === product.productId)!;
 
+			if (data.buyerMessage && !isCustomProduct(product.type)) {
+				throw new CustomError(
+					"You only can send messages in custom-made products",
+					StatusCodeEnum.BAD_REQUEST,
+				);
+			}
+
 			return this.productToSaleProduct(product, data);
 		});
 
