@@ -57,10 +57,36 @@ export const resourcesStore: AWS["resources"] = {
 		 * Storage
 		 *
 		 */
+		MediaStorageAvatarLambdaInvokePermission: {
+			Type: "AWS::Lambda::Permission",
+			Properties: {
+				FunctionName: {
+					"Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-storeS3UpdateAvatar",
+				},
+				Action: "lambda:InvokeFunction",
+				Principal: "s3.amazonaws.com",
+				SourceAccount: {
+					Ref: "AWS::AccountId",
+				},
+			},
+		},
+		MediaStorageBannerLambdaInvokePermission: {
+			Type: "AWS::Lambda::Permission",
+			Properties: {
+				FunctionName: {
+					"Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-storeS3UpdateBanner",
+				},
+				Action: "lambda:InvokeFunction",
+				Principal: "s3.amazonaws.com",
+				SourceAccount: {
+					Ref: "AWS::AccountId",
+				},
+			},
+		},
 		MediaStorage: {
 			Type: "AWS::S3::Bucket",
 			Properties: {
-				BucketName: "monetizzer-${self:service}-${opt:stage, 'dev'}-media",
+				BucketName: "monetizzer-${self:service}-${opt:stage, 'dev'}-media-storage",
 				PublicAccessBlockConfiguration: {
 					BlockPublicAcls : true,
 					BlockPublicPolicy : true,
@@ -73,7 +99,7 @@ export const resourcesStore: AWS["resources"] = {
 							Event: "s3:ObjectCreated:*",
 							Function: {
 								"Fn::Sub":
-									"arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-update-avatar",
+									"arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-storeS3UpdateAvatar",
 							},
 							Filter: {
 								S3Key: {
@@ -90,7 +116,7 @@ export const resourcesStore: AWS["resources"] = {
 							Event: "s3:ObjectCreated:*",
 							Function: {
 								"Fn::Sub":
-									"arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-update-banner",
+									"arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-storeS3UpdateBanner",
 							},
 							Filter: {
 								S3Key: {

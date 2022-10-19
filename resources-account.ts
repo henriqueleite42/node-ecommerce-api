@@ -117,10 +117,6 @@ export const resourcesAccount: AWS["resources"] = {
 						AttributeName: "accountId",
 						AttributeType: "S",
 					},
-					{
-						AttributeName: "ttl",
-						AttributeType: "N",
-					},
 				],
 				KeySchema: [
 					{

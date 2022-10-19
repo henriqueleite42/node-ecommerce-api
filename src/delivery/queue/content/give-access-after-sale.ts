@@ -12,8 +12,8 @@ import type { SalePaidMessage } from "../../../models/sale";
 import { SQSProvider } from "../../../providers/implementations/sqs";
 
 const sqsManager = new SQSProvider<SalePaidMessage, ContentUseCase>({
-	from: "TOPIC",
-	queue: "GiveAccessAfterSale",
+	from: "QUEUE",
+	queue: "GiveBuyerAccessToSaleProducts",
 }).setService(new ContentService());
 
 /**

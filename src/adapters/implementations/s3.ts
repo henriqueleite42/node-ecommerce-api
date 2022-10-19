@@ -81,7 +81,7 @@ export class S3Adapter implements FileManager {
 
 		return {
 			file: result.Body as ReadableStream,
-			contentType: result.ContentType as string,
+			contentType: result.ContentType as unknown as string,
 		};
 	}
 }

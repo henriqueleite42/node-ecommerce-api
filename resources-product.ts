@@ -86,10 +86,23 @@ export const resourcesProduct: AWS["resources"] = {
 		 * Storage
 		 *
 		 */
+		MediaStorageLambdaInvokePermission: {
+			Type: "AWS::Lambda::Permission",
+			Properties: {
+				FunctionName: {
+					"Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-productS3UpdateImg",
+				},
+				Action: "lambda:InvokeFunction",
+				Principal: "s3.amazonaws.com",
+				SourceAccount: {
+					Ref: "AWS::AccountId",
+				},
+			},
+		},
 		MediaStorage: {
 			Type: "AWS::S3::Bucket",
 			Properties: {
-				BucketName: "monetizzer-${self:service}-${opt:stage, 'dev'}-media",
+				BucketName: "monetizzer-${self:service}-${opt:stage, 'dev'}-media-storage",
 				PublicAccessBlockConfiguration: {
 					BlockPublicAcls : true,
 					BlockPublicPolicy : true,
@@ -102,7 +115,7 @@ export const resourcesProduct: AWS["resources"] = {
 							Event: "s3:ObjectCreated:*",
 							Function: {
 								"Fn::Sub":
-									"arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-update-img",
+									"arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-productS3UpdateImg",
 							},
 						},
 					],

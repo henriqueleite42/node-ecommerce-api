@@ -99,7 +99,7 @@ export const resourcesDiscord: AWS["resources"] = {
 				},
 				Region: "${self:custom.region.${opt:stage, 'local'}}",
 				TopicArn: {
-					"Fn::ImportValue": "content-${opt:stage, 'local'}:SaleDeliveredTopicArn"
+					"Fn::ImportValue": "sale-${opt:stage, 'local'}:SaleDeliveredTopicArn"
 				},
 				FilterPolicy: {
 					originPlatform: [{prefix:"DISCORD"}]
@@ -122,7 +122,7 @@ export const resourcesDiscord: AWS["resources"] = {
 				},
 				Region: "${self:custom.region.${opt:stage, 'local'}}",
 				TopicArn: {
-					"Fn::ImportValue": "content-${opt:stage, 'local'}:SaleDeliveryConfirmedTopicArn"
+					"Fn::ImportValue": "sale-${opt:stage, 'local'}:SaleDeliveryConfirmedTopicArn"
 				},
 				FilterPolicy: {
 					originPlatform: [{prefix:"DISCORD"}]
