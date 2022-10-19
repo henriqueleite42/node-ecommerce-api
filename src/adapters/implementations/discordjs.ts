@@ -36,6 +36,11 @@ interface GetUserDataAPIOutput {
 	public_flags: number;
 }
 
+interface GetUserDmChannelIdAPIOutput {
+	id: string;
+	// https://discord.com/developers/docs/resources/channel#channel-object
+}
+
 export class DiscordJSAdapter implements DiscordManager {
 	protected discordjs: REST;
 
@@ -119,6 +124,16 @@ export class DiscordJSAdapter implements DiscordManager {
 				? this.getBannerUrl(result.id, result.banner)
 				: undefined,
 		};
+	}
+
+	public async getUserDmChannelId(discordId: string) {
+		const dmChannel = (await this.discordjs.post(Routes.userChannels(), {
+			body: {
+				recipient_id: discordId,
+			},
+		})) as GetUserDmChannelIdAPIOutput;
+
+		return dmChannel.id;
 	}
 
 	// Private

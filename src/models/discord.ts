@@ -8,7 +8,7 @@
 
 import type { EventAlertEntity } from "./event-alert";
 import type { ProductEntity } from "./product";
-import type { SaleEntity } from "./sale";
+import type { SaleEntity, SalePaidMessage } from "./sale";
 import type { StoreEntity } from "./store";
 
 export interface SendNewSaleAnnouncementMessagesInput {
@@ -40,6 +40,8 @@ export interface DiscordUseCase {
 	sendNewProductAnnouncementMessages: (
 		p: SendNewProductAnnouncementMessagesInput,
 	) => Promise<void>;
+
+	sendSalePaidMessage: (p: SalePaidMessage) => Promise<void>;
 }
 
 /**

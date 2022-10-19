@@ -4,7 +4,9 @@
 import type {
 	ButtonComponent,
 	DiscordManager,
+	SendMessageInput,
 } from "../adapters/discord-manager";
+import type { AccountRepository } from "../models/account";
 import type {
 	DiscordUseCase,
 	SendNewProductAnnouncementMessagesInput,
@@ -13,12 +15,18 @@ import type {
 } from "../models/discord";
 import type { EventAlertEntity } from "../models/event-alert";
 import type { ProductEntity } from "../models/product";
+import type { SalePaidMessage } from "../models/sale";
+
+import { colors } from "../config/colors";
 
 import { DeliveryMethodEnum } from "../types/enums/delivery-method";
 import { ProductTypeEnum } from "../types/enums/product-type";
 
 export class DiscordUseCaseImplementation implements DiscordUseCase {
-	public constructor(private readonly discordManager: DiscordManager) {}
+	public constructor(
+		private readonly accountRepository: AccountRepository,
+		private readonly discordManager: DiscordManager,
+	) {}
 
 	public async sendNewSaleAnnouncementMessages({
 		items,
@@ -69,7 +77,7 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 				return row;
 			});
 
-		const message = {
+		const message: Pick<SendMessageInput, "embeds"> = {
 			embeds: [
 				{
 					author: {
@@ -78,6 +86,7 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 					},
 					title: "Alguém fez uma compra! 😍",
 					description,
+					color: store.color || colors.maite,
 				},
 			],
 		};
@@ -101,7 +110,7 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 		product,
 		store,
 	}: SendNewProductAnnouncementMessagesInput) {
-		const embeds = [
+		const embeds: SendMessageInput["embeds"] = [
 			{
 				author: {
 					name: store.name,
@@ -119,6 +128,7 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 						value: this.getProductDisplayPrice(product),
 					},
 				],
+				color: product.color || colors.maite,
 			},
 		];
 
@@ -197,6 +207,7 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 							description:
 								"Já já terão novos conteúdos fresquinhos pra vocês 🥵",
 							bannerUrl: store.bannerUrl,
+							color: store.color || colors.maite,
 						},
 					],
 					components: [
@@ -214,7 +225,44 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 		);
 	}
 
-	protected getProductDisplayPrice(product: ProductEntity) {
+	public async sendSalePaidMessage(sale: SalePaidMessage) {
+		const account = await this.accountRepository.getByAccountId(sale.clientId);
+
+		if (!account) return;
+
+		const dmChannelId = await this.discordManager.getUserDmChannelId(
+			account.discordId!,
+		);
+
+		await this.discordManager.sendMessage({
+			channelId: dmChannelId,
+			embeds: [
+				{
+					title: "Pagamento confirmado!",
+					description:
+						"Seu pagamento foi confirmado e o vendedor foi notificado! O conteúdo será enviado dentro do prazo especificado.\n\nCaso algum problema acontece, entre em contato com nosso suporte.",
+					footer: {
+						text: `ID da compra: ${sale.saleId}`,
+					},
+					color: colors.green,
+				},
+			],
+			components: [
+				[
+					{
+						style: "link",
+						url: "",
+						label: "Preciso de ajuda",
+						emoji: "❓",
+					},
+				],
+			],
+		});
+	}
+
+	// Internal
+
+	private getProductDisplayPrice(product: ProductEntity) {
 		if (product.variations) {
 			const variationsPrices = product.variations.map(p => p.price);
 
@@ -227,18 +275,18 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 		return this.formatBRL(product.price!);
 	}
 
-	protected formatBRL(value: number) {
+	private formatBRL(value: number) {
 		return Intl.NumberFormat("pt-BR", {
 			style: "currency",
 			currency: "BRL",
 		}).format(value);
 	}
 
-	protected formatBRLRange(minValue: number, maxValue: number) {
+	private formatBRLRange(minValue: number, maxValue: number) {
 		return `R$ ${Math.floor(minValue)}-${Math.ceil(maxValue)}`;
 	}
 
-	protected getTypeDisplay(deliveryMethod: ProductTypeEnum) {
+	private getTypeDisplay(deliveryMethod: ProductTypeEnum) {
 		switch (deliveryMethod) {
 			case ProductTypeEnum.PACK:
 				return "📦 Pack";
@@ -247,7 +295,7 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 		}
 	}
 
-	protected getDeliveryMethodDisplay(deliveryMethod: DeliveryMethodEnum) {
+	private getDeliveryMethodDisplay(deliveryMethod: DeliveryMethodEnum) {
 		switch (deliveryMethod) {
 			case DeliveryMethodEnum.AUTOMATIC_DISCORD_DM:
 				return "🟦 Automaticamente via DM";
@@ -260,7 +308,7 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 		}
 	}
 
-	protected getRolesToMention(rolesToMention?: Array<string>) {
+	private getRolesToMention(rolesToMention?: Array<string>) {
 		if (!rolesToMention) return;
 
 		return rolesToMention

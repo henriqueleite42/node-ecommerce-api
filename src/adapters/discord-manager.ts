@@ -76,4 +76,6 @@ export interface DiscordManager {
 	exchangeCode: (code: string) => Promise<ExchangeCodeOutput>;
 
 	getUserData: (accessToken: string) => Promise<GetUserDataOutput>;
+
+	getUserDmChannelId: (discordId: string) => Promise<string>;
 }

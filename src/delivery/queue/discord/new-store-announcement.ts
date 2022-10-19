@@ -7,16 +7,19 @@
  */
 
 import { DiscordService } from "../../../factories/discord";
-import type { SendNewStoreAnnouncementMessagesInput } from "../../../models/discord";
+import type {
+	DiscordUseCase,
+	SendNewStoreAnnouncementMessagesInput,
+} from "../../../models/discord";
 import { SQSProvider } from "../../../providers/implementations/sqs";
 
 const sqsManager = new SQSProvider<
 	SendNewStoreAnnouncementMessagesInput,
-	undefined
+	DiscordUseCase
 >({
 	from: "QUEUE",
 	queue: "NewStoreAnnouncement",
-});
+}).setService(new DiscordService());
 
 /**
  *
@@ -25,10 +28,8 @@ const sqsManager = new SQSProvider<
  */
 
 export const func = sqsManager
-	.setFunc(async ({ data }) => {
-		const discordService = new DiscordService().getInstance();
-
-		await discordService.sendNewStoreAnnouncementMessages(data);
+	.setFunc(async ({ service, data }) => {
+		await service.sendNewStoreAnnouncementMessages(data);
 	})
 	.getFunc();
 
