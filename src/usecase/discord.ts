@@ -1,3 +1,5 @@
+/* eslint-disable capitalized-comments */
+/* eslint-disable multiline-comment-style */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
@@ -8,6 +10,7 @@ import type {
 } from "../adapters/discord-manager";
 import type { AccountRepository } from "../models/account";
 import type {
+	DiscordNotifySellerLiveProductsSaleMessage,
 	DiscordUseCase,
 	SendNewProductAnnouncementMessagesInput,
 	SendNewSaleAnnouncementMessagesInput,
@@ -19,8 +22,12 @@ import type { SalePaidMessage } from "../models/sale";
 
 import { colors } from "../config/colors";
 
-import { DeliveryMethodEnum } from "../types/enums/delivery-method";
-import { ProductTypeEnum } from "../types/enums/product-type";
+import { PlatformEnum } from "../types/enums/platform";
+import {
+	isCustomProduct,
+	isLiveProduct,
+	ProductTypeEnum,
+} from "../types/enums/product-type";
 
 export class DiscordUseCaseImplementation implements DiscordUseCase {
 	public constructor(
@@ -225,7 +232,7 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 		);
 	}
 
-	public async sendSalePaidMessage(sale: SalePaidMessage) {
+	public async sendBuyerSalePaidMessage(sale: SalePaidMessage) {
 		const account = await this.accountRepository.getByAccountId(sale.clientId);
 
 		if (!account) return;
@@ -256,6 +263,83 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 						emoji: "❓",
 					},
 				],
+			],
+		});
+	}
+
+	/**
+	 * This will have to be reviewed when we implement other platforms.
+	 *
+	 * Rn it considers that every purchase is made via Discord.
+	 *
+	 * In the future we should simply notify the seller once a day that
+	 * she has X amount of products to deliver (only if she has any
+	 * product to be delivered)
+	 */
+	public async sendSellerOrderLiveCustomProductCreatedMessage({
+		sale,
+		discordId: sellerDiscordId,
+	}: DiscordNotifySellerLiveProductsSaleMessage) {
+		// const originPlatform = sale.origin.split("#").shift()! as PlatformEnum;
+		const originPlatform = PlatformEnum.DISCORD;
+
+		const buyerAccount = await this.accountRepository.getByAccountId(
+			sale.clientId,
+		);
+
+		if (!buyerAccount) return;
+
+		const discordData = await this.discordManager.getUserData(
+			buyerAccount.discordId!,
+		);
+
+		const dmChannelId = await this.discordManager.getUserDmChannelId(
+			sellerDiscordId,
+		);
+
+		const products = sale.products.filter(
+			p => isLiveProduct(p.type) || isCustomProduct(p.type),
+		);
+
+		await this.discordManager.sendMessage({
+			channelId: dmChannelId,
+			embeds: [
+				{
+					title: "Novo pedido!",
+					description: [
+						"O pagamento da compra foi confirmado, você já pode enviar o conteúdo! Por enquanto, o conteúdo precisa ser entregue de forma **MANUAL**, você tem que entrar em contato com o comprador para entregar o conteúdo.",
+						[
+							"**Conteúdos comprados e descrição do pedido:**",
+							"--------",
+							products.map(p =>
+								// [p.name, p.buyerMessage || "_n/a_", "--------"].join("\n"),
+								[p.name, "_n/a_", "--------"].join("\n"),
+							),
+						].join("\n"),
+					].join("\n\n"),
+					fields: [
+						{
+							name: "Entragar via:",
+							value: this.getPlatformDisplay(originPlatform),
+						},
+						{
+							name: "Tag do comprador:",
+							value: discordData.tag,
+						},
+					],
+					footer: {
+						text: `ID da compra: ${sale.saleId}`,
+					},
+					color: colors.green,
+				},
+			],
+			components: [
+				products.map(p => ({
+					style: "secondary",
+					customId: `SET_PRODUCT_AS_DELIVERED/${sale.saleId}/${p.productId}`,
+					label: `Marcar ${p.name} como entregue`,
+					emoji: "✅",
+				})),
 			],
 		});
 	}
@@ -295,14 +379,12 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 		}
 	}
 
-	private getDeliveryMethodDisplay(deliveryMethod: DeliveryMethodEnum) {
-		switch (deliveryMethod) {
-			case DeliveryMethodEnum.AUTOMATIC_DISCORD_DM:
-				return "🟦 Automaticamente via DM";
-			case DeliveryMethodEnum.MANUAL_DISCORD_DM:
-				return "🟦 Manualmente via DM";
-			case DeliveryMethodEnum.MANUAL_GOOGLE_DRIVE_ACCESS:
-				return "🔰 Manualmente via Google Drive";
+	private getPlatformDisplay(platform: PlatformEnum) {
+		switch (platform) {
+			case PlatformEnum.DISCORD:
+				return "🟦 Discord";
+			case PlatformEnum.TELEGRAM:
+				return "✈️ Telegram";
 			default:
 				return "";
 		}

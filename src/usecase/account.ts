@@ -46,7 +46,9 @@ export class AccountUseCaseImplementation implements AccountUseCase {
 			throw new CustomError("Missing scopes", StatusCodeEnum.BAD_REQUEST);
 		}
 
-		const { id } = await this.discordManager.getUserData(accessToken);
+		const { id } = await this.discordManager.getAuthenticatedUserData(
+			accessToken,
+		);
 
 		const oldAccount = await this.accountRepository.getByDiscordId(id);
 

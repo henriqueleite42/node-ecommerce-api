@@ -66,6 +66,11 @@ export interface ExchangeCodeOutput {
 
 export interface GetUserDataOutput {
 	id: string;
+	tag: string;
+}
+
+export interface GetAuthenticatedUserDataOutput {
+	id: string;
 	avatar?: string;
 	banner?: string;
 }
@@ -75,7 +80,11 @@ export interface DiscordManager {
 
 	exchangeCode: (code: string) => Promise<ExchangeCodeOutput>;
 
-	getUserData: (accessToken: string) => Promise<GetUserDataOutput>;
+	getUserData: (discordId: string) => Promise<GetUserDataOutput>;
+
+	getAuthenticatedUserData: (
+		accessToken: string,
+	) => Promise<GetAuthenticatedUserDataOutput>;
 
 	getUserDmChannelId: (discordId: string) => Promise<string>;
 }

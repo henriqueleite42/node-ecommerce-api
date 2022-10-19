@@ -108,7 +108,19 @@ export class DiscordJSAdapter implements DiscordManager {
 		};
 	}
 
-	public async getUserData(accessToken: string) {
+	public async getUserData(discordId: string) {
+		const result = (await this.discordjs.get(
+			Routes.user(discordId),
+			{},
+		)) as GetUserDataAPIOutput;
+
+		return {
+			id: result.id,
+			tag: `${result.username}#${result.discriminator}`,
+		};
+	}
+
+	public async getAuthenticatedUserData(accessToken: string) {
 		const result = (await this.discordjs.get(Routes.user(), {
 			headers: {
 				Authorization: `Bearer ${accessToken}`,

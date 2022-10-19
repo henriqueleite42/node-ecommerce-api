@@ -24,7 +24,7 @@ const sqsManager = new SQSProvider<SalePaidMessage, DiscordUseCase>({
 
 export const func = sqsManager
 	.setFunc(async ({ service, data }) => {
-		await service.sendSalePaidMessage(data);
+		await service.sendBuyerSalePaidMessage(data);
 	})
 	.getFunc();
 

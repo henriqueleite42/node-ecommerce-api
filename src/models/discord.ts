@@ -41,7 +41,11 @@ export interface DiscordUseCase {
 		p: SendNewProductAnnouncementMessagesInput,
 	) => Promise<void>;
 
-	sendSalePaidMessage: (p: SalePaidMessage) => Promise<void>;
+	sendBuyerSalePaidMessage: (p: SalePaidMessage) => Promise<void>;
+
+	sendSellerOrderLiveCustomProductCreatedMessage: (
+		p: DiscordNotifySellerLiveProductsSaleMessage,
+	) => Promise<void>;
 }
 
 /**
