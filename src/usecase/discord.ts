@@ -19,9 +19,10 @@ import type {
 } from "../models/discord";
 import type { EventAlertEntity } from "../models/event-alert";
 import type { ProductEntity } from "../models/product";
-import type { SalePaidMessage } from "../models/sale";
+import type { SaleDeliveredMessage, SalePaidMessage } from "../models/sale";
 
 import { colors } from "../config/colors";
+import { images } from "../config/images";
 import { urls } from "../config/urls";
 
 import { PlatformEnum } from "../types/enums/platform";
@@ -378,6 +379,63 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 						url: urls.platformAccessContent(storeId, product.productId),
 						label: "Ver conteúdo",
 						emoji: "🔥",
+					},
+				],
+			],
+		});
+	}
+
+	public async sendBuyerSaleDeliveredMessage({
+		saleId,
+		clientId,
+		products,
+	}: SaleDeliveredMessage) {
+		const buyerAccount = await this.accountRepository.getByAccountId(clientId);
+
+		if (!buyerAccount?.discordId) return;
+
+		const dmChannelId = await this.discordManager.getUserDmChannelId(
+			buyerAccount.discordId,
+		);
+
+		await this.discordManager.sendMessage({
+			channelId: dmChannelId,
+			embeds: [
+				{
+					title: "Conteúdo entregue!",
+					description: `Sua compra foi marcada como entregue, e com isso esta tudo pronto! 🤩
+
+**Conteúdos:**
+${products.map(p => `- ${p.name}`).join("\n")}
+
+Caso você não tenha recebido seus conteúdos ou teve algum problema com a compra, por favor entre em contato com a gente que resolveremos.`,
+					fields: [
+						{
+							name: "Id da compra",
+							value: saleId,
+						},
+						{
+							name: "Que tal dar um feedback sobre o conteúdo que vc comprou? 🥰",
+							value: "É só clicar no botão aqui embaixo ⬇️",
+						},
+					],
+					color: colors.blue,
+					iconUrl: images.maiteAvatar,
+				},
+			],
+			components: [
+				[
+					{
+						style: "primary",
+						customId: `SALE_FEEDBACK/${saleId}`,
+						label: "Dar um feedback",
+						emoji: "⭐️",
+					},
+					{
+						style: "link",
+						url: urls.discordServerSupportInvite(),
+						label: "Preciso de ajuda",
+						emoji: "❓",
 					},
 				],
 			],
