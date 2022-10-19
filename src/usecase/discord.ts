@@ -491,6 +491,38 @@ Caso você não tenha recebido seus conteúdos ou teve algum problema com a comp
 		});
 	}
 
+	public async sendSellerSaleDeliveryConfirmedMessage({
+		saleId,
+		storeId,
+		finalValue,
+	}: SaleDeliveryConfirmedMessage) {
+		const sellerAccount = await this.accountRepository.getByAccountId(storeId);
+
+		if (!sellerAccount?.discordId) return;
+
+		const dmChannelId = await this.discordManager.getUserDmChannelId(
+			sellerAccount.discordId,
+		);
+
+		await this.discordManager.sendMessage({
+			channelId: dmChannelId,
+			embeds: [
+				{
+					title: "Tudo prontinho! 🤩",
+					description: `A entrega dos conteúdos da venda \`${saleId}\` foi confirmada e o dinheiro foi liberado para sua conta! 🥰`,
+					fields: [
+						{
+							name: "Valor da venda",
+							value: `💵 ${this.formatBRL(finalValue!)}`,
+						},
+					],
+					color: colors.green,
+					iconUrl: images.maiteAvatar,
+				},
+			],
+		});
+	}
+
 	// Internal
 
 	private getProductDisplayPrice(product: ProductEntity) {

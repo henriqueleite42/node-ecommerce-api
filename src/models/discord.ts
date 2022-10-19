@@ -62,6 +62,10 @@ export interface DiscordUseCase {
 		clientId,
 		products,
 	}: SaleDeliveryConfirmedMessage) => Promise<void>;
+
+	sendSellerSaleDeliveryConfirmedMessage: (
+		p: SaleDeliveryConfirmedMessage,
+	) => Promise<void>;
 }
 
 /**
