@@ -6,6 +6,7 @@
  *
  */
 
+import type { AccessGrantedMessage } from "./content";
 import type { EventAlertEntity } from "./event-alert";
 import type { ProductEntity } from "./product";
 import type { SaleEntity, SalePaidMessage } from "./sale";
@@ -46,6 +47,8 @@ export interface DiscordUseCase {
 	sendSellerOrderLiveCustomProductCreatedMessage: (
 		p: DiscordNotifySellerLiveProductsSaleMessage,
 	) => Promise<void>;
+
+	sendBuyerAccessGrantedMessage: (p: AccessGrantedMessage) => Promise<void>;
 }
 
 /**

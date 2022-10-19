@@ -16,6 +16,7 @@ import type {
 	GetUrlToUploadImgInput,
 	VerifyInput,
 	GetByIdInput,
+	StoreVerifiedMessage,
 } from "../models/store";
 import type { UploadManager } from "../providers/upload-manager";
 
@@ -141,7 +142,7 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 			verified: true,
 		});
 
-		await this.topicManager.sendMsg({
+		await this.topicManager.sendMsg<StoreVerifiedMessage>({
 			to: process.env.STORE_STORE_VERIFIED_TOPIC_ARN!,
 			message: store,
 		});

@@ -128,6 +128,7 @@ export type GiveBuyerAccessToSaleMessage = SaleEntity;
 
 export interface AccessGrantedMessage {
 	saleId: string;
+	storeId: string;
 	clientId: string;
 	product: SaleProduct;
 }

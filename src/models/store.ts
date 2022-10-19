@@ -132,3 +132,5 @@ export interface StoreUseCase {
  */
 
 export type StoreCreatedMessage = StoreEntity;
+
+export type StoreVerifiedMessage = StoreEntity;

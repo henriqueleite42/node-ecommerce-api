@@ -12,7 +12,7 @@ export class SQSAdapter implements QueueManager {
 		this.sqs = new SQSClient({});
 	}
 
-	public async sendMsg<T extends Record<string, any>>(p: SendMsgInput<T>) {
+	public async sendMsg<T>(p: SendMsgInput<T>) {
 		const metadata: Record<string, MessageAttributeValue> = {};
 
 		if (p.metadata) {

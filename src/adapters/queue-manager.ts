@@ -6,5 +6,5 @@ export interface SendMsgInput<T> {
 }
 
 export interface QueueManager {
-	sendMsg: <T extends Record<string, any>>(p: SendMsgInput<T>) => Promise<void>;
+	sendMsg: <T>(p: SendMsgInput<T>) => Promise<void>;
 }

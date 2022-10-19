@@ -8,6 +8,7 @@ import type {
 	CreateManyInput,
 } from "../models/access-content";
 import type {
+	AccessGrantedMessage,
 	ContentRepository,
 	ContentUseCase,
 	CreateManyWithUrlInput,
@@ -174,11 +175,12 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 					cursor = nextPage;
 				} while (cursor);
 
-				await this.topicManager.sendMsg({
+				await this.topicManager.sendMsg<AccessGrantedMessage>({
 					to: process.env.CONTENT_ACCESS_GRANTED!,
 					message: {
 						saleId,
 						clientId,
+						storeId,
 						product: pack,
 					},
 					metadata: {
@@ -212,11 +214,12 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 					},
 				]);
 
-				await this.topicManager.sendMsg({
+				await this.topicManager.sendMsg<AccessGrantedMessage>({
 					to: process.env.CONTENT_ACCESS_GRANTED!,
 					message: {
 						saleId,
 						clientId,
+						storeId,
 						product: media,
 					},
 					metadata: {

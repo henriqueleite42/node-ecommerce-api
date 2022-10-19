@@ -9,6 +9,7 @@ import type {
 	SendMessageInput,
 } from "../adapters/discord-manager";
 import type { AccountRepository } from "../models/account";
+import type { AccessGrantedMessage } from "../models/content";
 import type {
 	DiscordNotifySellerLiveProductsSaleMessage,
 	DiscordUseCase,
@@ -21,6 +22,7 @@ import type { ProductEntity } from "../models/product";
 import type { SalePaidMessage } from "../models/sale";
 
 import { colors } from "../config/colors";
+import { urls } from "../config/urls";
 
 import { PlatformEnum } from "../types/enums/platform";
 import {
@@ -258,7 +260,7 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 				[
 					{
 						style: "link",
-						url: "",
+						url: urls.discordServerSupportInvite(),
 						label: "Preciso de ajuda",
 						emoji: "❓",
 					},
@@ -339,6 +341,45 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 					label: `Marcar ${p.name} como entregue`,
 					emoji: "✅",
 				})),
+			],
+		});
+	}
+
+	public async sendBuyerAccessGrantedMessage({
+		saleId,
+		storeId,
+		clientId,
+		product,
+	}: AccessGrantedMessage) {
+		const buyerAccount = await this.accountRepository.getByAccountId(clientId);
+
+		if (!buyerAccount?.discordId) return;
+
+		const dmChannelId = await this.discordManager.getUserDmChannelId(
+			buyerAccount.discordId,
+		);
+
+		await this.discordManager.sendMessage({
+			channelId: dmChannelId,
+			embeds: [
+				{
+					title: "Acesso liberado!",
+					description: `Seu acesso ao conteúdo ${product.name} foi liberado!`,
+					footer: {
+						text: `ID da compra: ${saleId}`,
+					},
+					color: colors.green,
+				},
+			],
+			components: [
+				[
+					{
+						style: "link",
+						url: urls.platformAccessContent(storeId, product.productId),
+						label: "Ver conteúdo",
+						emoji: "🔥",
+					},
+				],
 			],
 		});
 	}
