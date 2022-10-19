@@ -90,6 +90,12 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 					StatusCodeEnum.BAD_REQUEST,
 				);
 			}
+			if (!data.buyerMessage && isCustomProduct(product.type)) {
+				throw new CustomError(
+					"A message is required in custom-made products",
+					StatusCodeEnum.BAD_REQUEST,
+				);
+			}
 
 			return this.productToSaleProduct(product, data);
 		});
@@ -152,6 +158,12 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		if (product.buyerMessage && !isCustomProduct(productData.type)) {
 			throw new CustomError(
 				"You only can send messages in custom-made products",
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+		if (!product.buyerMessage && isCustomProduct(productData.type)) {
+			throw new CustomError(
+				"A message is required in custom-made products",
 				StatusCodeEnum.BAD_REQUEST,
 			);
 		}
