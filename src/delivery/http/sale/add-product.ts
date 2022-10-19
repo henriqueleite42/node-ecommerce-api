@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+
 import { SaleService } from "../../../factories/sale";
 import type { AddProductSaleInput } from "../../../models/sale";
 import type { HttpManager } from "../../../providers/http-manager";
@@ -34,6 +36,10 @@ export const addProduct = (server: HttpManager) => {
 							{
 								key: "variationId",
 								validations: [Validations.code],
+							},
+							{
+								key: "buyerMessage",
+								validations: [Validations.string, Validations.maxLength(500)],
 							},
 						]),
 					],

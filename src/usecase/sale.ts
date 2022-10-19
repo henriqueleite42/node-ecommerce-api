@@ -142,6 +142,13 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 			throw new CustomError("Product not found", StatusCodeEnum.NOT_FOUND);
 		}
 
+		if (product.buyerMessage && !isCustomProduct(productData.type)) {
+			throw new CustomError(
+				"You only can send messages in custom-made products",
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+
 		const newProduct = this.productToSaleProduct(productData, product);
 
 		const { originalValue, finalValue, products } = this.getProductsAndValues(
@@ -600,7 +607,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 
 	private productToSaleProduct(
 		product: ProductEntity,
-		{ productId, variationId }: AddProductSaleInput["product"],
+		{ productId, variationId, buyerMessage }: AddProductSaleInput["product"],
 	): SaleProduct {
 		if (product.variations && product.variations.length > 0 && !variationId) {
 			throw new CustomError("Missing variation", StatusCodeEnum.BAD_REQUEST);
@@ -620,6 +627,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 			originalPrice: price,
 			imageUrl: product.imageUrl,
 			deliveryMethod: product.deliveryMethod,
+			buyerMessage,
 		};
 	}
 

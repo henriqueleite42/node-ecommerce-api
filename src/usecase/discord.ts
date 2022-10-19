@@ -312,8 +312,7 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 							"**Conteúdos comprados e descrição do pedido:**",
 							"--------",
 							products.map(p =>
-								// [p.name, p.buyerMessage || "_n/a_", "--------"].join("\n"),
-								[p.name, "_n/a_", "--------"].join("\n"),
+								[p.name, p.buyerMessage || "_n/a_", "--------"].join("\n"),
 							),
 						].join("\n"),
 					].join("\n\n"),

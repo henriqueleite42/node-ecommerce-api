@@ -21,6 +21,7 @@ export interface SaleProduct {
 	type: ProductTypeEnum;
 	name: string;
 	description: string;
+	buyerMessage?: string;
 	originalPrice: number;
 	finalPrice?: number;
 	imageUrl?: string;
@@ -153,6 +154,7 @@ export interface AddProductSaleInput {
 	product: {
 		productId: string;
 		variationId?: string;
+		buyerMessage?: string;
 	};
 }
 
