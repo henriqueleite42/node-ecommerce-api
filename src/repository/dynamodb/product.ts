@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { DeleteItemCommand, PutItemCommand } from "@aws-sdk/client-dynamodb";
+import {
+	DeleteItemCommand,
+	PutItemCommand,
+	UpdateItemCommand,
+} from "@aws-sdk/client-dynamodb";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { cleanObj } from "@techmmunity/utils";
 
@@ -8,11 +12,14 @@ import type {
 	CreateInput,
 	DeleteInput,
 	EditInput,
+	IncreaseMediaCountInput,
 	GetByIdInput,
 	GetManyByIdInput,
 	GetProductsByTypeInput,
 	ProductEntity,
 	ProductRepository,
+	ProductMediaCount,
+	ProductVariation,
 } from "../../models/product";
 
 import { DynamodbRepository } from ".";
@@ -31,12 +38,8 @@ export interface ProductTable {
 	color?: string;
 	price?: number;
 	imagePath?: string;
-	variations: Array<{
-		id: string;
-		name: string;
-		description: string;
-		price: number;
-	}>;
+	mediaCount?: ProductMediaCount;
+	variations: Array<ProductVariation>;
 	deliveryMethod: DeliveryMethodEnum;
 	createdAt: string;
 
@@ -96,6 +99,29 @@ export class ProductRepositoryDynamoDB
 				storeId,
 			}).Key,
 			data,
+		);
+	}
+
+	public async increaseMediaCount({ media, ...keys }: IncreaseMediaCountInput) {
+		await this.dynamodb.send(
+			new UpdateItemCommand({
+				TableName: this.tableName,
+				ReturnValues: "NONE",
+				Key: this.indexStoreIdProductId(keys).Key,
+				UpdateExpression: `SET  ${[
+					"#mediaCount = if_not_exists(#mediaCount, :mediaCountInitialValue)",
+					"#mediaCount.#media = if_not_exists(#mediaCount.#media, :countInitialValue) + :amount",
+				].join(", ")}`,
+				ExpressionAttributeNames: {
+					"#mediaCount": "mediaCount",
+					"#media": media,
+				},
+				ExpressionAttributeValues: marshall({
+					":mediaCountInitialValue": {},
+					":countInitialValue": 0,
+					":amount": 1,
+				}),
+			}),
 		);
 	}
 

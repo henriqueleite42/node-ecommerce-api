@@ -114,6 +114,9 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 				content,
 				product,
 			},
+			metadata: {
+				productType: product.type,
+			},
 		});
 	}
 

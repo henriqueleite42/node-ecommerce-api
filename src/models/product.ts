@@ -3,9 +3,12 @@ import type { GetUrlToUploadOutput } from "../providers/upload-manager";
 import type { PaginatedItems } from "./types";
 
 import type { DeliveryMethodEnum } from "../types/enums/delivery-method";
+import type { MediaTypeEnum } from "../types/enums/media-type";
 import type { ProductTypeEnum } from "../types/enums/product-type";
 
-interface ProductVariation {
+export type ProductMediaCount = Record<MediaTypeEnum, number>;
+
+export interface ProductVariation {
 	id: string;
 	name: string;
 	description: string;
@@ -21,6 +24,7 @@ export interface ProductEntity {
 	color?: string;
 	price?: number;
 	imageUrl?: string;
+	mediaCount?: ProductMediaCount;
 	variations: Array<ProductVariation>;
 	deliveryMethod: DeliveryMethodEnum;
 	createdAt: Date;
@@ -43,9 +47,15 @@ export interface CreateInput
 }
 
 export type EditInput = Partial<
-	Omit<ProductEntity, "createdAt" | "deliveryMethod" | "type">
+	Omit<ProductEntity, "createdAt" | "deliveryMethod" | "mediaCount" | "type">
 > &
 	Pick<ProductEntity, "productId" | "storeId">;
+
+export interface IncreaseMediaCountInput {
+	storeId: string;
+	productId: string;
+	media: MediaTypeEnum;
+}
 
 export interface DeleteInput {
 	storeId: string;
@@ -68,6 +78,8 @@ export interface ProductRepository {
 	create: (p: CreateInput) => Promise<ProductEntity>;
 
 	edit: (p: EditInput) => Promise<ProductEntity | null>;
+
+	increaseMediaCount: (p: IncreaseMediaCountInput) => Promise<void>;
 
 	delete: (p: DeleteInput) => Promise<void>;
 
@@ -124,6 +136,8 @@ export interface ProductUseCase {
 	) => Promise<void>;
 
 	edit: (p: EditProductInput) => Promise<ProductEntity>;
+
+	increaseMediaCount: (p: IncreaseMediaCountInput) => Promise<void>;
 
 	delete: (p: DeleteInput) => Promise<void>;
 

@@ -229,7 +229,7 @@ export const resourcesProduct: AWS["resources"] = {
 		 * Queues And Topics
 		 *
 		 */
-		 DelayProductCreatedNotificationQueue: {
+		DelayProductCreatedNotificationQueue: {
 			Type: "AWS::SQS::Queue",
 			Properties: {
 				QueueName:
@@ -305,6 +305,29 @@ export const resourcesProduct: AWS["resources"] = {
 				Region: "${self:custom.region.${opt:stage, 'local'}}",
 				TopicArn: {
 					"Fn::ImportValue": "sale-${opt:stage, 'local'}:SalePaidTopicArn"
+				},
+			},
+		},
+		IncrementMediaCountQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'local'}-update-product-media-count",
+			},
+		},
+		IncrementMediaCountSubscription: {
+			Type: "AWS::SNS::Subscription",
+			Properties: {
+				Protocol: "sqs",
+				Endpoint: {
+					"Fn::GetAtt": ["IncrementMediaCountQueue", "Arn"],
+				},
+				Region: "${self:custom.region.${opt:stage, 'local'}}",
+				TopicArn: {
+					"Fn::ImportValue": "content-${opt:stage, 'local'}:ContentCreatedTopicArn"
+				},
+				FilterPolicy: {
+					productType: ["PACK"]
 				},
 			},
 		},

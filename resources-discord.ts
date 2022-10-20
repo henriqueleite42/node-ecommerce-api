@@ -92,7 +92,7 @@ export const resourcesDiscord: AWS["resources"] = {
 					"Fn::ImportValue": "sale-${opt:stage, 'local'}:SalePaidTopicArn"
 				},
 				FilterPolicy: {
-					originPlatform: [{prefix:"DISCORD"}]
+					origin: [{prefix:"DISCORD"}]
 				},
 			},
 		},
@@ -129,7 +129,7 @@ export const resourcesDiscord: AWS["resources"] = {
 					"Fn::ImportValue": "content-${opt:stage, 'local'}:AccessGrantedTopicArn"
 				},
 				FilterPolicy: {
-					originPlatform: [{prefix:"DISCORD"}]
+					origin: [{prefix:"DISCORD"}]
 				},
 			},
 		},
@@ -152,7 +152,7 @@ export const resourcesDiscord: AWS["resources"] = {
 					"Fn::ImportValue": "sale-${opt:stage, 'local'}:SaleDeliveredTopicArn"
 				},
 				FilterPolicy: {
-					originPlatform: [{prefix:"DISCORD"}]
+					origin: [{prefix:"DISCORD"}]
 				},
 			},
 		},
@@ -175,7 +175,7 @@ export const resourcesDiscord: AWS["resources"] = {
 					"Fn::ImportValue": "sale-${opt:stage, 'local'}:SaleDeliveryConfirmedTopicArn"
 				},
 				FilterPolicy: {
-					originPlatform: [{prefix:"DISCORD"}]
+					origin: [{prefix:"DISCORD"}]
 				},
 			},
 		},

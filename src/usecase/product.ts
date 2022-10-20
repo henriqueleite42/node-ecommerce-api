@@ -16,6 +16,7 @@ import type {
 	GetUrlToUploadImgInput,
 	DelayProductCreatedNotificationMessage,
 	ProductCreatedMessage,
+	IncreaseMediaCountInput,
 } from "../models/product";
 import type { StoreUseCase } from "../models/store";
 import type { UploadManager } from "../providers/upload-manager";
@@ -154,6 +155,10 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 		}
 
 		return product;
+	}
+
+	public increaseMediaCount(p: IncreaseMediaCountInput) {
+		return this.productRepository.increaseMediaCount(p);
 	}
 
 	public getUrlToUploadImg({ storeId, productId }: GetUrlToUploadImgInput) {
