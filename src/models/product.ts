@@ -87,6 +87,7 @@ export interface ProductRepository {
  *
  *
  */
+
 export type EditProductInput = Omit<EditInput, "imageUrl">;
 
 export interface GetUrlToUploadImgInput {
@@ -117,6 +118,10 @@ export interface GetProductsCountOutput {
 
 export interface ProductUseCase {
 	create: (p: CreateInput) => Promise<ProductEntity>;
+
+	processDelayedCreatedNotification: (
+		p: DelayProductCreatedNotificationMessage,
+	) => Promise<void>;
 
 	edit: (p: EditProductInput) => Promise<ProductEntity>;
 
@@ -152,6 +157,11 @@ export interface ProductUseCase {
  *
  *
  */
+
+export interface DelayProductCreatedNotificationMessage
+	extends Pick<ProductEntity, "productId" | "storeId" | "type"> {
+	createdAt: string;
+}
 
 export type ProductCreatedMessage = ProductEntity;
 

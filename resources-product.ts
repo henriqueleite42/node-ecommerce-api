@@ -229,6 +229,13 @@ export const resourcesProduct: AWS["resources"] = {
 		 * Queues And Topics
 		 *
 		 */
+		 DelayProductCreatedNotificationQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'local'}-delay-product-created-notification",
+			},
+		},
 		ProductCreatedTopic: {
 			Type: "AWS::SNS::Topic",
 			Properties: {
@@ -303,6 +310,24 @@ export const resourcesProduct: AWS["resources"] = {
 		},
 	},
 	Outputs: {
+		DelayProductCreatedNotificationQueueUrl:  {
+			Value: {
+				Ref: "DelayProductCreatedNotificationQueue"
+			},
+			Export: {
+				Name: {
+					"Fn::Join": [
+						":",
+						[
+							{
+								Ref: "AWS::StackName",
+							},
+							"DelayProductCreatedNotificationQueueUrl",
+						],
+					],
+				},
+			}
+		},
 		ProductCreatedTopicArn: {
 			Value: {
 				Ref: "ProductCreatedTopic"

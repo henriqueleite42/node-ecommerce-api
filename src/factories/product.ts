@@ -9,6 +9,7 @@ import { ProductRepositoryDynamoDB } from "../repository/dynamodb/product";
 import { ProductUseCaseImplementation } from "../usecase/product";
 
 import { Service } from ".";
+import { StoreService } from "./store";
 
 let instance: ProductUseCaseImplementation;
 
@@ -26,11 +27,15 @@ export class ProductService extends Service<ProductUseCase> {
 		const productRepository = new ProductRepositoryDynamoDB(dynamodb);
 		const counterRepository = new CounterRepositoryDynamoDB(dynamodb);
 
+		const storeUseCase = new StoreService().getInstance();
+
 		const newInstance = new ProductUseCaseImplementation(
 			productRepository,
 			counterRepository,
 			uploadManager,
+			sqs,
 			sns,
+			storeUseCase,
 		);
 
 		instance = newInstance;

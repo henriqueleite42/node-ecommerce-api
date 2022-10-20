@@ -1,3 +1,4 @@
+import type { QueueManager } from "../adapters/queue-manager";
 import type { TopicManager } from "../adapters/topic-manager";
 import type { CounterRepository } from "../models/counter";
 import type {
@@ -11,17 +12,19 @@ import type {
 	IncreaseSalesCountInput,
 	IncreaseTotalBilledInput,
 	DeleteInput,
-	ProductCreatedMessage,
 	ProductDeletedMessage,
 	GetUrlToUploadImgInput,
+	DelayProductCreatedNotificationMessage,
+	ProductCreatedMessage,
 } from "../models/product";
+import type { StoreUseCase } from "../models/store";
 import type { UploadManager } from "../providers/upload-manager";
 
 import { CustomError } from "../utils/error";
 
 import { isAutomaticDelivery } from "../types/enums/delivery-method";
 import { MediaTypeEnum } from "../types/enums/media-type";
-import { isPreMadeProduct } from "../types/enums/product-type";
+import { isPreMadeProduct, ProductTypeEnum } from "../types/enums/product-type";
 import { StatusCodeEnum } from "../types/enums/status-code";
 
 export class ProductUseCaseImplementation implements ProductUseCase {
@@ -29,18 +32,36 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 		private readonly productRepository: ProductRepository,
 		private readonly counterRepository: CounterRepository,
 		private readonly uploadManager: UploadManager,
+		private readonly queueManager: QueueManager,
 		private readonly topicManager: TopicManager,
+
+		private readonly storeUsecase: StoreUseCase,
 	) {}
 
 	public async create(p: CreateInput) {
-		if (p.variations && p.price) {
+		const { storeId, variations, price, type, deliveryMethod } = p;
+
+		const store = await this.storeUsecase.getById({ storeId }).catch();
+
+		if (!store) {
+			throw new CustomError("Store not found", StatusCodeEnum.NOT_FOUND);
+		}
+
+		if (!store.verified) {
+			throw new CustomError(
+				"Store must be verified to create products",
+				StatusCodeEnum.FORBIDDEN,
+			);
+		}
+
+		if (variations && price) {
 			throw new CustomError(
 				"The product cannot have a prive if it has variations",
 				StatusCodeEnum.BAD_REQUEST,
 			);
 		}
 
-		if (!isPreMadeProduct(p.type) && isAutomaticDelivery(p.deliveryMethod)) {
+		if (!isPreMadeProduct(type) && isAutomaticDelivery(deliveryMethod)) {
 			throw new CustomError(
 				"A custom product cannot have an automatic delivery method",
 				StatusCodeEnum.BAD_REQUEST,
@@ -49,12 +70,75 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 
 		const product = await this.productRepository.create(p);
 
+		await this.queueManager.sendMsg<DelayProductCreatedNotificationMessage>({
+			to: process.env.PRODUCT_DELAY_PRODUCT_CREATION_NOTIFICATION_QUEUE_URL!,
+			message: {
+				storeId,
+				productId: product.productId,
+				type: product.type,
+				createdAt: product.createdAt.toString(),
+			},
+			delayInSeconds: 900, // 15 min
+		});
+
+		return product;
+	}
+
+	public async processDelayedCreatedNotification({
+		storeId,
+		productId,
+		type,
+		createdAt,
+	}: DelayProductCreatedNotificationMessage) {
+		if (type === ProductTypeEnum.PACK) {
+			const delayForPackProducts = // 30 min after creation
+				// eslint-disable-next-line @typescript-eslint/no-magic-numbers
+				new Date(createdAt).getTime() + 1000 * 60 * 30;
+			const now = new Date().getTime();
+
+			/**
+			 * We give 30min for products of type PACK, so the
+			 * creator can have time to create all the contents of the pack
+			 * before we notify it's creation.
+			 *
+			 * As the limit of SQS is 15min of delay, we have to
+			 * create this workaround.
+			 */
+			if (now < delayForPackProducts) {
+				await this.queueManager.sendMsg<DelayProductCreatedNotificationMessage>(
+					{
+						to: process.env
+							.PRODUCT_DELAY_PRODUCT_CREATION_NOTIFICATION_QUEUE_URL!,
+						message: {
+							storeId,
+							productId,
+							type,
+							createdAt,
+						},
+						delayInSeconds: 900, // 15 min
+					},
+				);
+
+				return;
+			}
+		}
+
+		/**
+		 * We need to get the product again, because if type = PACK,
+		 * the product will be updated with the media count
+		 */
+		const product = await this.productRepository.getById({
+			storeId,
+			productId,
+		});
+
+		// In case of the product being deleted in the meantime
+		if (!product) return;
+
 		await this.topicManager.sendMsg<ProductCreatedMessage>({
 			to: process.env.PRODUCT_PRODUCT_CREATED_TOPIC_ARN!,
 			message: product,
 		});
-
-		return product;
 	}
 
 	public async edit(p: EditInput) {
