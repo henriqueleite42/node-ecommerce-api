@@ -11,6 +11,7 @@ import { StoreRepositoryDynamoDB } from "../repository/dynamodb/store";
 import { ContentUseCaseImplementation } from "../usecase/content";
 
 import { Service } from ".";
+import { ProductService } from "./product";
 
 let instance: ContentUseCaseImplementation;
 
@@ -31,6 +32,8 @@ export class ContentService extends Service<ContentUseCase> {
 
 		const uploadManager = new UploadManagerProvider(sqs, s3);
 
+		const productUsecase = new ProductService().getInstance();
+
 		const newInstance = new ContentUseCaseImplementation(
 			contentRepository,
 			accessRepository,
@@ -39,6 +42,8 @@ export class ContentService extends Service<ContentUseCase> {
 			uploadManager,
 			s3,
 			sns,
+
+			productUsecase,
 		);
 
 		instance = newInstance;

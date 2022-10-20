@@ -310,6 +310,12 @@ export const resourcesContent: AWS["resources"] = {
 				TopicName: "${self:service}-${opt:stage, 'local'}-access-granted",
 			},
 		},
+		ContentCreatedTopic: {
+			Type: "AWS::SNS::Topic",
+			Properties: {
+				TopicName: "${self:service}-${opt:stage, 'local'}-content-created",
+			},
+		},
 	},
 	Outputs: {
 		RawMediaBucketName: {
@@ -361,6 +367,24 @@ export const resourcesContent: AWS["resources"] = {
 								Ref: "AWS::StackName",
 							},
 							"AccessGrantedTopicArn",
+						],
+					],
+				},
+			}
+		},
+		ContentCreatedTopicArn: {
+			Value: {
+				Ref: "ContentCreatedTopic"
+			},
+			Export: {
+				Name: {
+					"Fn::Join": [
+						":",
+						[
+							{
+								Ref: "AWS::StackName",
+							},
+							"ContentCreatedTopicArn",
 						],
 					],
 				},

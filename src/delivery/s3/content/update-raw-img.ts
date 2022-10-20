@@ -24,12 +24,11 @@ export const func = s3Manager
 	.setFunc(async ({ service, data }) => {
 		const [contentId, productId, storeId] = data.key.split("/").reverse();
 
-		await service.edit({
+		await service.setMediaPath({
 			storeId,
 			productId,
 			contentId,
-			rawContentPath: data.key,
-			processedContentPath: data.key,
+			mediaPath: data.key,
 		});
 	})
 	.getFunc();

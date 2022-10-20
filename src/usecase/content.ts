@@ -9,6 +9,7 @@ import type {
 } from "../models/access-content";
 import type {
 	AccessGrantedMessage,
+	ContentCreatedMessage,
 	ContentRepository,
 	ContentUseCase,
 	CreateManyWithUrlInput,
@@ -16,7 +17,9 @@ import type {
 	GetContentFileInput,
 	GetUrlToUploadRawMediaInput,
 	GetUserAccessStoresInput,
+	SetMediaPathInput,
 } from "../models/content";
+import type { ProductUseCase } from "../models/product";
 import type { SalePaidMessage, SaleProduct } from "../models/sale";
 import type { StoreRepository } from "../models/store";
 import type { UploadManager } from "../providers/upload-manager";
@@ -35,6 +38,8 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 		private readonly uploadManager: UploadManager,
 		private readonly fileManager: FileManager,
 		private readonly topicManager: TopicManager,
+
+		private readonly productUsecase: ProductUseCase,
 	) {}
 
 	public async createManyWithUrl(p: CreateManyWithUrlInput) {
@@ -74,6 +79,42 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 
 	public edit(p: EditInput) {
 		return this.contentRepository.edit(p);
+	}
+
+	public async setMediaPath({
+		storeId,
+		productId,
+		contentId,
+		mediaPath: mediaUrl,
+	}: SetMediaPathInput) {
+		const product = await this.productUsecase.getById({
+			storeId,
+			productId,
+		});
+
+		if (!product) {
+			return;
+		}
+
+		const content = await this.contentRepository.edit({
+			storeId,
+			productId,
+			contentId,
+			rawContentPath: mediaUrl,
+			processedContentPath: mediaUrl,
+		});
+
+		if (!content) {
+			return;
+		}
+
+		await this.topicManager.sendMsg<ContentCreatedMessage>({
+			to: process.env.CONTENT_CONTENT_CREATED_TOPIC_ARN!,
+			message: {
+				content,
+				product,
+			},
+		});
 	}
 
 	public async getContentFile({

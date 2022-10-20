@@ -2,6 +2,7 @@ import type { GetFileOutput } from "../adapters/file-manager";
 import type { GetUrlToUploadOutput } from "../providers/upload-manager";
 
 import type { AccountAccessStoreEntity } from "./access-content";
+import type { ProductEntity } from "./product";
 import type { SaleEntity, SalePaidMessage, SaleProduct } from "./sale";
 import type { PaginatedItems } from "./types";
 
@@ -82,6 +83,13 @@ export interface GetUrlToUploadRawMediaInput {
 	type: MediaTypeEnum;
 }
 
+export interface SetMediaPathInput {
+	storeId: string;
+	productId: string;
+	contentId: string;
+	mediaPath: string;
+}
+
 export interface CreateManyWithUrlInput
 	extends Pick<ContentEntity, "productId" | "storeId"> {
 	contents: Array<{
@@ -105,6 +113,8 @@ export interface ContentUseCase {
 		p: GetUrlToUploadRawMediaInput,
 	) => Promise<GetUrlToUploadOutput>;
 
+	setMediaPath: (p: SetMediaPathInput) => Promise<void>;
+
 	getContentFile: (p: GetContentFileInput) => Promise<GetFileOutput>;
 
 	edit: (p: EditInput) => Promise<ContentEntity | null>;
@@ -123,6 +133,11 @@ export interface ContentUseCase {
  *
  *
  */
+
+export interface ContentCreatedMessage {
+	product: ProductEntity;
+	content: ContentEntity;
+}
 
 export type GiveBuyerAccessToSaleMessage = SaleEntity;
 
