@@ -1,7 +1,7 @@
 import { DiscordJSAdapter } from "../adapters/implementations/discordjs";
 import type { DiscordUseCase } from "../models/discord";
 import { getDynamoInstance } from "../repository/dynamodb";
-import { AccountRepositoryDynamoDB } from "../repository/dynamodb/account";
+import { DiscordRepositoryDynamoDB } from "../repository/dynamodb/discord";
 import { DiscordUseCaseImplementation } from "../usecase/discord";
 
 import { Service } from ".";
@@ -16,10 +16,10 @@ export class DiscordService extends Service<DiscordUseCase> {
 
 		const discordManager = new DiscordJSAdapter();
 
-		const accountRepository = new AccountRepositoryDynamoDB(dynamodb);
+		const discordRepository = new DiscordRepositoryDynamoDB(dynamodb);
 
 		const newInstance = new DiscordUseCaseImplementation(
-			accountRepository,
+			discordRepository,
 			discordManager,
 		);
 

@@ -5,43 +5,37 @@ import { marshall } from "@aws-sdk/util-dynamodb";
 import { cleanObj } from "@techmmunity/utils";
 
 import type {
-	AccountRepository,
-	AccountEntity,
+	DiscordEntity,
+	DiscordRepository,
 	CreateWithDiscordIdInput,
-} from "../../models/account";
+} from "../../models/discord";
 
 import { DynamodbRepository } from ".";
 
-import { genId } from "../../utils/id/gen-id";
-
-import { PlatformEnum } from "../../types/enums/platform";
-
-export interface AccountTable {
+export interface DiscordTable {
 	accountId: string;
-	admin: boolean;
-	notifyThrough: PlatformEnum;
-	discordId?: string;
+	discordId: string;
+	dmChannelId?: string;
 	discord?: {
 		accessToken: string;
 		refreshToken: string;
 		expiresAt: string;
 	};
-	createdAt: string;
 }
 
-export class AccountRepositoryDynamoDB
-	extends DynamodbRepository<AccountTable, AccountEntity>
-	implements AccountRepository
+export class DiscordRepositoryDynamoDB
+	extends DynamodbRepository<DiscordTable, DiscordEntity>
+	implements DiscordRepository
 {
-	protected readonly tableName = "accounts";
+	protected readonly tableName = "discords";
 
-	public async createWithDiscordId({ discordId }: CreateWithDiscordIdInput) {
-		const item: AccountEntity = {
-			accountId: await genId(),
+	public async createWithDiscordId({
+		accountId,
+		discordId,
+	}: CreateWithDiscordIdInput) {
+		const item: DiscordEntity = {
+			accountId,
 			discordId,
-			admin: false,
-			notifyThrough: PlatformEnum.DISCORD,
-			createdAt: new Date(),
 		};
 
 		await this.dynamodb.send(
@@ -61,14 +55,12 @@ export class AccountRepositoryDynamoDB
 	}
 
 	public getByDiscordId(discordId: string) {
-		const index = this.indexDiscordId({ discordId });
-
-		return this.getSingleItem(index);
+		return this.getSingleItem(this.indexDiscordId({ discordId }));
 	}
 
 	// Keys
 
-	private indexAccountId({ accountId }: Pick<AccountEntity, "accountId">) {
+	private indexAccountId({ accountId }: Pick<DiscordEntity, "accountId">) {
 		return {
 			KeyConditionExpression: "#accountId = :accountId",
 			ExpressionAttributeNames: {
@@ -83,7 +75,7 @@ export class AccountRepositoryDynamoDB
 		};
 	}
 
-	private indexDiscordId({ discordId }: Pick<AccountEntity, "discordId">) {
+	private indexDiscordId({ discordId }: Pick<DiscordEntity, "discordId">) {
 		return {
 			IndexName: "DiscordId",
 			KeyConditionExpression: "#discordId = :discordId",
@@ -102,24 +94,32 @@ export class AccountRepositoryDynamoDB
 	// Mappers
 
 	protected entityToTable(
-		entity: Partial<AccountEntity>,
-	): Partial<AccountTable> {
+		entity: Partial<DiscordEntity>,
+	): Partial<DiscordTable> {
 		return cleanObj({
 			accountId: entity.accountId ? `ACCOUNT#${entity.accountId}` : undefined,
-			admin: entity.admin,
-			notifyThrough: entity.notifyThrough,
 			discordId: entity.discordId ? `DISCORD#${entity.discordId}` : undefined,
-			createdAt: entity.createdAt?.toISOString(),
+			dmChannelId: entity.dmChannelId,
+			discord: entity.discord
+				? {
+						...entity.discord,
+						expiresAt: entity.discord.expiresAt.toISOString(),
+				  }
+				: undefined,
 		});
 	}
 
-	protected tableToEntity(table: AccountTable): AccountEntity {
+	protected tableToEntity(table: DiscordTable): DiscordEntity {
 		return {
 			accountId: table.accountId.replace("ACCOUNT#", ""),
-			admin: table.admin,
-			notifyThrough: table.notifyThrough,
 			discordId: table.discordId?.replace("DISCORD#", ""),
-			createdAt: new Date(table.createdAt),
+			dmChannelId: table.dmChannelId,
+			discord: table.discord
+				? {
+						...table.discord,
+						expiresAt: new Date(table.discord.expiresAt),
+				  }
+				: undefined,
 		};
 	}
 }

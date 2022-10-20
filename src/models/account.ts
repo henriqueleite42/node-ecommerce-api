@@ -7,11 +7,6 @@ export interface AccountEntity {
 	admin: boolean;
 	notifyThrough: PlatformEnum;
 	discordId?: string;
-	discord?: {
-		accessToken: string;
-		refreshToken: string;
-		expiresAt: Date;
-	};
 	createdAt: Date;
 }
 
@@ -23,18 +18,12 @@ export interface AccountEntity {
  *
  */
 
-export interface CreateWithDiscordInput {
-	discordId: string;
-	discord: AccountEntity["discord"];
-}
-
 export interface CreateWithDiscordIdInput {
+	accountId: string;
 	discordId: string;
 }
 
 export interface AccountRepository {
-	createWithDiscord: (p: CreateWithDiscordInput) => Promise<AccountEntity>;
-
 	createWithDiscordId: (p: CreateWithDiscordIdInput) => Promise<AccountEntity>;
 
 	getByAccountId: (accountId: string) => Promise<AccountEntity | null>;
@@ -57,10 +46,6 @@ export interface AuthOutput {
 	expiresAt: string;
 }
 
-export interface CreateAccountWithDiscordInput {
-	code: string;
-}
-
 export interface GetByDiscordIdInput {
 	discordId: string;
 }
@@ -74,8 +59,6 @@ export interface RefreshInput {
 }
 
 export interface AccountUseCase {
-	createWithDiscord: (p: CreateAccountWithDiscordInput) => Promise<AuthOutput>;
-
 	createWithDiscordId: (p: CreateWithDiscordIdInput) => Promise<AccountEntity>;
 
 	getByDiscordId: (p: GetByDiscordIdInput) => Promise<AccountEntity>;

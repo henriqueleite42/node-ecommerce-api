@@ -8,10 +8,11 @@ import type {
 	DiscordManager,
 	SendMessageInput,
 } from "../adapters/discord-manager";
-import type { AccountRepository } from "../models/account";
 import type { AccessGrantedMessage } from "../models/content";
 import type {
+	CreateWithDiscordIdInput,
 	DiscordNotifySellerLiveProductsSaleMessage,
+	DiscordRepository,
 	DiscordUseCase,
 	SendNewProductAnnouncementMessagesInput,
 	SendNewSaleAnnouncementMessagesInput,
@@ -37,10 +38,30 @@ import {
 } from "../types/enums/product-type";
 
 export class DiscordUseCaseImplementation implements DiscordUseCase {
+	private readonly necessaryDiscordScopes = [
+		"identify",
+		"email",
+		"gdm.join",
+		"guilds",
+		"guilds.members.read",
+	] as Array<string>;
+
 	public constructor(
-		private readonly accountRepository: AccountRepository,
+		private readonly discordRepository: DiscordRepository,
 		private readonly discordManager: DiscordManager,
 	) {}
+
+	public async createWithDiscordId(p: CreateWithDiscordIdInput) {
+		const alreadyExists = await this.discordRepository.getByDiscordId(
+			p.discordId,
+		);
+
+		if (alreadyExists) {
+			return alreadyExists;
+		}
+
+		return this.discordRepository.createWithDiscordId(p);
+	}
 
 	public async sendNewSaleAnnouncementMessages({
 		items,
@@ -240,12 +261,12 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 	}
 
 	public async sendBuyerSalePaidMessage(sale: SalePaidMessage) {
-		const account = await this.accountRepository.getByAccountId(sale.clientId);
+		const discord = await this.discordRepository.getByAccountId(sale.clientId);
 
-		if (!account) return;
+		if (!discord) return;
 
 		const dmChannelId = await this.discordManager.getUserDmChannelId(
-			account.discordId!,
+			discord.discordId!,
 		);
 
 		await this.discordManager.sendMessage({
@@ -290,7 +311,7 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 		// const originPlatform = sale.origin.split("#").shift()! as PlatformEnum;
 		const originPlatform = PlatformEnum.DISCORD;
 
-		const buyerAccount = await this.accountRepository.getByAccountId(
+		const buyerAccount = await this.discordRepository.getByAccountId(
 			sale.clientId,
 		);
 
@@ -356,7 +377,7 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 		clientId,
 		product,
 	}: AccessGrantedMessage) {
-		const buyerAccount = await this.accountRepository.getByAccountId(clientId);
+		const buyerAccount = await this.discordRepository.getByAccountId(clientId);
 
 		if (!buyerAccount?.discordId) return;
 
@@ -394,7 +415,7 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 		clientId,
 		products,
 	}: SaleDeliveredMessage) {
-		const buyerAccount = await this.accountRepository.getByAccountId(clientId);
+		const buyerAccount = await this.discordRepository.getByAccountId(clientId);
 
 		if (!buyerAccount?.discordId) return;
 
@@ -447,7 +468,7 @@ Caso você não tenha recebido seus conteúdos ou teve algum problema com a comp
 		clientId,
 		products,
 	}: SaleDeliveryConfirmedMessage) {
-		const buyerAccount = await this.accountRepository.getByAccountId(clientId);
+		const buyerAccount = await this.discordRepository.getByAccountId(clientId);
 
 		if (!buyerAccount?.discordId) return;
 
@@ -496,7 +517,7 @@ Caso você não tenha recebido seus conteúdos ou teve algum problema com a comp
 		storeId,
 		finalValue,
 	}: SaleDeliveryConfirmedMessage) {
-		const sellerAccount = await this.accountRepository.getByAccountId(storeId);
+		const sellerAccount = await this.discordRepository.getByAccountId(storeId);
 
 		if (!sellerAccount?.discordId) return;
 

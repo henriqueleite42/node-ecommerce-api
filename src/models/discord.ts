@@ -17,6 +17,51 @@ import type {
 } from "./sale";
 import type { StoreEntity } from "./store";
 
+export interface DiscordEntity {
+	accountId: string;
+	discordId: string;
+	dmChannelId?: string;
+	discord?: {
+		accessToken: string;
+		refreshToken: string;
+		expiresAt: Date;
+	};
+}
+
+/**
+ *
+ *
+ * Repository
+ *
+ *
+ */
+
+export interface CreateOutput {
+	accountId: string;
+	discordId: string;
+}
+
+export interface CreateWithDiscordIdInput {
+	accountId: string;
+	discordId: string;
+}
+
+export interface DiscordRepository {
+	createWithDiscordId: (p: CreateWithDiscordIdInput) => Promise<CreateOutput>;
+
+	getByAccountId: (accountId: string) => Promise<DiscordEntity | null>;
+
+	getByDiscordId: (discordId: string) => Promise<DiscordEntity | null>;
+}
+
+/**
+ *
+ *
+ * Usecase
+ *
+ *
+ */
+
 export interface SendNewSaleAnnouncementMessagesInput {
 	items: Array<EventAlertEntity>;
 	sale: SaleEntity;
@@ -35,6 +80,8 @@ export interface SendNewProductAnnouncementMessagesInput {
 }
 
 export interface DiscordUseCase {
+	createWithDiscordId: (p: CreateWithDiscordIdInput) => Promise<CreateOutput>;
+
 	sendNewSaleAnnouncementMessages: (
 		p: SendNewSaleAnnouncementMessagesInput,
 	) => Promise<void>;

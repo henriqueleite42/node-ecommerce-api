@@ -7,6 +7,11 @@ const PROVISIONED_THROUGHPUT_COUNTERS = {
 
 export const resourcesCounter: AWS["resources"] = {
 	Resources: {
+		/**
+		 *
+		 * Database
+		 *
+		 */
 		CounterDynamoDBTable: {
 			DeletionPolicy: "Retain",
 			UpdateReplacePolicy: "Retain",

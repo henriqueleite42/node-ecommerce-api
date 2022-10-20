@@ -1,4 +1,3 @@
-import { DiscordJSAdapter } from "../adapters/implementations/discordjs";
 import { PasetoAdapter } from "../adapters/implementations/paseto";
 import type { AccountUseCase } from "../models/account";
 import { getDynamoInstance } from "../repository/dynamodb";
@@ -8,6 +7,7 @@ import { RefreshTokenRepositoryDynamoDB } from "../repository/dynamodb/refresh-t
 import { AccountUseCaseImplementation } from "../usecase/account";
 
 import { Service } from ".";
+import { DiscordService } from "./discord";
 
 let instance: AccountUseCaseImplementation;
 
@@ -22,14 +22,15 @@ export class AccountService extends Service<AccountUseCase> {
 		const magicLinkRepository = new MagicLinkRepositoryDynamoDB(dynamodb);
 
 		const accessTokenManager = new PasetoAdapter();
-		const discordManager = new DiscordJSAdapter();
+
+		const discordUsecase = new DiscordService().getInstance();
 
 		const newInstance = new AccountUseCaseImplementation(
 			accountRepository,
 			refreshTokenRepository,
 			magicLinkRepository,
 			accessTokenManager,
-			discordManager,
+			discordUsecase,
 		);
 
 		instance = newInstance;

@@ -7,6 +7,11 @@ const PROVISIONED_THROUGHPUT_COUPONS = {
 
 export const resourcesCoupon: AWS["resources"] = {
 	Resources: {
+		/**
+		 *
+		 * Database
+		 *
+		 */
 		CouponDynamoDBTable: {
 			DeletionPolicy: "Retain",
 			UpdateReplacePolicy: "Retain",

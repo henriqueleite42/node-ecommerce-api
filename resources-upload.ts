@@ -2,6 +2,11 @@ import type { AWS } from "@serverless/typescript";
 
 export const resourcesUpload: AWS["resources"] = {
 	Resources: {
+		/**
+		 *
+		 * Queues And Topics
+		 *
+		 */
 		UploadFromUrlQueue: {
 			Type: "AWS::SQS::Queue",
 			Properties: {

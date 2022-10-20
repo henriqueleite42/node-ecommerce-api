@@ -1,15 +1,14 @@
 import type { AccessTokenManager } from "../adapters/access-token-manager";
-import type { DiscordManager } from "../adapters/discord-manager";
 import type {
 	AccountUseCase,
 	AccountRepository,
 	CreateWithDiscordIdInput,
 	GetByDiscordIdInput,
 	AuthOutput,
-	CreateAccountWithDiscordInput,
 	AccountEntity,
 	RefreshInput,
 } from "../models/account";
+import type { DiscordUseCase } from "../models/discord";
 import type {
 	CreateMagicLinkInput,
 	GetMagicLinkInput,
@@ -18,67 +17,30 @@ import type {
 import type { RefreshTokenRepository } from "../models/refresh-token";
 
 import { CustomError } from "../utils/error";
+import { genId } from "../utils/id/gen-id";
 
 import { StatusCodeEnum } from "../types/enums/status-code";
 
 export class AccountUseCaseImplementation implements AccountUseCase {
-	private readonly necessaryDiscordScopes = [
-		"identify",
-		"email",
-		"gdm.join",
-		"guilds",
-		"guilds.members.read",
-	] as Array<string>;
-
 	public constructor(
 		private readonly accountRepository: AccountRepository,
 		private readonly refreshTokenRepository: RefreshTokenRepository,
 		private readonly magicLinkRepository: MagicLinkRepository,
 		private readonly accessTokenManager: AccessTokenManager,
-		private readonly discordManager: DiscordManager,
+
+		private readonly discordUsecase: DiscordUseCase,
 	) {}
 
-	public async createWithDiscord({ code }: CreateAccountWithDiscordInput) {
-		const { scopes, accessToken, refreshToken, expiresAt } =
-			await this.discordManager.exchangeCode(code);
-
-		if (!this.necessaryDiscordScopes.every(s => scopes.includes(s))) {
-			throw new CustomError("Missing scopes", StatusCodeEnum.BAD_REQUEST);
-		}
-
-		const { id } = await this.discordManager.getAuthenticatedUserData(
-			accessToken,
-		);
-
-		const oldAccount = await this.accountRepository.getByDiscordId(id);
-
-		if (oldAccount) {
-			return this.genAuthData(oldAccount);
-		}
-
-		const account = await this.accountRepository.createWithDiscord({
-			discordId: id,
-			discord: {
-				accessToken,
-				refreshToken,
-				expiresAt,
-			},
+	public async createWithDiscordId({ discordId }: CreateWithDiscordIdInput) {
+		const { accountId } = await this.discordUsecase.createWithDiscordId({
+			accountId: await genId(),
+			discordId,
 		});
 
-		return this.genAuthData(account);
-	}
-
-	public async createWithDiscordId(p: CreateWithDiscordIdInput) {
-		const account = await this.accountRepository.getByDiscordId(p.discordId);
-
-		if (account) {
-			throw new CustomError(
-				"An account with the same discordID already exists",
-				StatusCodeEnum.CONFLICT,
-			);
-		}
-
-		return this.accountRepository.createWithDiscordId(p);
+		return this.accountRepository.createWithDiscordId({
+			accountId,
+			discordId,
+		});
 	}
 
 	public async getByDiscordId({ discordId }: GetByDiscordIdInput) {

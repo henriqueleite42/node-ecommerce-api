@@ -17,6 +17,11 @@ const PROVISIONED_THROUGHPUT_MAGIC_LINKS = {
 
 export const resourcesAccount: AWS["resources"] = {
 	Resources: {
+		/**
+		 *
+		 * Database
+		 *
+		 */
 		AccountDynamoDBTable: {
 			DeletionPolicy: "Retain",
 			UpdateReplacePolicy: "Retain",

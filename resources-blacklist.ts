@@ -7,6 +7,11 @@ const PROVISIONED_THROUGHPUT_BLACKLISTS = {
 
 export const resourcesBlacklist: AWS["resources"] = {
 	Resources: {
+		/**
+		 *
+		 * Database
+		 *
+		 */
 		BlacklistDynamoDBTable: {
 			DeletionPolicy: "Retain",
 			UpdateReplacePolicy: "Retain",

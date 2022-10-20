@@ -1,7 +1,57 @@
 import type { AWS } from "@serverless/typescript";
 
+const PROVISIONED_THROUGHPUT_DISCORDS = {
+	ReadCapacityUnits: 3,
+	WriteCapacityUnits: 1,
+};
+
 export const resourcesDiscord: AWS["resources"] = {
 	Resources: {
+		/**
+		 *
+		 * Database
+		 *
+		 */
+		DiscordDynamoDBTable: {
+			DeletionPolicy: "Retain",
+			UpdateReplacePolicy: "Retain",
+			Type: "AWS::DynamoDB::Table",
+			Properties: {
+				TableName: "discords",
+				ProvisionedThroughput: PROVISIONED_THROUGHPUT_DISCORDS,
+				AttributeDefinitions: [
+					{
+						AttributeName: "accountId",
+						AttributeType: "S",
+					},
+					{
+						AttributeName: "discordId",
+						AttributeType: "S",
+					},
+				],
+				KeySchema: [
+					{
+						AttributeName: "accountId",
+						KeyType: "HASH",
+					},
+				],
+				GlobalSecondaryIndexes: [
+					{
+						IndexName: "DiscordId",
+						KeySchema: [
+							{
+								AttributeName: "discordId",
+								KeyType: "HASH",
+							},
+						],
+						Projection: {
+							ProjectionType: "ALL"
+						},
+						ProvisionedThroughput: PROVISIONED_THROUGHPUT_DISCORDS,
+					}
+				],
+			},
+		},
 		NewSaleAnnouncementQueue: {
 			Type: "AWS::SQS::Queue",
 			Properties: {
