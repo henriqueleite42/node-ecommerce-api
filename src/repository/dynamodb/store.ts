@@ -17,12 +17,14 @@ import type {
 
 import { DynamodbRepository } from ".";
 
+import type { GenderEnum } from "../../types/enums/gender";
 import type { ProductTypeEnum } from "../../types/enums/product-type";
 
 export interface StoreTable {
 	storeId: string; // Same as AccountId
 	accountId: string;
 	productTypes: Array<ProductTypeEnum>;
+	gender: GenderEnum;
 	name: string;
 	description?: string;
 	color?: string;
@@ -40,6 +42,7 @@ export class StoreRepositoryDynamoDB
 
 	public async create({
 		accountId,
+		gender,
 		name,
 		description,
 		color,
@@ -50,6 +53,7 @@ export class StoreRepositoryDynamoDB
 			storeId: accountId,
 			accountId,
 			productTypes: [],
+			gender,
 			name,
 			description,
 			color,
@@ -175,6 +179,7 @@ export class StoreRepositoryDynamoDB
 		return cleanObj<Partial<StoreTable>>({
 			storeId: entity.storeId ? `STORE#${entity.storeId}` : undefined,
 			accountId: entity.accountId ? `ACCOUNT#${entity.accountId}` : undefined,
+			gender: entity.gender,
 			productTypes: entity.productTypes,
 			name: entity.name ? `NAME#${entity.name}` : undefined,
 			description: entity.description,
@@ -190,6 +195,7 @@ export class StoreRepositoryDynamoDB
 			storeId: table.storeId.replace("STORE#", ""),
 			accountId: table.accountId.replace("ACCOUNT#", ""),
 			productTypes: table.productTypes,
+			gender: table.gender,
 			name: table.name.replace("NAME#", ""),
 			description: table.description,
 			color: table.color,

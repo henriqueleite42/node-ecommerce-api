@@ -20,6 +20,11 @@ export const create = (server: HttpManager) => {
 					validations: [Validations.required, Validations.id],
 				},
 				{
+					key: "gender",
+					loc: "body",
+					validations: [Validations.required, Validations.gender],
+				},
+				{
 					key: "name",
 					loc: "body",
 					validations: [Validations.required, Validations.username],

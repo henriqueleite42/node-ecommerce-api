@@ -17,6 +17,11 @@ export const edit = (server: HttpManager) => {
 					validations: [Validations.required, Validations.id],
 				},
 				{
+					key: "gender",
+					loc: "body",
+					validations: [Validations.gender],
+				},
+				{
 					key: "description",
 					loc: "body",
 					validations: [Validations.storeDescription],

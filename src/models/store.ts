@@ -2,12 +2,14 @@ import type { GetUrlToUploadOutput } from "../adapters/file-manager";
 
 import type { ProductEntity } from "./product";
 
+import type { GenderEnum } from "../types/enums/gender";
 import type { ProductTypeEnum } from "../types/enums/product-type";
 
 export interface StoreEntity {
 	storeId: string; // Same as accountId
 	accountId: string;
 	productTypes: Array<ProductTypeEnum>;
+	gender: GenderEnum;
 	name: string;
 	description?: string;
 	color?: string;
@@ -25,10 +27,7 @@ export interface StoreEntity {
  *
  */
 
-export interface CreateInput
-	extends Omit<StoreEntity, "createdAt" | "storeId"> {
-	accountId: string;
-}
+export type CreateInput = Omit<StoreEntity, "createdAt" | "storeId">;
 
 export type EditInput = Partial<Omit<StoreEntity, "createdAt" | "name">> &
 	Pick<StoreEntity, "storeId">;

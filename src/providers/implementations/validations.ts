@@ -17,6 +17,7 @@ import { ValidatorProvider } from "./validator";
 import { CustomError } from "../../utils/error";
 
 import { DeliveryMethodEnum } from "../../types/enums/delivery-method";
+import { GenderEnum } from "../../types/enums/gender";
 import { MediaTypeEnum } from "../../types/enums/media-type";
 import { PaymentMethodEnum } from "../../types/enums/payment-method";
 import { PlatformEnum } from "../../types/enums/platform";
@@ -549,6 +550,26 @@ export class Validations {
 		}
 
 		const values = getEnumValues(PlatformEnum);
+
+		if (!values.includes(p)) {
+			throw new CustomError(
+				`${key} must be in: ${values.map(v => `'${v}'`)}`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+	}
+
+	public static gender(key: string, p?: any) {
+		if (typeof p === "undefined") return;
+
+		if (typeof p !== "string") {
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+
+		const values = getEnumValues(GenderEnum);
 
 		if (!values.includes(p)) {
 			throw new CustomError(
