@@ -1,7 +1,7 @@
 import type { AWS } from "@serverless/typescript";
 
 const PROVISIONED_THROUGHPUT_SALES = {
-	ReadCapacityUnits: 3,
+	ReadCapacityUnits: 1,
 	WriteCapacityUnits: 1,
 };
 

@@ -22,8 +22,8 @@ const sqsManager = new SQSProvider<SalePaidMessage, SaleUseCase>({
  */
 
 export const func = sqsManager
-	.setFunc(({ service, data }) => {
-		return service.handleSaleDelivery(data);
+	.setFunc(async ({ service, data }) => {
+		await Promise.allSettled(data.map(service.handleSaleDelivery));
 	})
 	.getFunc();
 

@@ -24,11 +24,15 @@ const sqsManager = new SQSProvider<ContentCreatedMessage, ProductUseCase>({
 
 export const func = sqsManager
 	.setFunc(async ({ service, data }) => {
-		await service.increaseMediaCount({
-			storeId: data.product.storeId,
-			productId: data.product.productId,
-			media: data.content.type,
-		});
+		await Promise.allSettled(
+			data.map(d =>
+				service.increaseMediaCount({
+					storeId: d.product.storeId,
+					productId: d.product.productId,
+					media: d.content.type,
+				}),
+			),
+		);
 	})
 	.getFunc();
 

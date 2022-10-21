@@ -30,7 +30,7 @@ export const func = sqsManager
 
 		const uploadManager = new UploadManagerProvider(sqs, s3);
 
-		await uploadManager.uploadFromUrl(data);
+		await Promise.allSettled(data.map(uploadManager.uploadFromUrl));
 	})
 	.getFunc();
 

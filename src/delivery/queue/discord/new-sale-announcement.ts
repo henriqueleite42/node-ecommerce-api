@@ -29,7 +29,7 @@ const sqsManager = new SQSProvider<
 
 export const func = sqsManager
 	.setFunc(async ({ service, data }) => {
-		await service.sendNewSaleAnnouncementMessages(data);
+		await Promise.allSettled(data.map(service.sendNewSaleAnnouncementMessages));
 	})
 	.getFunc();
 

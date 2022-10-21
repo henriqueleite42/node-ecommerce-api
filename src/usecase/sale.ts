@@ -419,7 +419,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 
 		await this.topicManager.sendMsg<SalePaidMessage>({
 			to: process.env.SALE_SALE_PAID_TOPIC_ARN!,
-			message: sale,
+			message: sale as SalePaidMessage,
 			metadata: {
 				origin: sale.origin,
 			},
@@ -479,7 +479,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 
 				await this.topicManager.sendMsg<SaleDeliveredMessage>({
 					to: process.env.SALE_SALE_DELIVERY_CONFIRMED_TOPIC_ARN!,
-					message: sale,
+					message: sale as SaleDeliveredMessage,
 				});
 			} else {
 				await this.saleRepository.edit({
@@ -489,7 +489,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 
 				await this.topicManager.sendMsg<SaleDeliveredMessage>({
 					to: process.env.SALE_SALE_DELIVERED_TOPIC_ARN!,
-					message: sale,
+					message: sale as SaleDeliveredMessage,
 				});
 			}
 		}

@@ -7,14 +7,16 @@
  */
 
 import { WalletService } from "../../../factories/wallet";
-import type { SaleEntity } from "../../../models/sale";
+import type { SaleDeliveryConfirmedMessage } from "../../../models/sale";
 import type { WalletUseCase } from "../../../models/wallet";
 import { SQSProvider } from "../../../providers/implementations/sqs";
 
-const sqsManager = new SQSProvider<SaleEntity, WalletUseCase>({
-	from: "TOPIC",
-	queue: "ReleasePendingBalance",
-}).setService(new WalletService());
+const sqsManager = new SQSProvider<SaleDeliveryConfirmedMessage, WalletUseCase>(
+	{
+		from: "TOPIC",
+		queue: "ReleasePendingBalance",
+	},
+).setService(new WalletService());
 
 /**
  *
@@ -24,10 +26,14 @@ const sqsManager = new SQSProvider<SaleEntity, WalletUseCase>({
 
 export const func = sqsManager
 	.setFunc(async ({ service, data }) => {
-		await service.releasePendingBalance({
-			accountId: data.storeId,
-			amount: data.finalValue!,
-		});
+		await Promise.allSettled(
+			data.map(d =>
+				service.releasePendingBalance({
+					accountId: d.storeId,
+					amount: d.finalValue,
+				}),
+			),
+		);
 	})
 	.getFunc();
 

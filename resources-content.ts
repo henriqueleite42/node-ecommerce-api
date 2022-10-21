@@ -1,17 +1,17 @@
 import type { AWS } from "@serverless/typescript";
 
 const PROVISIONED_THROUGHPUT_CONTENTS = {
-	ReadCapacityUnits: 3,
+	ReadCapacityUnits: 1,
 	WriteCapacityUnits: 1,
 };
 
 const PROVISIONED_THROUGHPUT_ACCESSES_CONTENTS = {
-	ReadCapacityUnits: 3,
+	ReadCapacityUnits: 1,
 	WriteCapacityUnits: 1,
 };
 
 const PROVISIONED_THROUGHPUT_ACCOUNT_ACCESSES_STORES = {
-	ReadCapacityUnits: 3,
+	ReadCapacityUnits: 1,
 	WriteCapacityUnits: 1,
 };
 

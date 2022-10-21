@@ -24,13 +24,17 @@ const sqsManager = new SQSProvider<SaleEntity, ProductUseCase>({
 
 export const func = sqsManager
 	.setFunc(async ({ service, data }) => {
-		await Promise.all(
-			data.products.map(({ productId }) =>
-				service.increaseSalesCount({
-					storeId: data.storeId,
-					productId,
-				}),
-			),
+		await Promise.allSettled(
+			data
+				.map(d =>
+					d.products.map(({ productId }) =>
+						service.increaseSalesCount({
+							storeId: d.storeId,
+							productId,
+						}),
+					),
+				)
+				.flat(),
 		);
 	})
 	.getFunc();

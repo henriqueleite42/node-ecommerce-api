@@ -17,7 +17,7 @@ export type SetFunc<D, U> = (p: SetFuncInput<D, U>) => Promise<void> | void;
 export abstract class QueueManager<D, U> extends SFManager<
 	Config,
 	SQSEvent,
-	D,
+	Array<D>,
 	U
 > {
 	protected getData(event: SQSEvent) {
@@ -32,18 +32,16 @@ export abstract class QueueManager<D, U> extends SFManager<
 	}
 
 	protected getSqsMessage(event?: SQSEvent) {
-		if (!event) return undefined as unknown as D;
+		if (!event) return [];
 
-		const parsedJson = JSON.parse(event.Records[0].body);
-
-		return parsedJson as D;
+		return event.Records.map(r => JSON.parse(r.body)) as Array<D>;
 	}
 
 	protected getSnsMessage(event?: SQSEvent) {
-		if (!event) return undefined as unknown as D;
+		if (!event) return [];
 
-		const parsedJson = JSON.parse(event.Records[0].body) as SNSMessage;
+		const msgs = event.Records.map<SNSMessage>(r => JSON.parse(r.body));
 
-		return JSON.parse(parsedJson.Message) as D;
+		return msgs.map<D>(m => JSON.parse(m.Message));
 	}
 }

@@ -24,9 +24,13 @@ const sqsManager = new SQSProvider<StoreEntity, WalletUseCase>({
 
 export const func = sqsManager
 	.setFunc(async ({ service, data }) => {
-		await service.create({
-			accountId: data.accountId,
-		});
+		await Promise.allSettled(
+			data.map(d =>
+				service.create({
+					accountId: d.accountId,
+				}),
+			),
+		);
 	})
 	.getFunc();
 

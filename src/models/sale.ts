@@ -220,11 +220,22 @@ export interface SaleUseCase {
 
 export type SaleCreatedMessage = SaleEntity;
 
-export type SalePaidMessage = SaleEntity;
+export interface SalePaidMessage extends Omit<SaleEntity, "finalValue"> {
+	finalValue: number;
+}
 
-export type SaleDeliveredMessage = SaleEntity;
+export interface SaleRefundedMessage extends Omit<SaleEntity, "finalValue"> {
+	finalValue: number;
+}
 
-export type SaleDeliveryConfirmedMessage = SaleEntity;
+export interface SaleDeliveredMessage extends Omit<SaleEntity, "finalValue"> {
+	finalValue: number;
+}
+
+export interface SaleDeliveryConfirmedMessage
+	extends Omit<SaleEntity, "finalValue"> {
+	finalValue: number;
+}
 
 export interface SaleExpiredMessage {
 	sales: Array<SaleEntity>;

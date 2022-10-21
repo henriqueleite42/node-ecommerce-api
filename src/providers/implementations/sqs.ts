@@ -11,6 +11,8 @@ export class SQSProvider<D, U> extends QueueManager<D, U> {
 							// eslint-disable-next-line @typescript-eslint/naming-convention
 							"Fn::GetAtt": [`${this.config.queue}Queue`, "Arn"],
 						},
+						batchSize: 10,
+						maximumBatchingWindow: 300, // 5 min
 					},
 				},
 			],

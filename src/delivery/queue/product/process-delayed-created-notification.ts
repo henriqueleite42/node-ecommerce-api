@@ -29,7 +29,9 @@ const sqsManager = new SQSProvider<
 
 export const func = sqsManager
 	.setFunc(async ({ service, data }) => {
-		await service.processDelayedCreatedNotification(data);
+		await Promise.allSettled(
+			data.map(service.processDelayedCreatedNotification),
+		);
 	})
 	.getFunc();
 

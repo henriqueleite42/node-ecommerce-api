@@ -7,11 +7,11 @@
  */
 
 import { StoreService } from "../../../factories/store";
-import type { SaleEntity } from "../../../models/sale";
+import type { SalePaidMessage } from "../../../models/sale";
 import type { StoreUseCase } from "../../../models/store";
 import { SQSProvider } from "../../../providers/implementations/sqs";
 
-const sqsManager = new SQSProvider<SaleEntity, StoreUseCase>({
+const sqsManager = new SQSProvider<SalePaidMessage, StoreUseCase>({
 	from: "TOPIC",
 	queue: "IncrementTotalBilled",
 }).setService(new StoreService());
@@ -24,10 +24,14 @@ const sqsManager = new SQSProvider<SaleEntity, StoreUseCase>({
 
 export const func = sqsManager
 	.setFunc(async ({ service, data }) => {
-		await service.increaseTotalBilled({
-			storeId: data.storeId,
-			amount: data.finalValue!,
-		});
+		await Promise.allSettled(
+			data.map(d =>
+				service.increaseTotalBilled({
+					storeId: d.storeId,
+					amount: d.finalValue,
+				}),
+			),
+		);
 	})
 	.getFunc();
 

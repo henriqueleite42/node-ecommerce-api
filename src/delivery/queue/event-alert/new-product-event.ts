@@ -24,7 +24,7 @@ const sqsManager = new SQSProvider<ProductEntity, EventAlertUseCase>({
 
 export const func = sqsManager
 	.setFunc(async ({ service, data }) => {
-		await service.processDiscordNewProductEvent(data);
+		await Promise.allSettled(data.map(service.processDiscordNewProductEvent));
 	})
 	.getFunc();
 

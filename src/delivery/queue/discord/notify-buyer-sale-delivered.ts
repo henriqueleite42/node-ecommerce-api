@@ -24,7 +24,7 @@ const sqsManager = new SQSProvider<SaleDeliveredMessage, DiscordUseCase>({
 
 export const func = sqsManager
 	.setFunc(async ({ service, data }) => {
-		await service.sendBuyerSaleDeliveredMessage(data);
+		await Promise.allSettled(data.map(service.sendBuyerSaleDeliveredMessage));
 	})
 	.getFunc();
 

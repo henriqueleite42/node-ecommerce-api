@@ -24,7 +24,7 @@ const sqsManager = new SQSProvider<AccessGrantedMessage, DiscordUseCase>({
 
 export const func = sqsManager
 	.setFunc(async ({ service, data }) => {
-		await service.sendBuyerAccessGrantedMessage(data);
+		await Promise.allSettled(data.map(service.sendBuyerAccessGrantedMessage));
 	})
 	.getFunc();
 

@@ -22,8 +22,8 @@ const sqsManager = new SQSProvider<undefined, StoreUseCase>({
  */
 
 export const func = sqsManager
-	.setFunc(async ({ service }) => {
-		await service.increaseStoresCount();
+	.setFunc(async ({ service, data }) => {
+		await Promise.allSettled(data.map(service.increaseStoresCount));
 	})
 	.getFunc();
 

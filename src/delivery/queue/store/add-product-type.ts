@@ -24,7 +24,7 @@ const sqsManager = new SQSProvider<ProductEntity, StoreUseCase>({
 
 export const func = sqsManager
 	.setFunc(async ({ service, data }) => {
-		await service.addProductType(data);
+		await Promise.allSettled(data.map(service.addProductType));
 	})
 	.getFunc();
 
