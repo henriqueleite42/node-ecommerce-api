@@ -207,6 +207,27 @@ export const resourcesDiscord: AWS["resources"] = {
 					"${self:service}-${opt:stage, 'local'}-notify-seller-sale-delivery-confirmed",
 			},
 		},
+
+		NotifyAdminsToVerifyStoreQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'local'}-notify-admins-to-verify-store",
+			},
+		},
+		NotifyAdminsToVerifyStoreSubscription: {
+			Type: "AWS::SNS::Subscription",
+			Properties: {
+				Protocol: "sqs",
+				Endpoint: {
+					"Fn::GetAtt": ["NotifyAdminsToVerifyStoreQueue", "Arn"],
+				},
+				Region: "${self:custom.region.${opt:stage, 'local'}}",
+				TopicArn: {
+					"Fn::ImportValue": "store-${opt:stage, 'local'}:StoreCreatedTopicArn"
+				},
+			},
+		},
 	},
 	Outputs: {
 		NewSaleAnnouncementQueueUrl: {

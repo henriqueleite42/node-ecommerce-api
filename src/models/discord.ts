@@ -16,7 +16,7 @@ import type {
 	SaleEntity,
 	SalePaidMessage,
 } from "./sale";
-import type { StoreEntity } from "./store";
+import type { StoreCreatedMessage, StoreEntity } from "./store";
 
 export interface DiscordEntity {
 	accountId: string;
@@ -114,4 +114,11 @@ export interface DiscordUseCase {
 	sendSellerSaleDeliveryConfirmedMessage: (
 		p: SaleDeliveryConfirmedMessage,
 	) => Promise<void>;
+
+	sendAdminsMessageToVerifyStore: ({
+		storeId,
+		name,
+		avatarUrl,
+		bannerUrl,
+	}: StoreCreatedMessage) => Promise<void>;
 }
