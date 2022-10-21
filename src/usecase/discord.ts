@@ -11,7 +11,6 @@ import type {
 import type { AccessGrantedMessage } from "../models/content";
 import type {
 	CreateWithDiscordIdInput,
-	DiscordNotifySellerLiveProductsSaleMessage,
 	DiscordRepository,
 	DiscordUseCase,
 	SendNewProductAnnouncementMessagesInput,
@@ -21,6 +20,7 @@ import type {
 import type { EventAlertEntity } from "../models/event-alert";
 import type { ProductEntity } from "../models/product";
 import type {
+	NotifySellerSaleMessage,
 	SaleDeliveredMessage,
 	SaleDeliveryConfirmedMessage,
 	SalePaidMessage,
@@ -31,11 +31,7 @@ import { images } from "../config/images";
 import { urls } from "../config/urls";
 
 import { PlatformEnum } from "../types/enums/platform";
-import {
-	isCustomProduct,
-	isLiveProduct,
-	ProductTypeEnum,
-} from "../types/enums/product-type";
+import { ProductTypeEnum } from "../types/enums/product-type";
 
 export class DiscordUseCaseImplementation implements DiscordUseCase {
 	private readonly necessaryDiscordScopes = [
@@ -304,29 +300,28 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 	 * she has X amount of products to deliver (only if she has any
 	 * product to be delivered)
 	 */
-	public async sendSellerOrderLiveCustomProductCreatedMessage({
-		sale,
-		discordId: sellerDiscordId,
-	}: DiscordNotifySellerLiveProductsSaleMessage) {
-		// const originPlatform = sale.origin.split("#").shift()! as PlatformEnum;
-		const originPlatform = PlatformEnum.DISCORD;
+	public async sendSellerManualProductsSaleMessage({
+		saleId,
+		sellerId,
+		buyerId,
+		products,
+		origin,
+	}: NotifySellerSaleMessage) {
+		const originPlatform = origin.split("#").shift()! as PlatformEnum;
 
-		const buyerAccount = await this.discordRepository.getByAccountId(
-			sale.clientId,
-		);
+		const [sellerAccount, buyerAccount] = await Promise.all([
+			this.discordRepository.getByAccountId(sellerId),
+			this.discordRepository.getByAccountId(buyerId),
+		]);
 
-		if (!buyerAccount) return;
+		if (!buyerAccount || !sellerAccount) return;
 
 		const discordData = await this.discordManager.getUserData(
-			buyerAccount.discordId!,
+			buyerAccount.discordId,
 		);
 
 		const dmChannelId = await this.discordManager.getUserDmChannelId(
-			sellerDiscordId,
-		);
-
-		const products = sale.products.filter(
-			p => isLiveProduct(p.type) || isCustomProduct(p.type),
+			sellerAccount?.discordId,
 		);
 
 		await this.discordManager.sendMessage({
@@ -355,7 +350,7 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 						},
 					],
 					footer: {
-						text: `ID da compra: ${sale.saleId}`,
+						text: `ID da compra: ${saleId}`,
 					},
 					color: colors.green,
 				},
@@ -363,7 +358,7 @@ export class DiscordUseCaseImplementation implements DiscordUseCase {
 			components: [
 				products.map(p => ({
 					style: "secondary",
-					customId: `SET_PRODUCT_AS_DELIVERED/${sale.saleId}/${p.productId}`,
+					customId: `SET_PRODUCT_AS_DELIVERED/${saleId}/${p.productId}`,
 					label: `Marcar ${p.name} como entregue`,
 					emoji: "✅",
 				})),

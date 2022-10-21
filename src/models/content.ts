@@ -126,7 +126,13 @@ export interface ContentCreatedMessage {
 	content: ContentEntity;
 }
 
-export type GiveBuyerAccessToSaleMessage = SaleEntity;
+export interface GiveBuyerAccessToSaleMessage {
+	saleId: string;
+	clientId: string;
+	storeId: string;
+	products: Array<SaleProduct>;
+	origin: SaleEntity["origin"];
+}
 
 export interface AccessGrantedMessage {
 	saleId: string;

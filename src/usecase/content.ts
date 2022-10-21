@@ -16,10 +16,11 @@ import type {
 	GetContentFileInput,
 	GetUrlToUploadRawMediaInput,
 	GetUserAccessStoresInput,
+	GiveBuyerAccessToSaleMessage,
 	SetMediaPathInput,
 } from "../models/content";
 import type { ProductUseCase } from "../models/product";
-import type { SalePaidMessage, SaleProduct } from "../models/sale";
+import type { SaleProduct } from "../models/sale";
 import type { StoreRepository } from "../models/store";
 import type { UploadManager } from "../providers/upload-manager";
 
@@ -136,7 +137,7 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 		storeId,
 		products,
 		origin,
-	}: SalePaidMessage) {
+	}: GiveBuyerAccessToSaleMessage) {
 		const packs = [] as Array<SaleProduct>;
 		const medias = [] as Array<SaleProduct>;
 

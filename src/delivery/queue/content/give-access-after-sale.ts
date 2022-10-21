@@ -13,7 +13,7 @@ import { SQSProvider } from "../../../providers/implementations/sqs";
 
 const sqsManager = new SQSProvider<SalePaidMessage, ContentUseCase>({
 	from: "QUEUE",
-	queue: "GiveBuyerAccessToSaleProducts",
+	queue: "GiveBuyerAccessToPreMadeAutomaticSaleProducts",
 }).setService(new ContentService());
 
 /**

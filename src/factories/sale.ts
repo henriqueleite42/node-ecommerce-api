@@ -11,6 +11,7 @@ import { SaleRepositoryDynamoDB } from "../repository/dynamodb/sale";
 import { SaleUseCaseImplementation } from "../usecase/sale";
 
 import { Service } from ".";
+import { AccountService } from "./account";
 
 let instance: SaleUseCaseImplementation;
 
@@ -30,6 +31,8 @@ export class SaleService extends Service<SaleUseCase> {
 
 		const pixManager = new GerenciarnetManager();
 
+		const accountUsecase = new AccountService().getInstance();
+
 		const newInstance = new SaleUseCaseImplementation(
 			saleRepository,
 			blacklistRepository,
@@ -39,6 +42,8 @@ export class SaleService extends Service<SaleUseCase> {
 			sns,
 			sqs,
 			pixManager,
+
+			accountUsecase,
 		);
 
 		instance = newInstance;

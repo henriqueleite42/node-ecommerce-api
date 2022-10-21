@@ -7,18 +7,13 @@
  */
 
 import { DiscordService } from "../../../factories/discord";
-import type {
-	DiscordNotifySellerLiveProductsSaleMessage,
-	DiscordUseCase,
-} from "../../../models/discord";
+import type { DiscordUseCase } from "../../../models/discord";
+import type { NotifySellerSaleMessage } from "../../../models/sale";
 import { SQSProvider } from "../../../providers/implementations/sqs";
 
-const sqsManager = new SQSProvider<
-	DiscordNotifySellerLiveProductsSaleMessage,
-	DiscordUseCase
->({
+const sqsManager = new SQSProvider<NotifySellerSaleMessage, DiscordUseCase>({
 	from: "QUEUE",
-	queue: "NotifySellerCustomProductsSale",
+	queue: "NotifySellerCustomManualProductsSale",
 }).setService(new DiscordService());
 
 /**
@@ -30,7 +25,7 @@ const sqsManager = new SQSProvider<
 export const func = sqsManager
 	.setFunc(async ({ service, data }) => {
 		await Promise.allSettled(
-			data.map(service.sendSellerOrderLiveCustomProductCreatedMessage),
+			data.map(service.sendSellerManualProductsSaleMessage),
 		);
 	})
 	.getFunc();
@@ -41,7 +36,7 @@ export const func = sqsManager
  *
  */
 
-export const notifySellerCustomProductsSale = sqsManager.getHandler(
+export const notifySellerCustomManualProductsSale = sqsManager.getHandler(
 	__dirname,
 	__filename,
 );

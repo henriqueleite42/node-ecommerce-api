@@ -297,11 +297,11 @@ export const resourcesContent: AWS["resources"] = {
 		 * Queues And Topics
 		 *
 		 */
-		GiveBuyerAccessToSaleProductsQueue: {
+		GiveBuyerAccessToPreMadeAutomaticSaleProductsQueue: {
 			Type: "AWS::SQS::Queue",
 			Properties: {
 				QueueName:
-					"${self:service}-${opt:stage, 'local'}-give-buyer-access-to-sale-products",
+					"${self:service}-${opt:stage, 'local'}-give-buyer-access-to-pre-made-automatic-sale-products",
 			},
 		},
 		AccessGrantedTopic: {
@@ -336,9 +336,9 @@ export const resourcesContent: AWS["resources"] = {
 				},
 			}
 		},
-		GiveBuyerAccessToSaleProductsUrl: {
+		GiveBuyerAccessToPreMadeAutomaticSaleProductsUrl: {
 			Value: {
-				Ref: "GiveBuyerAccessToSaleProductsQueue"
+				Ref: "GiveBuyerAccessToPreMadeAutomaticSaleProductsQueue"
 			},
 			Export: {
 				Name: {
@@ -348,7 +348,7 @@ export const resourcesContent: AWS["resources"] = {
 							{
 								Ref: "AWS::StackName",
 							},
-							"GiveBuyerAccessToSaleProductsQueueUrl",
+							"GiveBuyerAccessToPreMadeAutomaticSaleProductsQueueUrl",
 						],
 					],
 				},

@@ -10,6 +10,7 @@ import type { AccessGrantedMessage } from "./content";
 import type { EventAlertEntity } from "./event-alert";
 import type { ProductEntity } from "./product";
 import type {
+	NotifySellerSaleMessage,
 	SaleDeliveredMessage,
 	SaleDeliveryConfirmedMessage,
 	SaleEntity,
@@ -96,8 +97,8 @@ export interface DiscordUseCase {
 
 	sendBuyerSalePaidMessage: (p: SalePaidMessage) => Promise<void>;
 
-	sendSellerOrderLiveCustomProductCreatedMessage: (
-		p: DiscordNotifySellerLiveProductsSaleMessage,
+	sendSellerManualProductsSaleMessage: (
+		p: NotifySellerSaleMessage,
 	) => Promise<void>;
 
 	sendBuyerAccessGrantedMessage: (p: AccessGrantedMessage) => Promise<void>;
@@ -113,30 +114,4 @@ export interface DiscordUseCase {
 	sendSellerSaleDeliveryConfirmedMessage: (
 		p: SaleDeliveryConfirmedMessage,
 	) => Promise<void>;
-}
-
-/**
- *
- *
- * Topic Messages
- *
- *
- */
-
-export interface DiscordNotifySellerCustomProductsSaleMessage {
-	sale: SaleEntity;
-	accountId: string;
-	discordId: string;
-}
-
-export interface DiscordNotifySellerLiveProductsSaleMessage {
-	sale: SaleEntity;
-	accountId: string;
-	discordId: string;
-}
-
-export interface DiscordNotifySellerSaleDeliveryConfirmedMessage {
-	sale: SaleEntity;
-	accountId: string;
-	discordId: string;
 }

@@ -5,8 +5,10 @@ import { notifyBuyerAccessGrantedMessage } from "./discord/notify-buyer-access-g
 import { notifyBuyerSaleDelivered } from "./discord/notify-buyer-sale-delivered";
 import { notifyBuyerSaleDeliveryConfirmed } from "./discord/notify-buyer-sale-delivery-confirmed";
 import { notifyBuyerSalePaid } from "./discord/notify-buyer-sale-paid";
-import { notifySellerCustomProductsSale } from "./discord/notify-seller-order-custom-product";
-import { notifySellerLiveProductsSale } from "./discord/notify-seller-order-live-product";
+import { notifySellerCustomAutomaticProductsSale } from "./discord/notify-seller-custom-automatic-products-sale";
+import { notifySellerCustomManualProductsSale } from "./discord/notify-seller-custom-manual-products-sale";
+import { notifySellerLiveManualProductsSale } from "./discord/notify-seller-live-manual-products-sale";
+import { notifySellerPreMadeManualProductsSale } from "./discord/notify-seller-pre-made-manual-products-sale";
 import { notifySellerSaleDeliveryConfirmed } from "./discord/notify-seller-sale-delivery-confirmed";
 
 export const discord = {
@@ -17,7 +19,10 @@ export const discord = {
 	discordNotifyBuyerSaleDelivered: notifyBuyerSaleDelivered,
 	discordNotifyBuyerSaleDeliveryConfirmed: notifyBuyerSaleDeliveryConfirmed,
 	discordNotifyBuyerSalePaid: notifyBuyerSalePaid,
-	discordNotifySellerCustomProductsSale: notifySellerCustomProductsSale,
-	discordNotifySellerLiveProductsSale: notifySellerLiveProductsSale,
+	discordNotifSellerCustomAutomaticSale:
+		notifySellerCustomAutomaticProductsSale,
+	discordNotifSellerCustomManualSale: notifySellerCustomManualProductsSale,
+	discordNotifSellerLiveManualSale: notifySellerLiveManualProductsSale,
+	discordNotifSellerPreMadeManualSale: notifySellerPreMadeManualProductsSale,
 	discordNotifySellerSaleDeliveryConfirmed: notifySellerSaleDeliveryConfirmed,
 };

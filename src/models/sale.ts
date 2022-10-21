@@ -240,3 +240,11 @@ export interface SaleDeliveryConfirmedMessage
 export interface SaleExpiredMessage {
 	sales: Array<SaleEntity>;
 }
+
+export interface NotifySellerSaleMessage {
+	saleId: string;
+	sellerId: string;
+	buyerId: string;
+	origin: SaleEntity["origin"];
+	products: Array<SaleProduct>;
+}

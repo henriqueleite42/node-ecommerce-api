@@ -25,7 +25,7 @@ import { CustomError } from "../utils/error";
 
 import { isAutomaticDelivery } from "../types/enums/delivery-method";
 import { MediaTypeEnum } from "../types/enums/media-type";
-import { isPreMadeProduct, ProductTypeEnum } from "../types/enums/product-type";
+import { isLiveProduct, ProductTypeEnum } from "../types/enums/product-type";
 import { StatusCodeEnum } from "../types/enums/status-code";
 
 export class ProductUseCaseImplementation implements ProductUseCase {
@@ -57,14 +57,14 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 
 		if (variations && price) {
 			throw new CustomError(
-				"The product cannot have a prive if it has variations",
+				"The product cannot have a price if it has variations",
 				StatusCodeEnum.BAD_REQUEST,
 			);
 		}
 
-		if (!isPreMadeProduct(type) && isAutomaticDelivery(deliveryMethod)) {
+		if (isLiveProduct(type) && isAutomaticDelivery(deliveryMethod)) {
 			throw new CustomError(
-				"A custom product cannot have an automatic delivery method",
+				"A live product cannot have an automatic delivery method",
 				StatusCodeEnum.BAD_REQUEST,
 			);
 		}

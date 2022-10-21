@@ -7,6 +7,7 @@ import type {
 	AuthOutput,
 	AccountEntity,
 	RefreshInput,
+	GetByAccountIdInput,
 } from "../models/account";
 import type { DiscordUseCase } from "../models/discord";
 import type {
@@ -41,6 +42,16 @@ export class AccountUseCaseImplementation implements AccountUseCase {
 			accountId,
 			discordId,
 		});
+	}
+
+	public async getByAccountId({ accountId }: GetByAccountIdInput) {
+		const account = await this.accountRepository.getByAccountId(accountId);
+
+		if (!account) {
+			throw new CustomError("Not Found", StatusCodeEnum.NOT_FOUND);
+		}
+
+		return account;
 	}
 
 	public async getByDiscordId({ discordId }: GetByDiscordIdInput) {

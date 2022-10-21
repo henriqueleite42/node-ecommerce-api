@@ -46,6 +46,10 @@ export interface AuthOutput {
 	expiresAt: string;
 }
 
+export interface GetByAccountIdInput {
+	accountId: string;
+}
+
 export interface GetByDiscordIdInput {
 	discordId: string;
 }
@@ -60,6 +64,8 @@ export interface RefreshInput {
 
 export interface AccountUseCase {
 	createWithDiscordId: (p: CreateWithDiscordIdInput) => Promise<AccountEntity>;
+
+	getByAccountId: (p: GetByAccountIdInput) => Promise<AccountEntity>;
 
 	getByDiscordId: (p: GetByDiscordIdInput) => Promise<AccountEntity>;
 

@@ -5,15 +5,10 @@
 import type { PixManager } from "../adapters/pix-manager";
 import type { QueueManager } from "../adapters/queue-manager";
 import type { TopicManager } from "../adapters/topic-manager";
-import type { AccountRepository } from "../models/account";
+import type { AccountRepository, AccountUseCase } from "../models/account";
 import type { BlacklistRepository } from "../models/blacklist";
 import type { GiveBuyerAccessToSaleMessage } from "../models/content";
 import type { CouponRepository } from "../models/coupon";
-import type {
-	DiscordNotifySellerCustomProductsSaleMessage,
-	DiscordNotifySellerLiveProductsSaleMessage,
-	DiscordNotifySellerSaleDeliveryConfirmedMessage,
-} from "../models/discord";
 import type { ProductEntity, ProductRepository } from "../models/product";
 import type {
 	AddProductSaleInput,
@@ -34,11 +29,15 @@ import type {
 	AddCouponInput,
 	SaleCoupon,
 	SaleDeliveryConfirmedMessage,
+	NotifySellerSaleMessage,
 } from "../models/sale";
 
 import { CustomError } from "../utils/error";
 
-import { isManualDelivery } from "../types/enums/delivery-method";
+import {
+	isAutomaticDelivery,
+	isManualDelivery,
+} from "../types/enums/delivery-method";
 import { DiscountTypeEnum } from "../types/enums/discount-type";
 import { PaymentMethodEnum } from "../types/enums/payment-method";
 import {
@@ -59,6 +58,8 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		private readonly topicManager: TopicManager,
 		private readonly queueManager: QueueManager,
 		private readonly pixManager: PixManager,
+
+		private readonly accountUsecase: AccountUseCase,
 	) {}
 
 	public async create({ products, ...i }: CreateSaleInput) {
@@ -545,58 +546,111 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		} while (cursor);
 	}
 
+	// eslint-disable-next-line sonarjs/cognitive-complexity
 	public async handleSaleDelivery(sale: SalePaidMessage) {
-		const hasPreMadeProducts = sale.products.some(p =>
-			isPreMadeProduct(p.type),
-		);
-		const hasCustomMadeProducts = sale.products.some(p =>
-			isCustomProduct(p.type),
-		);
-		const hasLiveProducts = sale.products.some(p => isLiveProduct(p.type));
+		const customAutomaticProducts = [] as Array<SaleProduct>;
+		const preMadeAutomaticProducts = [] as Array<SaleProduct>;
+		const customManualProducts = [] as Array<SaleProduct>;
+		const preMadeManualProducts = [] as Array<SaleProduct>;
+		const liveProducts = [] as Array<SaleProduct>;
 
-		if (hasPreMadeProducts) {
+		sale.products.forEach(p => {
+			if (isPreMadeProduct(p.type)) {
+				if (isAutomaticDelivery(p.deliveryMethod)) {
+					preMadeAutomaticProducts.push(p);
+				} else {
+					preMadeManualProducts.push(p);
+				}
+			}
+
+			if (isCustomProduct(p.type)) {
+				if (isAutomaticDelivery(p.deliveryMethod)) {
+					customAutomaticProducts.push(p);
+				} else {
+					customManualProducts.push(p);
+				}
+			}
+
+			if (isLiveProduct(p.type)) {
+				liveProducts.push(p);
+			}
+		});
+
+		if (preMadeAutomaticProducts.length > 0) {
 			await this.queueManager.sendMsg<GiveBuyerAccessToSaleMessage>({
-				to: process.env.CONTENT_GIVE_BUYER_ACCESS_TO_SALE_PRODUCTS!,
+				to: process.env
+					.CONTENT_GIVE_BUYER_ACCESS_TO_PRE_MADE_AUTOMATIC_SALE_PRODUCTS!,
 				message: sale,
 			});
 		}
 
-		const sellerAccount = await this.accountRepository.getByAccountId(
-			sale.storeId,
-		);
+		const hasCustomLiveProductsOrManualDelivery =
+			customAutomaticProducts.length > 0 ||
+			customManualProducts.length > 0 ||
+			preMadeManualProducts.length > 0 ||
+			liveProducts.length > 0;
 
-		if (!sellerAccount) return;
+		if (!hasCustomLiveProductsOrManualDelivery) return;
 
-		if (hasCustomMadeProducts) {
-			await this.queueManager.sendMsg<DiscordNotifySellerCustomProductsSaleMessage>(
-				{
-					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-					to: process.env[
-						`${sellerAccount?.notifyThrough}_NOTIFY_SELLER_CUSTOM_PRODUCTS_SALE`
-					]!,
-					message: {
-						sale,
-						accountId: sellerAccount.accountId,
-						discordId: sellerAccount.discordId!,
-					},
-				},
+		const sellerAccount = await this.accountUsecase
+			.getByAccountId({
+				accountId: sale.storeId,
+			})
+			.catch();
+
+		if (!sellerAccount) {
+			throw new CustomError(
+				"Unable to find seller account",
+				StatusCodeEnum.NOT_FOUND,
 			);
 		}
 
-		if (hasLiveProducts) {
-			await this.queueManager.sendMsg<DiscordNotifySellerLiveProductsSaleMessage>(
-				{
-					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-					to: process.env[
-						`${sellerAccount?.notifyThrough}_NOTIFY_SELLER_LIVE_PRODUCTS_SALE`
-					]!,
-					message: {
-						sale,
-						accountId: sellerAccount.accountId,
-						discordId: sellerAccount.discordId!,
-					},
+		if (customAutomaticProducts.length > 0) {
+			await this.queueManager.sendMsg<NotifySellerSaleMessage>({
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+				to: process.env[
+					`${sellerAccount.notifyThrough}_NOTIFY_SELLER_CUSTOM_AUTOMATIC_PRODUCTS_SALE`
+				]!,
+				message: {
+					saleId: sale.saleId,
+					sellerId: sale.storeId,
+					buyerId: sale.clientId,
+					origin: sale.origin,
+					products: customAutomaticProducts,
 				},
-			);
+			});
+		}
+
+		if (preMadeManualProducts.length > 0) {
+			await this.queueManager.sendMsg<NotifySellerSaleMessage>({
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+				to: process.env[
+					`${sellerAccount.notifyThrough}_NOTIFY_SELLER_PRE_MADE_MANUAL_PRODUCTS_SALE`
+				]!,
+				message: {
+					saleId: sale.saleId,
+					sellerId: sale.storeId,
+					buyerId: sale.clientId,
+					origin: sale.origin,
+					products: preMadeManualProducts,
+				},
+			});
+		}
+
+		if (liveProducts.length > 0) {
+			await this.queueManager.sendMsg<NotifySellerSaleMessage>({
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+				to: process.env[
+					`${sellerAccount.notifyThrough}_NOTIFY_SELLER_LIVE_MANUAL_PRODUCTS_SALE`
+				]!,
+				message: {
+					saleId: sale.saleId,
+					sellerId: sale.storeId,
+					buyerId: sale.clientId,
+					origin: sale.origin,
+					products: liveProducts,
+				},
+			});
 		}
 	}
 
@@ -607,19 +661,13 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 
 		if (!sellerAccount) return;
 
-		await this.queueManager.sendMsg<DiscordNotifySellerSaleDeliveryConfirmedMessage>(
-			{
-				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-				to: process.env[
-					`${sellerAccount?.notifyThrough}_NOTIFY_SELLER_SALE_DELIVERY_CONFIRMED`
-				]!,
-				message: {
-					sale,
-					accountId: sellerAccount.accountId,
-					discordId: sellerAccount.discordId!,
-				},
-			},
-		);
+		await this.queueManager.sendMsg<SaleDeliveryConfirmedMessage>({
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			to: process.env[
+				`${sellerAccount.notifyThrough}_NOTIFY_SELLER_SALE_DELIVERY_CONFIRMED`
+			]!,
+			message: sale,
+		});
 	}
 
 	// Internal Methods

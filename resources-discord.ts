@@ -52,6 +52,11 @@ export const resourcesDiscord: AWS["resources"] = {
 				],
 			},
 		},
+		/**
+		 *
+		 * Queues And Topics
+		 *
+		 */
 		NewSaleAnnouncementQueue: {
 			Type: "AWS::SQS::Queue",
 			Properties: {
@@ -73,6 +78,36 @@ export const resourcesDiscord: AWS["resources"] = {
 					"${self:service}-${opt:stage, 'local'}-new-product-announcement",
 			},
 		},
+
+		NotifySellerCustomAutomaticProductsSaleQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'local'}-notify-seller-custom-automatic-products-sale",
+			},
+		},
+		NotifySellerCustomManualProductsSaleQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'local'}-notify-seller-custom-manual-products-sale",
+			},
+		},
+		NotifySellerPreMadeManualProductsSaleQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'local'}-notify-seller-pre-made-manual-products-sale",
+			},
+		},
+		NotifySellerLiveManualProductsSaleQueue: {
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				QueueName:
+					"${self:service}-${opt:stage, 'local'}-notify-seller-live-manual-products-sale",
+			},
+		},
+
 		NotifyBuyerSalePaidQueue: {
 			Type: "AWS::SQS::Queue",
 			Properties: {
@@ -94,20 +129,6 @@ export const resourcesDiscord: AWS["resources"] = {
 				FilterPolicy: {
 					origin: [{prefix:"DISCORD"}]
 				},
-			},
-		},
-		NotifySellerLiveProductsSaleQueue: {
-			Type: "AWS::SQS::Queue",
-			Properties: {
-				QueueName:
-					"${self:service}-${opt:stage, 'local'}-notify-seller-live-products-sale",
-			},
-		},
-		NotifySellerCustomProductsSaleQueue: {
-			Type: "AWS::SQS::Queue",
-			Properties: {
-				QueueName:
-					"${self:service}-${opt:stage, 'local'}-notify-seller-custom-products-sale",
 			},
 		},
 		NotifyBuyerAccessGrantedQueue: {
