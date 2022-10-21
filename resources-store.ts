@@ -28,6 +28,10 @@ export const resourcesStore: AWS["resources"] = {
 						AttributeName: "name",
 						AttributeType: "S",
 					},
+					{
+						AttributeName: "gender",
+						AttributeType: "S",
+					},
 				],
 				KeySchema: [
 					{
@@ -42,6 +46,23 @@ export const resourcesStore: AWS["resources"] = {
 							{
 								AttributeName: "name",
 								KeyType: "HASH",
+							},
+						],
+						Projection: {
+							ProjectionType: "ALL"
+						},
+						ProvisionedThroughput: PROVISIONED_THROUGHPUT_STORES,
+					},
+					{
+						IndexName: "GenderStoreId",
+						KeySchema: [
+							{
+								AttributeName: "gender",
+								KeyType: "HASH",
+							},
+							{
+								AttributeName: "storeId",
+								KeyType: "RANGE",
 							},
 						],
 						Projection: {
