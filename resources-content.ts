@@ -246,11 +246,11 @@ export const resourcesContent: AWS["resources"] = {
 		 * Storage
 		 *
 		 */
-		RawMediaStorageLambdaInvokePermission: {
+		MediaStorageLambdaInvokePermission: {
 			Type: "AWS::Lambda::Permission",
 			Properties: {
 				FunctionName: {
-					"Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-contentS3UpdateRawImg",
+					"Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-contentS3UpdateMedia",
 				},
 				Action: "lambda:InvokeFunction",
 				Principal: "s3.amazonaws.com",
@@ -259,10 +259,10 @@ export const resourcesContent: AWS["resources"] = {
 				},
 			},
 		},
-		RawMediaStorage: {
+		MediaStorage: {
 			Type: "AWS::S3::Bucket",
 			Properties: {
-				BucketName: "monetizzer-${self:service}-${opt:stage, 'dev'}-raw-media",
+				BucketName: "monetizzer-${self:service}-${opt:stage, 'dev'}-media-storage",
 				PublicAccessBlockConfiguration: {
 					BlockPublicAcls : true,
 					BlockPublicPolicy : true,
@@ -275,7 +275,7 @@ export const resourcesContent: AWS["resources"] = {
 							Event: "s3:ObjectCreated:*",
 							Function: {
 								"Fn::Sub":
-									"arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-contentS3UpdateRawImg",
+									"arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-contentS3UpdateMedia",
 							},
 						},
 					],

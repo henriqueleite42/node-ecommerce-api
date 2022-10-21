@@ -24,8 +24,7 @@ export interface ContentTable {
 	productId: string;
 	storeId: string;
 	type: MediaTypeEnum;
-	rawContentPath?: string;
-	processedContentPath?: string;
+	mediaPath?: string;
 	createdAt: string;
 
 	storeId_productId: string;
@@ -161,8 +160,7 @@ export class ContentRepositoryDynamoDB
 			productId,
 			storeId,
 			type: entity.type,
-			rawContentPath: entity.rawContentPath,
-			processedContentPath: entity.processedContentPath,
+			mediaPath: entity.mediaPath,
 			createdAt,
 
 			storeId_productId:
@@ -182,8 +180,7 @@ export class ContentRepositoryDynamoDB
 			productId: table.productId.replace("PRODUCT#", ""),
 			storeId: table.storeId.replace("STORE#", ""),
 			type: table.type as MediaTypeEnum,
-			rawContentPath: table.rawContentPath,
-			processedContentPath: table.processedContentPath,
+			mediaPath: table.mediaPath,
 			createdAt: new Date(table.createdAt),
 		};
 	}

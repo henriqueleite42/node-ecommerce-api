@@ -12,7 +12,6 @@ import type {
 	ContentCreatedMessage,
 	ContentRepository,
 	ContentUseCase,
-	CreateManyWithUrlInput,
 	EditInput,
 	GetContentFileInput,
 	GetUrlToUploadRawMediaInput,
@@ -41,28 +40,6 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 
 		private readonly productUsecase: ProductUseCase,
 	) {}
-
-	public async createManyWithUrl(p: CreateManyWithUrlInput) {
-		const contents = await this.contentRepository.createMany(p);
-
-		await Promise.all(
-			contents.map((c, idx) =>
-				this.uploadManager.uploadFromUrlBackground({
-					folder: process.env.CONTENT_RAW_MEDIA_BUCKET_NAME!,
-					fileName: `${c.storeId}/${c.productId}/${c.contentId}`,
-					id: {
-						storeId: c.storeId,
-						productId: c.productId,
-						contentId: c.contentId,
-					},
-					mediaUrl: p.contents[idx].mediaUrl,
-					mediaType: p.contents[idx].type,
-				}),
-			),
-		);
-
-		return contents;
-	}
 
 	public getUrlToUploadRawMedia({
 		storeId,
@@ -100,8 +77,7 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 			storeId,
 			productId,
 			contentId,
-			rawContentPath: mediaUrl,
-			processedContentPath: mediaUrl,
+			mediaPath: mediaUrl,
 		});
 
 		if (!content) {
@@ -133,13 +109,13 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 			contentId,
 		});
 
-		if (!access?.rawContentPath) {
+		if (!access?.mediaPath) {
 			throw new CustomError("Not found", StatusCodeEnum.NOT_FOUND);
 		}
 
 		const file = await this.fileManager.getFile({
 			folder: process.env.CONTENT_RAW_MEDIA_BUCKET_NAME!,
-			fileName: access.rawContentPath,
+			fileName: access.mediaPath,
 		});
 
 		if (!file) {
@@ -200,8 +176,7 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 						productId: pack.productId,
 						contentId: p.contentId,
 						type: p.type,
-						rawContentPath: p.rawContentPath!,
-						processedContentPath: p.processedContentPath!,
+						mediaPath: p.mediaPath!,
 					})) as CreateManyInput;
 
 					// Only does it on the first time
@@ -253,8 +228,7 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 						productId: media.productId,
 						contentId: content.contentId,
 						type: content.type,
-						rawContentPath: content.rawContentPath!,
-						processedContentPath: content.processedContentPath!,
+						mediaPath: content.mediaPath!,
 					},
 				]);
 

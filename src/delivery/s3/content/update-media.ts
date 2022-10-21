@@ -39,4 +39,4 @@ export const func = s3Manager
  *
  */
 
-export const updateRawImg = s3Manager.getHandler(__dirname, __filename);
+export const updateMedia = s3Manager.getHandler(__dirname, __filename);

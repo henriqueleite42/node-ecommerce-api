@@ -13,8 +13,7 @@ export interface ContentEntity {
 	storeId: string;
 	productId: string;
 	type: MediaTypeEnum;
-	rawContentPath?: string;
-	processedContentPath?: string;
+	mediaPath?: string;
 	createdAt: Date;
 }
 
@@ -50,7 +49,7 @@ export interface GetFromProductInput {
 }
 
 export interface ContentRepository {
-	createMany: (p: CreateManyWithUrlInput) => Promise<Array<ContentEntity>>;
+	createMany: (p: CreateManyInput) => Promise<Array<ContentEntity>>;
 
 	edit: (p: EditInput) => Promise<ContentEntity | null>;
 
@@ -90,14 +89,6 @@ export interface SetMediaPathInput {
 	mediaPath: string;
 }
 
-export interface CreateManyWithUrlInput
-	extends Pick<ContentEntity, "productId" | "storeId"> {
-	contents: Array<{
-		type: MediaTypeEnum;
-		mediaUrl: string;
-	}>;
-}
-
 export interface GetUserAccessStoresInput {
 	accountId: string;
 	limit: number;
@@ -105,10 +96,6 @@ export interface GetUserAccessStoresInput {
 }
 
 export interface ContentUseCase {
-	createManyWithUrl: (
-		p: CreateManyWithUrlInput,
-	) => Promise<Array<ContentEntity>>;
-
 	getUrlToUploadRawMedia: (
 		p: GetUrlToUploadRawMediaInput,
 	) => Promise<GetUrlToUploadOutput>;

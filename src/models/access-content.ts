@@ -43,8 +43,7 @@ export interface AccessContentEntity {
 	productId: string;
 	contentId: string | "ALL";
 	type?: MediaTypeEnum;
-	rawContentPath?: string;
-	processedContentPath?: string;
+	mediaPath?: string;
 	createdAt: Date;
 }
 export interface AccountAccessStoreEntity {
@@ -79,8 +78,7 @@ export type CreateManyInput = Array<{
 	storeId: string;
 	productId: string;
 	type?: MediaTypeEnum;
-	rawContentPath?: string;
-	processedContentPath?: string;
+	mediaPath?: string;
 }>;
 
 export interface GetFromProductInput {

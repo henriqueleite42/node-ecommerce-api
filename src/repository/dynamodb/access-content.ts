@@ -22,8 +22,7 @@ export interface AccessContentTable {
 	productId: string;
 	contentId: string;
 	type: MediaTypeEnum;
-	rawContentPath: string;
-	processedContentPath: string;
+	mediaPath: string;
 	createdAt: string;
 
 	pk: string;
@@ -172,6 +171,9 @@ export class AccessContentRepositoryDynamoDB
 			accountId,
 			storeId,
 			productId,
+			contentId: entity.contentId,
+			type: entity.type,
+			mediaPath: entity.mediaPath,
 			createdAt,
 
 			pk,
@@ -203,8 +205,7 @@ export class AccessContentRepositoryDynamoDB
 			productId: table.productId.replace("PRODUCT#", ""),
 			contentId: table.contentId?.replace("CONTENT#", ""),
 			type: table.type,
-			rawContentPath: table.rawContentPath,
-			processedContentPath: table.processedContentPath,
+			mediaPath: table.mediaPath,
 			createdAt: new Date(table.createdAt),
 		};
 	}

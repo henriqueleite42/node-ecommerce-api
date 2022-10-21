@@ -1,5 +1,5 @@
-import { updateRawImg } from "../s3/content/update-raw-img";
+import { updateMedia } from "./content/update-media";
 
 export const contentS3 = {
-	contentS3UpdateRawImg: updateRawImg,
+	contentS3UpdateMedia: updateMedia,
 };
