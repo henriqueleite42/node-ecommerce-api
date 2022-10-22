@@ -12,6 +12,7 @@ import { SaleUseCaseImplementation } from "../usecase/sale";
 
 import { Service } from ".";
 import { AccountService } from "./account";
+import { StoreService } from "./store";
 
 let instance: SaleUseCaseImplementation;
 
@@ -32,6 +33,7 @@ export class SaleService extends Service<SaleUseCase> {
 		const pixManager = new GerenciarnetManager();
 
 		const accountUsecase = new AccountService().getInstance();
+		const storeUsecase = new StoreService().getInstance();
 
 		const newInstance = new SaleUseCaseImplementation(
 			saleRepository,
@@ -44,6 +46,7 @@ export class SaleService extends Service<SaleUseCase> {
 			pixManager,
 
 			accountUsecase,
+			storeUsecase,
 		);
 
 		instance = newInstance;

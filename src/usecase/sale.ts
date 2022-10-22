@@ -31,6 +31,7 @@ import type {
 	SaleDeliveryConfirmedMessage,
 	NotifySellerSaleMessage,
 } from "../models/sale";
+import type { StoreUseCase } from "../models/store";
 
 import { CustomError } from "../utils/error";
 
@@ -60,6 +61,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		private readonly pixManager: PixManager,
 
 		private readonly accountUsecase: AccountUseCase,
+		private readonly storeUsecase: StoreUseCase,
 	) {}
 
 	public async create({ products, ...i }: CreateSaleInput) {
@@ -69,6 +71,13 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 
 		if (buying) {
 			throw new CustomError("User blacklisted", StatusCodeEnum.FORBIDDEN);
+		}
+		const store = await this.storeUsecase
+			.getById({ storeId: i.storeId })
+			.catch();
+
+		if (!store) {
+			throw new CustomError("Store not found", StatusCodeEnum.BAD_REQUEST);
 		}
 
 		const productsData = await this.productRepository.getManyById(
@@ -109,6 +118,11 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 			...i,
 			originalValue,
 			products: saleProducts,
+			store: {
+				name: store.name,
+				avatarUrl: store.avatarUrl,
+				bannerUrl: store.bannerUrl,
+			},
 		});
 
 		await this.topicManager.sendMsg<SaleCreatedMessage>({

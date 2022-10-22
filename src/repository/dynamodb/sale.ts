@@ -34,6 +34,11 @@ export interface SaleTable {
 	saleId: string;
 	storeId: string;
 	clientId: string;
+	store: {
+		name: string;
+		avatarUrl?: string;
+		bannerUrl?: string;
+	};
 	status: SalesStatusEnum;
 	products: SaleEntity["products"];
 	origin: `${SaleOriginEnum}#${string}`;
@@ -290,6 +295,7 @@ export class SaleRepositoryDynamoDB
 			saleId: entity.saleId ? `SALE#${entity.saleId}` : undefined,
 			storeId: entity.storeId ? `ACCOUNT#${entity.storeId}` : undefined,
 			clientId: entity.clientId ? `ACCOUNT#${entity.clientId}` : undefined,
+			store: entity.store,
 			origin: entity.origin,
 			status: entity.status,
 			products: entity.products,
@@ -331,6 +337,7 @@ export class SaleRepositoryDynamoDB
 			saleId: table.saleId.replace("SALE#$", ""),
 			storeId: table.storeId.replace("ACCOUNT#$", ""),
 			clientId: table.clientId.replace("ACCOUNT#$", ""),
+			store: table.store,
 			origin: table.origin,
 			status: table.status,
 			products: table.products,

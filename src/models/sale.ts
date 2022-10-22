@@ -33,6 +33,11 @@ export interface SaleEntity {
 	saleId: string;
 	storeId: string;
 	clientId: string;
+	store: {
+		name: string;
+		avatarUrl?: string;
+		bannerUrl?: string;
+	};
 	coupon?: SaleCoupon;
 	origin: `${SaleOriginEnum}#${string | "PV"}`;
 	status: SalesStatusEnum;
@@ -141,7 +146,8 @@ export interface SaleRepository {
  *
  */
 
-export interface CreateSaleInput extends Omit<CreateInput, "products"> {
+export interface CreateSaleInput
+	extends Omit<CreateInput, "products" | "store"> {
 	products: Array<{
 		productId: string;
 		variationId?: string;
