@@ -170,12 +170,6 @@ export const resourcesSale: AWS["resources"] = {
 		 * Queues And Topics
 		 *
 		 */
-		SaleCreatedTopic: {
-			Type: "AWS::SNS::Topic",
-			Properties: {
-				TopicName: "${self:service}-${opt:stage, 'local'}-sale-created",
-			},
-		},
 		SalePaidTopic: {
 			Type: "AWS::SNS::Topic",
 			Properties: {
@@ -268,24 +262,6 @@ export const resourcesSale: AWS["resources"] = {
 		},
 	},
 	Outputs: {
-		SaleCreatedTopicArn: {
-			Value: {
-				Ref: "SaleCreatedTopic"
-			},
-			Export: {
-				Name: {
-					"Fn::Join": [
-						":",
-						[
-							{
-								Ref: "AWS::StackName",
-							},
-							"SaleCreatedTopicArn",
-						],
-					],
-				},
-			}
-		},
 		SalePaidTopicArn: {
 			Value: {
 				Ref: "SalePaidTopic"

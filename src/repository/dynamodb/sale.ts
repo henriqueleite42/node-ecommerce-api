@@ -44,15 +44,15 @@ export interface SaleTable {
 	origin: `${SaleOriginEnum}#${string}`;
 	coupon: SaleEntity["coupon"];
 	originalValue: number;
-	finalValue?: number;
+	finalValue: number;
 	createdAt: string;
-	expiresAt: string;
+	expiresAt?: string;
 
 	storeId_clientId: string;
 	createdAt_saleId: string;
 	status_createdAt: string;
 	status_createdAt_saleId: string;
-	expiresAt_saleId: string;
+	expiresAt_saleId?: string;
 }
 
 export class SaleRepositoryDynamoDB
@@ -345,7 +345,7 @@ export class SaleRepositoryDynamoDB
 			finalValue: table.finalValue,
 			originalValue: table.originalValue,
 			createdAt: new Date(table.createdAt),
-			expiresAt: new Date(table.expiresAt),
+			expiresAt: table.expiresAt ? new Date(table.expiresAt) : undefined,
 		};
 	}
 }

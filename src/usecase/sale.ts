@@ -22,7 +22,6 @@ import type {
 	SaleUseCase,
 	CheckoutSaleInput,
 	SalePaidMessage,
-	SaleCreatedMessage,
 	SetProductAsDeliveredInput,
 	SaleDeliveredMessage,
 	SaleExpiredMessage,
@@ -114,9 +113,10 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 			return acc + cur.originalPrice;
 		}, 0);
 
-		const sale = await this.saleRepository.create({
+		return this.saleRepository.create({
 			...i,
 			originalValue,
+			finalValue: originalValue,
 			products: saleProducts,
 			store: {
 				name: store.name,
@@ -124,13 +124,6 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 				bannerUrl: store.bannerUrl,
 			},
 		});
-
-		await this.topicManager.sendMsg<SaleCreatedMessage>({
-			to: process.env.SALE_SALE_CREATED_TOPIC_ARN!,
-			message: sale,
-		});
-
-		return sale;
 	}
 
 	public async addProduct({ clientId, saleId, product }: AddProductSaleInput) {
@@ -706,6 +699,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 			name: product.name,
 			description: product.description,
 			originalPrice: price,
+			finalPrice: price,
 			imageUrl: product.imageUrl,
 			deliveryMethod: product.deliveryMethod,
 			buyerMessage,

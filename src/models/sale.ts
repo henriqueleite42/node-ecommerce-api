@@ -23,7 +23,7 @@ export interface SaleProduct {
 	description: string;
 	buyerMessage?: string;
 	originalPrice: number;
-	finalPrice?: number;
+	finalPrice: number;
 	imageUrl?: string;
 	deliveryMethod: DeliveryMethodEnum;
 	delivered?: boolean;
@@ -43,9 +43,9 @@ export interface SaleEntity {
 	status: SalesStatusEnum;
 	products: Array<SaleProduct>;
 	originalValue: number;
-	finalValue?: number;
+	finalValue: number;
 	createdAt: Date;
-	expiresAt: Date;
+	expiresAt?: Date;
 }
 
 /**
@@ -146,8 +146,10 @@ export interface SaleRepository {
  *
  */
 
-export interface CreateSaleInput
-	extends Omit<CreateInput, "products" | "store"> {
+export interface CreateSaleInput {
+	storeId: string;
+	clientId: string;
+	origin: `${SaleOriginEnum}#${string | "PV"}`;
 	products: Array<{
 		productId: string;
 		variationId?: string;
@@ -223,8 +225,6 @@ export interface SaleUseCase {
  *
  *
  */
-
-export type SaleCreatedMessage = SaleEntity;
 
 export interface SalePaidMessage extends Omit<SaleEntity, "finalValue"> {
 	finalValue: number;

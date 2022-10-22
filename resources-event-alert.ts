@@ -109,7 +109,7 @@ export const resourcesEventAlert: AWS["resources"] = {
 				},
 				Region: "${self:custom.region.${opt:stage, 'local'}}",
 				TopicArn: {
-					"Fn::ImportValue": "sale-${opt:stage, 'local'}:SaleCreatedTopicArn"
+					"Fn::ImportValue": "sale-${opt:stage, 'local'}:SalePaidTopicArn"
 				},
 			},
 		},
