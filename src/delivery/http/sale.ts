@@ -1,6 +1,7 @@
 import { addCoupon } from "./sale/add-coupon";
 import { addProduct } from "./sale/add-product";
 import { checkout } from "./sale/checkout";
+import { confirmDelivery } from "./sale/confirm-delivery";
 import { create } from "./sale/create";
 import { deliver } from "./sale/deliver";
 import { processPixPayment } from "./sale/process-pix-payment";
@@ -21,6 +22,7 @@ export const saleDomain = async ({
 	addCoupon(server);
 	addProduct(server);
 	checkout(server);
+	confirmDelivery(server);
 	create(server);
 	deliver(server);
 	processPixPayment(server);

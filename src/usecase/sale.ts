@@ -29,6 +29,7 @@ import type {
 	SaleCoupon,
 	SaleDeliveryConfirmedMessage,
 	NotifySellerSaleMessage,
+	ConfirmDeliveryInput,
 } from "../models/sale";
 import type { StoreUseCase } from "../models/store";
 
@@ -69,7 +70,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		});
 
 		if (buying) {
-			throw new CustomError("User blacklisted", StatusCodeEnum.FORBIDDEN);
+			throw new CustomError("User blacklisted", StatusCodeEnum.UNAUTHORIZED);
 		}
 		const store = await this.storeUsecase
 			.getById({ storeId: i.storeId })
@@ -503,6 +504,32 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		}
 
 		return saleUpdated!;
+	}
+
+	public async confirmDelivery({ clientId, saleId }: ConfirmDeliveryInput) {
+		const sale = await this.saleRepository.getById({ saleId });
+
+		if (!sale) {
+			throw new CustomError("Sale not found", StatusCodeEnum.NOT_FOUND);
+		}
+
+		if (sale.clientId !== clientId) {
+			throw new CustomError("Unauthorized", StatusCodeEnum.UNAUTHORIZED);
+		}
+
+		if (sale.status !== SalesStatusEnum.DELIVERED) {
+			throw new CustomError("Sale status invalid", StatusCodeEnum.CONFLICT);
+		}
+
+		const saleUpdated = await this.saleRepository.edit({
+			saleId,
+			status: SalesStatusEnum.DELIVERY_CONFIRMED,
+		});
+
+		await this.topicManager.sendMsg<SaleDeliveryConfirmedMessage>({
+			to: process.env.SALE_SALE_DELIVERY_CONFIRMED_TOPIC_ARN!,
+			message: saleUpdated!,
+		});
 	}
 
 	public async getById(p: GetByIdInput) {

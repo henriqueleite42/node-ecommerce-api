@@ -190,6 +190,11 @@ export interface SetProductAsDeliveredInput {
 	variationId?: string;
 }
 
+export interface ConfirmDeliveryInput {
+	clientId: string;
+	saleId: string;
+}
+
 export interface SaleUseCase {
 	create: (p: CreateSaleInput) => Promise<SaleEntity>;
 
@@ -202,6 +207,8 @@ export interface SaleUseCase {
 	processPixPayment: (p: any) => Promise<void>;
 
 	setProductAsDelivered: (p: SetProductAsDeliveredInput) => Promise<SaleEntity>;
+
+	confirmDelivery: (p: ConfirmDeliveryInput) => Promise<void>;
 
 	getById: (p: GetByIdInput) => Promise<SaleEntity>;
 

@@ -41,7 +41,7 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 		});
 
 		if (storeCreation) {
-			throw new CustomError("User blacklisted", StatusCodeEnum.FORBIDDEN);
+			throw new CustomError("User blacklisted", StatusCodeEnum.UNAUTHORIZED);
 		}
 
 		const accountAlreadyHasStore = await this.storeRepository.getById({
