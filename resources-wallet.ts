@@ -54,7 +54,7 @@ export const resourcesWallet: AWS["resources"] = {
 				},
 				Region: "${self:custom.region.${opt:stage, 'local'}}",
 				TopicArn: {
-					"Fn::ImportValue": "store-${opt:stage, 'local'}:StoreVerifiedTopicArn"
+					"Fn::ImportValue": "store-${opt:stage, 'local'}:StoreCreatedTopicArn"
 				},
 			},
 		},

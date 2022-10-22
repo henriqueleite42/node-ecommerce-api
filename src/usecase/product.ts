@@ -48,13 +48,6 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 			throw new CustomError("Store not found", StatusCodeEnum.NOT_FOUND);
 		}
 
-		if (!store.verified) {
-			throw new CustomError(
-				"Store must be verified to create products",
-				StatusCodeEnum.FORBIDDEN,
-			);
-		}
-
 		if (variations && price) {
 			throw new CustomError(
 				"The product cannot have a price if it has variations",

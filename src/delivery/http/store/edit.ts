@@ -1,10 +1,10 @@
 import { StoreService } from "../../../factories/store";
-import type { EditInput } from "../../../models/store";
+import type { EditStoreInput } from "../../../models/store";
 import type { HttpManager } from "../../../providers/http-manager";
 import { Validations } from "../../../providers/implementations/validations";
 
 export const edit = (server: HttpManager) => {
-	server.addRoute<EditInput>(
+	server.addRoute<EditStoreInput>(
 		{
 			method: "PATCH",
 			path: "stores",
@@ -30,16 +30,6 @@ export const edit = (server: HttpManager) => {
 					key: "color",
 					loc: "body",
 					validations: [Validations.color],
-				},
-				{
-					key: "bannerUrl",
-					loc: "body",
-					validations: [Validations.url],
-				},
-				{
-					key: "avatarUrl",
-					loc: "body",
-					validations: [Validations.url],
 				},
 			],
 		},

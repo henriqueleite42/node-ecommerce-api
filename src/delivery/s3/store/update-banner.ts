@@ -24,7 +24,7 @@ export const func = s3Manager
 	.setFunc(async ({ service, data }) => {
 		const storeId = data.key.split("/").pop()!;
 
-		await service.edit({
+		await service.updateBannerUrl({
 			storeId,
 			bannerUrl: data.key,
 		});

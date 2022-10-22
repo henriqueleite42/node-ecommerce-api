@@ -6,7 +6,7 @@ import type { CounterRepository } from "../models/counter";
 import type { ProductEntity, ProductRepository } from "../models/product";
 import type {
 	CreateInput,
-	EditInput,
+	EditStoreInput,
 	GetByNameInput,
 	IncreaseSalesCountInput,
 	IncreaseTotalBilledInput,
@@ -14,9 +14,9 @@ import type {
 	StoreRepository,
 	StoreUseCase,
 	GetUrlToUploadImgInput,
-	VerifyInput,
 	GetByIdInput,
-	StoreVerifiedMessage,
+	UpdateAvatarUrlInput,
+	UpdateBannerUrlInput,
 } from "../models/store";
 import type { UploadManager } from "../providers/upload-manager";
 
@@ -35,7 +35,7 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 		private readonly uploadManager: UploadManager,
 	) {}
 
-	public async create({ avatarUrl, bannerUrl, ...p }: CreateInput) {
+	public async create(p: CreateInput) {
 		const { storeCreation } = await this.blacklistRepository.get({
 			accountId: p.accountId,
 		});
@@ -66,86 +66,22 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 
 		const store = await this.storeRepository.create(p);
 
-		if (avatarUrl) {
-			await this.uploadManager.uploadFromUrlBackground({
-				folder: process.env.STORE_MEDIA_BUCKET_NAME!,
-				fileName: `avatars/${store.storeId}`,
-				id: {
-					storeId: store.storeId,
-				},
-				mediaUrl: avatarUrl,
-				mediaType: MediaTypeEnum.IMAGE,
-			});
-		}
-
-		if (bannerUrl) {
-			await this.uploadManager.uploadFromUrlBackground({
-				folder: process.env.STORE_MEDIA_BUCKET_NAME!,
-				fileName: `banners/${store.storeId}`,
-				id: {
-					storeId: store.storeId,
-				},
-				mediaUrl: bannerUrl,
-				mediaType: MediaTypeEnum.IMAGE,
-			});
-		}
-
 		await this.topicManager.sendMsg<StoreCreatedMessage>({
 			to: process.env.STORE_STORE_CREATED_TOPIC_ARN!,
-			message: {
-				...store,
-				avatarUrl,
-				bannerUrl,
-			},
+			message: store,
 		});
 
 		return store;
 	}
 
-	public async edit({ avatarUrl, bannerUrl, ...p }: EditInput) {
+	public async edit(p: EditStoreInput) {
 		const store = await this.storeRepository.edit(p);
 
 		if (!store) {
 			throw new CustomError("Store not found", StatusCodeEnum.NOT_FOUND);
 		}
 
-		if (avatarUrl) {
-			await this.uploadManager.uploadFromUrlBackground({
-				folder: process.env.STORE_MEDIA_BUCKET_NAME!,
-				fileName: `avatars/${store.storeId}`,
-				id: {
-					storeId: store.storeId,
-				},
-				mediaUrl: avatarUrl,
-				mediaType: MediaTypeEnum.IMAGE,
-			});
-		}
-
-		if (bannerUrl) {
-			await this.uploadManager.uploadFromUrlBackground({
-				folder: process.env.STORE_MEDIA_BUCKET_NAME!,
-				fileName: `banners/${store.storeId}`,
-				id: {
-					storeId: store.storeId,
-				},
-				mediaUrl: bannerUrl,
-				mediaType: MediaTypeEnum.IMAGE,
-			});
-		}
-
 		return store;
-	}
-
-	public async verify({ storeId }: VerifyInput) {
-		const store = await this.edit({
-			storeId,
-			verified: true,
-		});
-
-		await this.topicManager.sendMsg<StoreVerifiedMessage>({
-			to: process.env.STORE_STORE_VERIFIED_TOPIC_ARN!,
-			message: store,
-		});
 	}
 
 	public getUrlToUploadAvatar({ storeId }: GetUrlToUploadImgInput) {
@@ -162,6 +98,14 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 			fileName: `banners/${storeId}`,
 			type: MediaTypeEnum.IMAGE,
 		});
+	}
+
+	public async updateAvatarUrl(p: UpdateAvatarUrlInput) {
+		await this.storeRepository.edit(p);
+	}
+
+	public async updateBannerUrl(p: UpdateBannerUrlInput) {
+		await this.storeRepository.edit(p);
 	}
 
 	public addProductType({ storeId, type }: ProductEntity) {

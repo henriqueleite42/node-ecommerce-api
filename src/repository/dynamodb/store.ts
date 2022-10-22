@@ -30,7 +30,6 @@ export interface StoreTable {
 	color?: string;
 	bannerPath?: string;
 	avatarPath?: string;
-	verified: boolean;
 	createdAt: string;
 }
 
@@ -46,8 +45,6 @@ export class StoreRepositoryDynamoDB
 		name,
 		description,
 		color,
-		bannerUrl,
-		avatarUrl,
 	}: CreateInput) {
 		const item: StoreEntity = {
 			storeId: accountId,
@@ -57,9 +54,6 @@ export class StoreRepositoryDynamoDB
 			name,
 			description,
 			color,
-			bannerUrl,
-			avatarUrl,
-			verified: false,
 			createdAt: new Date(),
 		};
 
@@ -205,7 +199,6 @@ export class StoreRepositoryDynamoDB
 			bannerUrl: table.bannerPath
 				? `${process.env.STORE_MEDIA_STORAGE_CLOUDFRONT_URL}/${table.bannerPath}`
 				: undefined,
-			verified: table.verified,
 			createdAt: new Date(table.createdAt),
 		};
 	}

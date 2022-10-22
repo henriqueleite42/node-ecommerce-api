@@ -41,16 +41,6 @@ export const create = (server: HttpManager) => {
 					loc: "body",
 					validations: [Validations.color],
 				},
-				{
-					key: "bannerUrl",
-					loc: "body",
-					validations: [Validations.url],
-				},
-				{
-					key: "avatarUrl",
-					loc: "body",
-					validations: [Validations.url],
-				},
 			],
 		},
 		route =>

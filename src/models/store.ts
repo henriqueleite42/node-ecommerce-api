@@ -15,7 +15,6 @@ export interface StoreEntity {
 	color?: string;
 	bannerUrl?: string;
 	avatarUrl?: string;
-	verified: boolean;
 	createdAt: Date;
 }
 
@@ -27,7 +26,10 @@ export interface StoreEntity {
  *
  */
 
-export type CreateInput = Omit<StoreEntity, "createdAt" | "storeId">;
+export type CreateInput = Omit<
+	StoreEntity,
+	"avatarUrl" | "bannerUrl" | "createdAt" | "storeId"
+>;
 
 export type EditInput = Partial<Omit<StoreEntity, "createdAt" | "name">> &
 	Pick<StoreEntity, "storeId">;
@@ -67,12 +69,20 @@ export interface StoreRepository {
  *
  */
 
-export interface VerifyInput {
-	storeId: string;
-}
+export type EditStoreInput = Omit<EditInput, "avatarUrl" | "bannerUrl">;
 
 export interface GetUrlToUploadImgInput {
 	storeId: string;
+}
+
+export interface UpdateAvatarUrlInput {
+	storeId: string;
+	avatarUrl: string;
+}
+
+export interface UpdateBannerUrlInput {
+	storeId: string;
+	bannerUrl: string;
 }
 
 export interface IncreaseSalesCountInput {
@@ -91,9 +101,7 @@ export interface GetStoresCountOutput {
 export interface StoreUseCase {
 	create: (p: CreateInput) => Promise<StoreEntity>;
 
-	edit: (p: EditInput) => Promise<StoreEntity>;
-
-	verify: (p: VerifyInput) => Promise<void>;
+	edit: (p: EditStoreInput) => Promise<StoreEntity>;
 
 	getUrlToUploadAvatar: (
 		p: GetUrlToUploadImgInput,
@@ -102,6 +110,10 @@ export interface StoreUseCase {
 	getUrlToUploadBanner: (
 		p: GetUrlToUploadImgInput,
 	) => Promise<GetUrlToUploadOutput>;
+
+	updateAvatarUrl: (p: UpdateAvatarUrlInput) => void;
+
+	updateBannerUrl: (p: UpdateBannerUrlInput) => void;
 
 	addProductType: (p: ProductEntity) => Promise<void>;
 
@@ -131,5 +143,3 @@ export interface StoreUseCase {
  */
 
 export type StoreCreatedMessage = StoreEntity;
-
-export type StoreVerifiedMessage = StoreEntity;

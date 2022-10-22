@@ -25,7 +25,6 @@ import type {
 	SaleDeliveryConfirmedMessage,
 	SalePaidMessage,
 } from "../models/sale";
-import type { StoreCreatedMessage } from "../models/store";
 
 import { colors } from "../config/colors";
 import { images } from "../config/images";
@@ -540,52 +539,6 @@ Caso você não tenha recebido seus conteúdos ou teve algum problema com a comp
 					color: colors.green,
 					iconUrl: images.maiteAvatar,
 				},
-			],
-		});
-	}
-
-	public async sendAdminsMessageToVerifyStore({
-		storeId,
-		name,
-		avatarUrl,
-		bannerUrl,
-	}: StoreCreatedMessage) {
-		await this.discordManager.sendMessage({
-			channelId: this.adminChannelId,
-			content: `<@&${this.staffRoleId}>`,
-			embeds: [
-				{
-					title: "New store verification request",
-					fields: [
-						{
-							name: "ID",
-							value: storeId,
-						},
-						{
-							name: "Name",
-							value: name,
-						},
-					],
-					color: colors.green,
-					iconUrl: avatarUrl,
-					bannerUrl,
-				},
-			],
-			components: [
-				[
-					{
-						style: "success",
-						customId: `ALLOW_STORE/${storeId}`,
-						label: "Allow creation",
-						emoji: "✅",
-					},
-					{
-						style: "danger",
-						customId: `DENY_STORE/${storeId}`,
-						label: "Deny creation",
-						emoji: "❌",
-					},
-				],
 			],
 		});
 	}
