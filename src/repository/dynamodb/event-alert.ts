@@ -16,6 +16,7 @@ import type {
 import { DynamodbRepository } from ".";
 
 import type { AlertTypeEnum } from "../../types/enums/alert-type";
+import type { GenderEnum } from "../../types/enums/gender";
 import { PlatformEnum } from "../../types/enums/platform";
 import type { ProductTypeEnum } from "../../types/enums/product-type";
 
@@ -24,6 +25,7 @@ export interface EventAlertTable {
 	alertType: AlertTypeEnum;
 	storeId?: string | "ALL";
 	productType?: ProductTypeEnum | "ALL";
+	gender?: GenderEnum | "ALL";
 	createdAt: string;
 	// DISCORD
 	discordGuildId?: string;
@@ -33,7 +35,7 @@ export interface EventAlertTable {
 	pk: string;
 	sk: string;
 	platform_discordGuildId?: string;
-	discordChannelId_alertType_storeId_productType?: string;
+	discordChannelId_alertType_filters?: string;
 }
 
 export class EventAlertRepositoryDynamoDB
@@ -85,26 +87,30 @@ export class EventAlertRepositoryDynamoDB
 		alertType,
 		storeId,
 		productType,
+		gender,
 	}: Pick<
 		EventAlertEntity,
-		"alertType" | "platform" | "productType" | "storeId"
+		"alertType" | "gender" | "platform" | "productType" | "storeId"
 	>) {
-		const value = `PLATFORM#${platform}#ALERT_TYPE#${alertType}#STORE#${
-			storeId || "ALL"
-		}#PRODUCT_TYPE#${productType || "ALL"}`;
+		const pk = [
+			`PLATFORM#${platform}`,
+			`ALERT_TYPE#${alertType}`,
+			`STORE#${storeId || "ALL"}`,
+			`PRODUCT_TYPE#${productType || "ALL"}`,
+			// eslint-disable-next-line @typescript-eslint/no-base-to-string
+			`GENDER#${gender || "ALL"}`,
+		].join("#");
 
 		return {
-			KeyConditionExpression:
-				"#platform_alertType_storeId_productType = :platform_alertType_storeId_productType",
+			KeyConditionExpression: "#pk = :pk",
 			ExpressionAttributeNames: {
-				"#platform_alertType_storeId_productType":
-					"platform_alertType_storeId_productType",
+				"#pk": "pk",
 			},
 			ExpressionAttributeValues: marshall({
-				":platform_alertType_storeId_productType": value,
+				":pk": pk,
 			}),
 			Key: marshall({
-				platform_alertType_storeId_productType: value,
+				pk,
 			}),
 		};
 	}
@@ -115,8 +121,7 @@ export class EventAlertRepositoryDynamoDB
 		const platform_discordGuildId = `PLATFORM#${PlatformEnum.DISCORD}#DISCORD_GUILD#${discordGuildId}`;
 
 		return {
-			Index:
-				"PlatformDiscordGuildIdDiscordChannelIdAlertTypeStoreIdProductType",
+			Index: "PlatformDiscordGuildIdDiscordChannelIdAlertTypeFilters",
 			KeyConditionExpression:
 				"#platform_discordGuildId = :platform_discordGuildId",
 			ExpressionAttributeNames: {
@@ -135,18 +140,17 @@ export class EventAlertRepositoryDynamoDB
 		const platform_discordGuildId = `PLATFORM#${PlatformEnum.DISCORD}#DISCORD_GUILD#${discordGuildId}`;
 
 		return {
-			Index:
-				"PlatformDiscordGuildIdDiscordChannelIdAlertTypeStoreIdProductType",
+			Index: "PlatformDiscordGuildIdDiscordChannelIdAlertTypeFilters",
 			KeyConditionExpression:
-				"#platform_discordGuildId = :platform_discordGuildId AND begins_with(#discordChannelId_alertType_storeId_productType, :discordChannelId_alertType_storeId_productType)",
+				"#platform_discordGuildId = :platform_discordGuildId AND begins_with(#discordChannelId_alertType_filters, :discordChannelId_alertType_filters)",
 			ExpressionAttributeNames: {
 				"#platform_discordGuildId": "platform_discordGuildId",
-				"#discordChannelId_alertType_storeId_productType":
-					"discordChannelId_alertType_storeId_productType",
+				"#discordChannelId_alertType_filters":
+					"discordChannelId_alertType_filters",
 			},
 			ExpressionAttributeValues: marshall({
 				":platform_discordGuildId": platform_discordGuildId,
-				":discordChannelId_alertType_storeId_productType": `DISCORD_CHANNEL#${discordChannelId}`,
+				":discordChannelId_alertType_filters": `DISCORD_CHANNEL#${discordChannelId}`,
 			}),
 		};
 	}
@@ -163,13 +167,14 @@ export class EventAlertRepositoryDynamoDB
 			? `ALERT_TYPE#${entity.alertType}`
 			: undefined;
 		const storeId = entity.storeId ? `STORE#${entity.storeId}` : undefined;
-		const productType = entity.storeId
+		const productType = entity.productType
 			? `PRODUCT_TYPE#${entity.productType}`
 			: undefined;
+		const gender = entity.gender ? `GENDER#${entity.gender}` : undefined;
 
 		const pk =
-			platform && alertType && storeId && productType
-				? [platform, alertType, storeId, productType].join("#")
+			platform && alertType && storeId && productType && gender
+				? [platform, alertType, storeId, productType, gender].join("#")
 				: undefined;
 
 		const discordGuildId = entity.discordGuildId
@@ -188,9 +193,9 @@ export class EventAlertRepositoryDynamoDB
 			platform && discordGuildId
 				? [platform, discordGuildId].join("#")
 				: undefined;
-		const discordChannelId_alertType_storeId_productType =
-			discordChannelId && alertType && storeId && productType
-				? [discordChannelId, alertType, storeId, productType].join("#")
+		const discordChannelId_alertType_filters =
+			discordChannelId && alertType && storeId && productType && gender
+				? [discordChannelId, alertType, storeId, productType, gender].join("#")
 				: undefined;
 
 		return cleanObj({
@@ -198,6 +203,7 @@ export class EventAlertRepositoryDynamoDB
 			alertType: entity.alertType,
 			storeId: entity.storeId,
 			productType: entity.productType,
+			gender: entity.gender,
 			createdAt: entity.createdAt?.toString(),
 			// DISCORD
 			discordGuildId,
@@ -208,7 +214,7 @@ export class EventAlertRepositoryDynamoDB
 			sk,
 			// DISCORD
 			platform_discordGuildId,
-			discordChannelId_alertType_storeId_productType,
+			discordChannelId_alertType_filters,
 		});
 	}
 
@@ -218,6 +224,7 @@ export class EventAlertRepositoryDynamoDB
 			alertType: table.alertType,
 			storeId: table.storeId,
 			productType: table.productType,
+			gender: table.gender,
 			createdAt: new Date(table.createdAt),
 			// DISCORD
 			discordGuildId: table.discordGuildId?.replace("DISCORD_GUILD#", ""),

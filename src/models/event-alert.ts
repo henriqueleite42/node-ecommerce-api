@@ -3,12 +3,13 @@ import type { SaleEntity } from "./sale";
 import type { StoreEntity } from "./store";
 
 import type { AlertTypeEnum } from "../types/enums/alert-type";
+import type { GenderEnum } from "../types/enums/gender";
 import type { PlatformEnum } from "../types/enums/platform";
 import type { ProductTypeEnum } from "../types/enums/product-type";
 
 /**
  * Filters allowed:
- * NEW_STORE: --
+ * NEW_STORE: gender
  * NEW_PRODUCT: storeId
  * NEW_SALE: storeId, productType
  * NEW_FEEDBACK: storeId, productType
@@ -16,8 +17,9 @@ import type { ProductTypeEnum } from "../types/enums/product-type";
 interface BaseEventAlert {
 	platform: PlatformEnum;
 	alertType: AlertTypeEnum;
-	storeId?: string | "ALL";
-	productType?: ProductTypeEnum | "ALL";
+	storeId: string | "ALL";
+	productType: ProductTypeEnum | "ALL";
+	gender: GenderEnum | "ALL";
 	createdAt: Date;
 }
 
@@ -44,8 +46,9 @@ export interface EventAlertEntity
 export interface GetEventsInput {
 	platform: PlatformEnum;
 	alertType: AlertTypeEnum;
-	storeId?: string | "ALL";
-	productType?: ProductTypeEnum | "ALL";
+	storeId: string | "ALL";
+	productType: ProductTypeEnum | "ALL";
+	gender: GenderEnum | "ALL";
 	limit: number;
 	cursor?: string;
 }

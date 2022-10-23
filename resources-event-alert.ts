@@ -33,7 +33,7 @@ export const resourcesEventAlert: AWS["resources"] = {
 						AttributeType: "S",
 					},
 					{
-						AttributeName: "discordChannelId_alertType_storeId_productType",
+						AttributeName: "discordChannelId_alertType_filters",
 						AttributeType: "S",
 					},
 				],
@@ -49,14 +49,14 @@ export const resourcesEventAlert: AWS["resources"] = {
 				],
 				GlobalSecondaryIndexes: [
 					{
-						IndexName: "PlatformDiscordGuildIdDiscordChannelIdAlertTypeStoreIdProductType",
+						IndexName: "PlatformDiscordGuildIdDiscordChannelIdAlertTypeFilters",
 						KeySchema: [
 							{
 								AttributeName: "platform_discordGuildId",
 								KeyType: "HASH",
 							},
 							{
-								AttributeName: "discordChannelId_alertType_storeId_productType",
+								AttributeName: "discordChannelId_alertType_filters",
 								KeyType: "RANGE",
 							},
 						],

@@ -88,6 +88,11 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 
 		if (!store) return;
 
+		/**
+		 *
+		 * Check `BaseEventAlert` to see all the filters allowed
+		 *
+		 */
 		const queries: Array<GetEventsInput> = [
 			{
 				// Event alerts with no filters
@@ -95,6 +100,7 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 				alertType: AlertTypeEnum.NEW_SALE,
 				storeId: "ALL",
 				productType: "ALL",
+				gender: "ALL",
 				limit: 25,
 			},
 			{
@@ -103,22 +109,25 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 				alertType: AlertTypeEnum.NEW_SALE,
 				storeId: sale.storeId,
 				productType: "ALL",
+				gender: "ALL",
 				limit: 25,
 			},
 			// Event alerts with filter for specific product types
-			...sale.products.map(p => ({
+			...sale.products.map<any>(p => ({
 				platform: PlatformEnum.DISCORD,
 				alertType: AlertTypeEnum.NEW_SALE,
 				storeId: "ALL",
 				productType: p.type,
+				gender: "ALL",
 				limit: 25,
 			})),
 			// Event alerts with filter for specific store and product types
-			...sale.products.map(p => ({
+			...sale.products.map<any>(p => ({
 				platform: PlatformEnum.DISCORD,
 				alertType: AlertTypeEnum.NEW_SALE,
 				storeId: sale.storeId,
 				productType: p.type,
+				gender: "ALL",
 				limit: 25,
 			})),
 		];
@@ -161,36 +170,62 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 
 		let delay = 0;
 
-		do {
-			const { items, nextPage } = await this.eventAlertRepository.getEvents({
+		/**
+		 *
+		 * Check `BaseEventAlert` to see all the filters allowed
+		 *
+		 */
+		const queries: Array<GetEventsInput> = [
+			{
+				// Event alerts with no filters
 				platform: PlatformEnum.DISCORD,
 				alertType: AlertTypeEnum.NEW_STORE,
+				storeId: "ALL",
+				productType: "ALL",
+				gender: "ALL",
 				limit: 25,
-			});
+			},
+			{
+				// Event alerts with filter for specific gender
+				platform: PlatformEnum.DISCORD,
+				alertType: AlertTypeEnum.NEW_STORE,
+				storeId: "ALL",
+				productType: "ALL",
+				gender: store.gender,
+				limit: 25,
+			},
+		];
 
-			if (items.length === 0) {
-				return;
-			}
+		for (const query of queries) {
+			do {
+				const { items, nextPage } = await this.eventAlertRepository.getEvents(
+					query,
+				);
 
-			await this.queueManager.sendMsg<DiscordNewStoreAnnouncementMessage>({
-				to: process.env.DISCORD_NEW_STORE_ANNOUNCEMENT_QUEUE_URL!,
-				message: {
-					items,
-					store,
-				},
-				delayInSeconds: delay,
-			});
+				if (items.length === 0) {
+					break;
+				}
 
-			// AWS SQS delay limit of 15 min
-			if (delay === 900) {
-				sleep(10);
-				delay = 0;
-			} else {
-				delay++;
-			}
+				await this.queueManager.sendMsg<DiscordNewStoreAnnouncementMessage>({
+					to: process.env.DISCORD_NEW_STORE_ANNOUNCEMENT_QUEUE_URL!,
+					message: {
+						items,
+						store,
+					},
+					delayInSeconds: delay,
+				});
 
-			cursor = nextPage;
-		} while (cursor);
+				// AWS SQS delay limit of 15 min
+				if (delay === 900) {
+					sleep(10);
+					delay = 0;
+				} else {
+					delay++;
+				}
+
+				cursor = nextPage;
+			} while (cursor);
+		}
 	}
 
 	// eslint-disable-next-line sonarjs/cognitive-complexity
@@ -205,6 +240,11 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 
 		if (!store) return;
 
+		/**
+		 *
+		 * Check `BaseEventAlert` to see all the filters allowed
+		 *
+		 */
 		const queries: Array<GetEventsInput> = [
 			{
 				// Event alerts with no filters
@@ -212,6 +252,7 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 				alertType: AlertTypeEnum.NEW_PRODUCT,
 				storeId: "ALL",
 				productType: "ALL",
+				gender: "ALL",
 				limit: 25,
 			},
 			{
@@ -220,6 +261,7 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 				alertType: AlertTypeEnum.NEW_PRODUCT,
 				storeId: product.storeId,
 				productType: "ALL",
+				gender: "ALL",
 				limit: 25,
 			},
 			{
@@ -228,6 +270,7 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 				alertType: AlertTypeEnum.NEW_PRODUCT,
 				storeId: "ALL",
 				productType: product.type,
+				gender: "ALL",
 				limit: 25,
 			},
 			{
@@ -236,6 +279,7 @@ export class EventAlertUseCaseImplementation implements EventAlertUseCase {
 				alertType: AlertTypeEnum.NEW_PRODUCT,
 				storeId: product.storeId,
 				productType: product.type,
+				gender: "ALL",
 				limit: 25,
 			},
 		];
