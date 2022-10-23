@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { BatchWriteItemCommand } from "@aws-sdk/client-dynamodb";
+import { PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { cleanObj } from "@techmmunity/utils";
 
 import type {
 	ContentEntity,
 	ContentRepository,
-	CreateManyInput,
+	CreateInput,
 	EditInput,
 	GetContentInput,
 	GetFromProductInput,
@@ -38,50 +38,25 @@ export class ContentRepositoryDynamoDB
 {
 	protected readonly tableName = "contents";
 
-	public async createMany({ storeId, productId, contents }: CreateManyInput) {
-		const createdAt = new Date();
-
-		const items: Array<ContentEntity> = contents.map(c => ({
+	public async create({ storeId, productId, type }: CreateInput) {
+		const item: ContentEntity = {
 			contentId: genCode(),
 			productId,
 			storeId,
-			type: c.type,
-			createdAt,
-		}));
+			type,
+			createdAt: new Date(),
+		};
 
-		const itemsTable = items.map(i => this.entityToTable(i));
-
-		const result = await this.dynamodb.send(
-			new BatchWriteItemCommand({
-				RequestItems: {
-					[this.tableName]: itemsTable.map(i => ({
-						PutRequest: {
-							Item: marshall(i),
-						},
-					})),
-				},
+		await this.dynamodb.send(
+			new PutItemCommand({
+				// eslint-disable-next-line @typescript-eslint/naming-convention
+				TableName: this.tableName,
+				// eslint-disable-next-line @typescript-eslint/naming-convention
+				Item: marshall(this.entityToTable(item)),
 			}),
 		);
 
-		if ((result.UnprocessedItems?.[this.tableName]?.length || 0) > 0) {
-			await this.dynamodb.send(
-				new BatchWriteItemCommand({
-					RequestItems: {
-						[this.tableName]: itemsTable.map(i => ({
-							DeleteRequest: {
-								Key: marshall({
-									storeId_productId_contentId: i.storeId_productId_contentId,
-								}),
-							},
-						})),
-					},
-				}),
-			);
-
-			throw new Error("Fail to create contents");
-		}
-
-		return items;
+		return item;
 	}
 
 	public edit({ storeId, productId, contentId, ...data }: EditInput) {

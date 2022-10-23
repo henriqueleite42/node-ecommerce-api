@@ -25,11 +25,10 @@ export interface ContentEntity {
  *
  */
 
-export interface CreateManyInput
-	extends Pick<ContentEntity, "productId" | "storeId"> {
-	contents: Array<{
-		type: MediaTypeEnum;
-	}>;
+export interface CreateInput {
+	storeId: string;
+	productId: string;
+	type: MediaTypeEnum;
 }
 
 export type EditInput = Partial<Omit<ContentEntity, "createdAt" | "type">> &
@@ -49,7 +48,7 @@ export interface GetFromProductInput {
 }
 
 export interface ContentRepository {
-	createMany: (p: CreateManyInput) => Promise<Array<ContentEntity>>;
+	create: (p: CreateInput) => Promise<ContentEntity>;
 
 	edit: (p: EditInput) => Promise<ContentEntity | null>;
 
@@ -96,15 +95,15 @@ export interface GetUserAccessStoresInput {
 }
 
 export interface ContentUseCase {
-	getUrlToUploadRawMedia: (
+	create: (p: CreateInput) => Promise<ContentEntity>;
+
+	getUrlToUploadMedia: (
 		p: GetUrlToUploadRawMediaInput,
 	) => Promise<GetUrlToUploadOutput>;
 
 	setMediaPath: (p: SetMediaPathInput) => Promise<void>;
 
 	getContentFile: (p: GetContentFileInput) => Promise<GetFileOutput>;
-
-	edit: (p: EditInput) => Promise<ContentEntity | null>;
 
 	getUserAccessStores: (
 		p: GetUserAccessStoresInput,

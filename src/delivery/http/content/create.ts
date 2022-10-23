@@ -1,48 +1,39 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { ContentService } from "../../../factories/content";
-import type { GetContentFileInput } from "../../../models/content";
+import type { CreateInput } from "../../../models/content";
 import type { HttpManager } from "../../../providers/http-manager";
 import { Validations } from "../../../providers/implementations/validations";
 
 export const getContentFile = (server: HttpManager) => {
-	server.addRoute<GetContentFileInput>(
+	server.addRoute<CreateInput>(
 		{
-			method: "GET",
-			path: "contents/:storeId/:productId/:contentId",
+			method: "POST",
+			path: "contents",
 			auth: ["REST_USER"],
 			validations: [
 				{
-					key: "accountId",
+					key: "storeId",
 					loc: "auth",
 					validations: [Validations.required, Validations.id],
 				},
 				{
-					key: "storeId",
-					loc: "path",
-					validations: [Validations.required, Validations.id],
-				},
-				{
 					key: "productId",
-					loc: "path",
+					loc: "body",
 					validations: [Validations.required, Validations.code],
 				},
 				{
-					key: "contentId",
-					loc: "path",
-					validations: [Validations.required, Validations.id],
+					key: "type",
+					loc: "body",
+					validations: [Validations.required, Validations.mediaType],
 				},
 			],
 		},
 		route =>
-			route.setFunc(async (p, headers) => {
+			route.setFunc(p => {
 				const service = new ContentService().getInstance();
 
-				const { contentType, file } = await service.getContentFile(p);
-
-				headers.set("content-type", contentType);
-
-				return file;
+				return service.create(p);
 			}),
 	);
 };

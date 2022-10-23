@@ -12,7 +12,7 @@ import type {
 	ContentCreatedMessage,
 	ContentRepository,
 	ContentUseCase,
-	EditInput,
+	CreateInput,
 	GetContentFileInput,
 	GetUrlToUploadRawMediaInput,
 	GetUserAccessStoresInput,
@@ -42,7 +42,11 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 		private readonly productUsecase: ProductUseCase,
 	) {}
 
-	public getUrlToUploadRawMedia({
+	public create(p: CreateInput) {
+		return this.contentRepository.create(p);
+	}
+
+	public getUrlToUploadMedia({
 		storeId,
 		productId,
 		contentId,
@@ -53,10 +57,6 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 			fileName: `${storeId}/${productId}/${contentId}`,
 			type,
 		});
-	}
-
-	public edit(p: EditInput) {
-		return this.contentRepository.edit(p);
 	}
 
 	public async setMediaPath({

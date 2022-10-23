@@ -9,7 +9,7 @@ export const getUserAccessStores = (server: HttpManager) => {
 	server.addRoute<GetUserAccessStoresInput>(
 		{
 			method: "GET",
-			path: "content/access/stores",
+			path: "contents/access/stores",
 			auth: ["REST_USER"],
 			validations: [
 				{

@@ -3,7 +3,7 @@ import { del } from "./product/delete";
 import { edit } from "./product/edit";
 import { getById } from "./product/get-by-id";
 import { getPaginated } from "./product/get-paginated";
-import { getUrlToUploadImg } from "./product/get-urlupload-img";
+import { getUrlToUploadImg } from "./product/get-url-to-upload-img";
 import { top } from "./product/top";
 import { total } from "./product/total";
 import type { DomainInput } from "./types";

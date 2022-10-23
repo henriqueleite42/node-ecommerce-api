@@ -9,7 +9,7 @@ export const getUrlToUploadMedia = (server: HttpManager) => {
 	server.addRoute<GetUrlToUploadRawMediaInput>(
 		{
 			method: "GET",
-			path: "content/upload-media",
+			path: "contents/upload-media",
 			auth: ["REST_USER"],
 			validations: [
 				{
@@ -38,7 +38,7 @@ export const getUrlToUploadMedia = (server: HttpManager) => {
 			route.setFunc(p => {
 				const service = new ContentService().getInstance();
 
-				return service.getUrlToUploadRawMedia(p);
+				return service.getUrlToUploadMedia(p);
 			}),
 	);
 };
