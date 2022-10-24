@@ -22,7 +22,6 @@ import type {
 import type { ProductUseCase } from "../models/product";
 import type { SaleProduct } from "../models/sale";
 import type { StoreRepository } from "../models/store";
-import type { UploadManager } from "../providers/upload-manager";
 
 import { CustomError } from "../utils/error";
 
@@ -35,15 +34,29 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 		private readonly accessContentRepository: AccessContentRepository,
 		private readonly accountAccessesStoresRepository: AccountAccessesStoresRepository,
 		private readonly storeRepository: StoreRepository,
-		private readonly uploadManager: UploadManager,
 		private readonly fileManager: FileManager,
 		private readonly topicManager: TopicManager,
 
 		private readonly productUsecase: ProductUseCase,
 	) {}
 
-	public create(p: CreateInput) {
-		return this.contentRepository.create(p);
+	public async create({ storeId, productId, type }: CreateInput) {
+		const product = await this.productUsecase
+			.getById({
+				storeId,
+				productId,
+			})
+			.catch();
+
+		if (!product) {
+			throw new CustomError("Product not found", StatusCodeEnum.NOT_FOUND);
+		}
+
+		return this.contentRepository.create({
+			storeId,
+			productId,
+			type,
+		});
 	}
 
 	public getUrlToUploadMedia({
@@ -52,8 +65,8 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 		contentId,
 		type,
 	}: GetUrlToUploadRawMediaInput) {
-		return this.uploadManager.getUrlToUpload({
-			folder: process.env.CONTENT_RAW_MEDIA_BUCKET_NAME!,
+		return this.fileManager.getUrlToUpload({
+			folder: process.env.CONTENT_MEDIA_BUCKET_NAME!,
 			fileName: `${storeId}/${productId}/${contentId}`,
 			type,
 		});
@@ -115,7 +128,7 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 		}
 
 		const file = await this.fileManager.getFile({
-			folder: process.env.CONTENT_RAW_MEDIA_BUCKET_NAME!,
+			folder: process.env.CONTENT_MEDIA_BUCKET_NAME!,
 			fileName: access.mediaPath,
 		});
 

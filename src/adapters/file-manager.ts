@@ -4,7 +4,7 @@ import type { MediaTypeEnum } from "../types/enums/media-type";
 
 export interface SaveFileInput {
 	folder: string;
-	file: ReadStream;
+	file: Buffer | ReadStream;
 	fileName: string;
 	metadata?: Record<string, string>;
 }

@@ -1,5 +1,7 @@
-import type { GetFileOutput } from "../adapters/file-manager";
-import type { GetUrlToUploadOutput } from "../providers/upload-manager";
+import type {
+	GetFileOutput,
+	GetUrlToUploadOutput,
+} from "../adapters/file-manager";
 
 import type { AccountAccessStoreEntity } from "./access-content";
 import type { ProductEntity } from "./product";

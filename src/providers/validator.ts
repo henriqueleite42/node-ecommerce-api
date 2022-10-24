@@ -6,11 +6,13 @@ export interface ValidateInput {
 	query?: Record<string, any> | null;
 }
 
+export type ValidatorFunc = (key: string, p?: any) => void;
+
 export interface Validations<T> {
 	key: keyof T; // Prop name on the final object
 	as?: string; // Prop name on body / auth / etc object
 	loc?: keyof ValidateInput;
-	validations?: Array<(key: string, p?: any) => void>;
+	validations?: Array<ValidatorFunc>;
 	transform?: Array<(p?: any) => any>;
 }
 

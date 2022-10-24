@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
+import type { Type } from "@techmmunity/utils";
 import {
 	getArrayUniqueValues,
 	getEnumValues,
@@ -8,9 +9,13 @@ import {
 	isCpf,
 	isEmail,
 	isUrl,
+	getTypeof,
 } from "@techmmunity/utils";
 
-import type { Validations as ValidationsType } from "../../providers/validator";
+import type {
+	Validations as ValidationsType,
+	ValidatorFunc,
+} from "../../providers/validator";
 
 import { ValidatorProvider } from "./validator";
 
@@ -102,15 +107,26 @@ export class Validations {
 		};
 	}
 
-	public static array(key: string, p?: any) {
-		if (typeof p === "undefined") return;
+	public static array(type: Type) {
+		return (key: string, p?: any) => {
+			if (typeof p === "undefined") return;
 
-		if (!Array.isArray(p)) {
-			throw new CustomError(
-				`${key} must be an array`,
-				StatusCodeEnum.BAD_REQUEST,
-			);
-		}
+			if (!Array.isArray(p)) {
+				throw new CustomError(
+					`${key} must be an array`,
+					StatusCodeEnum.BAD_REQUEST,
+				);
+			}
+
+			const valType = getTypeof(p[0]);
+
+			if (type !== valType) {
+				throw new CustomError(
+					`${key} items must be type '${type}' but are type '${valType}'`,
+					StatusCodeEnum.BAD_REQUEST,
+				);
+			}
+		};
 	}
 
 	public static arrOfObj(vArr: Array<Omit<ValidationsType<any>, "loc">>) {
@@ -131,7 +147,40 @@ export class Validations {
 					validator.validate(v);
 				} catch (err: any) {
 					if (err instanceof CustomError) {
-						const { message } = JSON.parse(err.getBodyString());
+						const { message } = err.getBody();
+
+						throw new CustomError(
+							`${key}[${idx}].${message}`,
+							StatusCodeEnum.BAD_REQUEST,
+						);
+					} else {
+						throw new CustomError(
+							`${key}[${idx}].??? ${err.message}`,
+							StatusCodeEnum.BAD_REQUEST,
+						);
+					}
+				}
+			});
+		};
+	}
+
+	public static arrOf(validatorFunc: ValidatorFunc) {
+		return (key: string, p?: any) => {
+			if (typeof p === "undefined") return;
+
+			if (!Array.isArray(p)) {
+				throw new CustomError(
+					`${key} must be an array`,
+					StatusCodeEnum.BAD_REQUEST,
+				);
+			}
+
+			p.forEach((v: any, idx) => {
+				try {
+					validatorFunc(v);
+				} catch (err: any) {
+					if (err instanceof CustomError) {
+						const { message } = err.getBody();
 
 						throw new CustomError(
 							`${key}[${idx}].${message}`,
@@ -156,7 +205,7 @@ export class Validations {
 				new ValidatorProvider(vArr as any).validate(p);
 			} catch (err: any) {
 				if (err instanceof CustomError) {
-					const { message } = JSON.parse(err.getBodyString());
+					const { message } = err.getBody();
 
 					throw new CustomError(
 						`${key}.${message}`,

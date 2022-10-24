@@ -1,5 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 
+import type { FileManager } from "../adapters/file-manager";
+import type { ImageManager } from "../adapters/image-manager";
 import type { TopicManager } from "../adapters/topic-manager";
 import type { BlacklistRepository } from "../models/blacklist";
 import type { CounterRepository } from "../models/counter";
@@ -17,8 +19,9 @@ import type {
 	GetByIdInput,
 	UpdateAvatarUrlInput,
 	UpdateBannerUrlInput,
+	CreateTopStoresInput,
+	StoreEntity,
 } from "../models/store";
-import type { UploadManager } from "../providers/upload-manager";
 
 import { CustomError } from "../utils/error";
 
@@ -32,7 +35,8 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 		private readonly blacklistRepository: BlacklistRepository,
 		private readonly counterRepository: CounterRepository,
 		private readonly topicManager: TopicManager,
-		private readonly uploadManager: UploadManager,
+		private readonly fileManager: FileManager,
+		private readonly imageManager: ImageManager,
 	) {}
 
 	public async create(p: CreateInput) {
@@ -85,7 +89,7 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 	}
 
 	public getUrlToUploadAvatar({ storeId }: GetUrlToUploadImgInput) {
-		return this.uploadManager.getUrlToUpload({
+		return this.fileManager.getUrlToUpload({
 			folder: process.env.STORE_MEDIA_BUCKET_NAME!,
 			fileName: `avatars/${storeId}`,
 			type: MediaTypeEnum.IMAGE,
@@ -93,7 +97,7 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 	}
 
 	public getUrlToUploadBanner({ storeId }: GetUrlToUploadImgInput) {
-		return this.uploadManager.getUrlToUpload({
+		return this.fileManager.getUrlToUpload({
 			folder: process.env.STORE_MEDIA_BUCKET_NAME!,
 			fileName: `banners/${storeId}`,
 			type: MediaTypeEnum.IMAGE,
@@ -158,16 +162,6 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 		return store;
 	}
 
-	public async getTop() {
-		const topStores = await this.counterRepository.getTopStores();
-
-		if (topStores.length === 0) {
-			return [];
-		}
-
-		return this.storeRepository.getManyById(topStores);
-	}
-
 	public async getStoresCount() {
 		const count = await this.counterRepository.getTotal("STORES");
 
@@ -197,5 +191,49 @@ export class StoreUseCaseImplementation implements StoreUseCase {
 			qtd: amount,
 			type: "TOTAL_BILLED",
 		});
+	}
+
+	public async createTopStores({ storesNames }: CreateTopStoresInput) {
+		const stores = await Promise.all(
+			storesNames.map(name =>
+				this.storeRepository.getByName({
+					name,
+				}),
+			),
+		).then(r => r.filter(Boolean) as Array<StoreEntity>);
+
+		if (stores.length !== storesNames.length) {
+			const notFound = storesNames.filter(
+				name => !stores.find(s => s.name === name),
+			);
+
+			throw new CustomError(
+				`Stores not found: ${notFound.join(", ")}`,
+				StatusCodeEnum.NOT_FOUND,
+			);
+		}
+
+		const img = await this.imageManager.genTopStores({
+			stores,
+		});
+
+		const { filePath } = await this.fileManager.saveFile({
+			folder: process.env.STORE_MEDIA_BUCKET_NAME!,
+			fileName: `top/${new Date().toISOString()}`,
+			file: img,
+		});
+
+		return this.storeRepository.createTopStores({
+			imageUrl: filePath,
+			stores: stores.map(s => ({
+				storeId: s.storeId,
+				name: s.name,
+				gender: s.gender,
+			})),
+		});
+	}
+
+	public getTopStores() {
+		return this.storeRepository.getTopStores();
 	}
 }

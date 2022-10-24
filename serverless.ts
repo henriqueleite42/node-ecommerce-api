@@ -20,7 +20,6 @@ import { eventAlert } from "./src/delivery/queue/event-alert";
 import { productSQS } from "./src/delivery/queue/product";
 import { saleSQS } from "./src/delivery/queue/sale";
 import { storeSQS } from "./src/delivery/queue/store";
-import { upload } from "./src/delivery/queue/upload";
 import { wallet } from "./src/delivery/queue/wallet";
 
 import { contentS3 } from "./src/delivery/s3/content";
@@ -202,7 +201,6 @@ const uploadConfig = {
 		"serverless-webpack",
 	],
 	resources: resourcesUpload,
-	functions: upload,
 };
 
 const walletConfig = {

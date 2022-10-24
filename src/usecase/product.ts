@@ -1,3 +1,4 @@
+import type { FileManager } from "../adapters/file-manager";
 import type { QueueManager } from "../adapters/queue-manager";
 import type { TopicManager } from "../adapters/topic-manager";
 import type { CounterRepository } from "../models/counter";
@@ -19,7 +20,6 @@ import type {
 	IncreaseMediaCountInput,
 } from "../models/product";
 import type { StoreUseCase } from "../models/store";
-import type { UploadManager } from "../providers/upload-manager";
 
 import { CustomError } from "../utils/error";
 
@@ -32,7 +32,7 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 	public constructor(
 		private readonly productRepository: ProductRepository,
 		private readonly counterRepository: CounterRepository,
-		private readonly uploadManager: UploadManager,
+		private readonly fileManager: FileManager,
 		private readonly queueManager: QueueManager,
 		private readonly topicManager: TopicManager,
 
@@ -155,7 +155,7 @@ export class ProductUseCaseImplementation implements ProductUseCase {
 	}
 
 	public getUrlToUploadImg({ storeId, productId }: GetUrlToUploadImgInput) {
-		return this.uploadManager.getUrlToUpload({
+		return this.fileManager.getUrlToUpload({
 			folder: process.env.PRODUCT_MEDIA_BUCKET_NAME!,
 			fileName: `${storeId}/${productId}`,
 			type: MediaTypeEnum.IMAGE,

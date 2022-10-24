@@ -59,3 +59,7 @@ serverless.js.map
 
 # NPM
 package-lock.json
+
+# Experiments
+/src/.experiments/*
+!/src/.experiments/.gitkeep

@@ -1,4 +1,4 @@
-import type { GetUrlToUploadOutput } from "../providers/upload-manager";
+import type { GetUrlToUploadOutput } from "../adapters/file-manager";
 
 import type { PaginatedItems } from "./types";
 

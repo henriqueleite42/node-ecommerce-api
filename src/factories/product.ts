@@ -2,7 +2,6 @@ import { S3Adapter } from "../adapters/implementations/s3";
 import { SNSAdapter } from "../adapters/implementations/sns";
 import { SQSAdapter } from "../adapters/implementations/sqs";
 import type { ProductUseCase } from "../models/product";
-import { UploadManagerProvider } from "../providers/implementations/upload-manager";
 import { getDynamoInstance } from "../repository/dynamodb";
 import { CounterRepositoryDynamoDB } from "../repository/dynamodb/counter";
 import { ProductRepositoryDynamoDB } from "../repository/dynamodb/product";
@@ -22,8 +21,6 @@ export class ProductService extends Service<ProductUseCase> {
 		const sns = new SNSAdapter();
 		const s3 = new S3Adapter();
 
-		const uploadManager = new UploadManagerProvider(sqs, s3);
-
 		const productRepository = new ProductRepositoryDynamoDB(dynamodb);
 		const counterRepository = new CounterRepositoryDynamoDB(dynamodb);
 
@@ -32,7 +29,7 @@ export class ProductService extends Service<ProductUseCase> {
 		const newInstance = new ProductUseCaseImplementation(
 			productRepository,
 			counterRepository,
-			uploadManager,
+			s3,
 			sqs,
 			sns,
 			storeUseCase,

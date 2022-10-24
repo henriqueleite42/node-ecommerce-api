@@ -1,7 +1,13 @@
+/* eslint-disable capitalized-comments */
+/* eslint-disable multiline-comment-style */
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { PutItemCommand, UpdateItemCommand } from "@aws-sdk/client-dynamodb";
-import { marshall } from "@aws-sdk/util-dynamodb";
+import {
+	GetItemCommand,
+	PutItemCommand,
+	UpdateItemCommand,
+} from "@aws-sdk/client-dynamodb";
+import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { cleanObj } from "@techmmunity/utils";
 
 import type {
@@ -13,6 +19,8 @@ import type {
 	GetManyByIdInput,
 	StoreEntity,
 	StoreRepository,
+	CreateTopStoresEntityInput,
+	TopStoresOutput,
 } from "../../models/store";
 
 import { DynamodbRepository } from ".";
@@ -31,6 +39,15 @@ export interface StoreTable {
 	bannerPath?: string;
 	avatarPath?: string;
 	createdAt: string;
+
+	// Only used by the top stores
+	// storeId: "TOP_STORES";
+	imageUrl?: string;
+	stores?: Array<{
+		storeId: string;
+		storeName: string;
+		gender: GenderEnum;
+	}>;
 }
 
 export class StoreRepositoryDynamoDB
@@ -134,6 +151,45 @@ export class StoreRepositoryDynamoDB
 		return this.getSingleItem(this.indexName(keys));
 	}
 
+	public async createTopStores({
+		imageUrl,
+		stores,
+	}: CreateTopStoresEntityInput) {
+		await this.dynamodb.send(
+			new PutItemCommand({
+				TableName: this.tableName,
+				Item: marshall({
+					storeId: "TOP_STORES",
+					imageUrl,
+					stores,
+				}),
+			}),
+		);
+
+		return {
+			imageUrl: `${process.env.STORE_MEDIA_STORAGE_CLOUDFRONT_URL}/${imageUrl}`,
+			stores,
+		};
+	}
+
+	public async getTopStores() {
+		const result = await this.dynamodb.send(
+			new GetItemCommand({
+				TableName: this.tableName,
+				Key: marshall({
+					storeId: "TOP_STORES",
+				}),
+			}),
+		);
+
+		const { imageUrl, stores } = unmarshall(result.Item!) as TopStoresOutput;
+
+		return {
+			imageUrl: `${process.env.STORE_MEDIA_STORAGE_CLOUDFRONT_URL}/${imageUrl}`,
+			stores,
+		};
+	}
+
 	// Keys
 
 	private indexStoreId({ storeId }: { storeId: StoreEntity["storeId"] }) {
@@ -163,6 +219,19 @@ export class StoreRepositoryDynamoDB
 			}),
 			Key: marshall({
 				name: `NAME#${entity.name}`,
+			}),
+		};
+	}
+
+	private indexGender(entity: Pick<StoreEntity, "gender">) {
+		return {
+			IndexName: "GenderStoreId",
+			KeyConditionExpression: "#gender = :gender",
+			ExpressionAttributeNames: {
+				"#gender": "gender",
+			},
+			ExpressionAttributeValues: marshall({
+				":gender": `GENDER#${entity.gender}`,
 			}),
 		};
 	}

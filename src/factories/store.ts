@@ -1,8 +1,7 @@
+import { CanvasAdapter } from "../adapters/implementations/canvas";
 import { S3Adapter } from "../adapters/implementations/s3";
 import { SNSAdapter } from "../adapters/implementations/sns";
-import { SQSAdapter } from "../adapters/implementations/sqs";
 import type { StoreUseCase } from "../models/store";
-import { UploadManagerProvider } from "../providers/implementations/upload-manager";
 import { getDynamoInstance } from "../repository/dynamodb";
 import { BlacklistRepositoryDynamoDB } from "../repository/dynamodb/blacklist";
 import { CounterRepositoryDynamoDB } from "../repository/dynamodb/counter";
@@ -20,7 +19,6 @@ export class StoreService extends Service<StoreUseCase> {
 
 		const dynamodb = getDynamoInstance();
 		const sns = new SNSAdapter();
-		const sqs = new SQSAdapter();
 		const s3 = new S3Adapter();
 
 		const storeRepository = new StoreRepositoryDynamoDB(dynamodb);
@@ -28,7 +26,7 @@ export class StoreService extends Service<StoreUseCase> {
 		const blacklistRepository = new BlacklistRepositoryDynamoDB(dynamodb);
 		const counterRepository = new CounterRepositoryDynamoDB(dynamodb);
 
-		const uploadManager = new UploadManagerProvider(sqs, s3);
+		const canvas = new CanvasAdapter();
 
 		const newInstance = new StoreUseCaseImplementation(
 			storeRepository,
@@ -36,7 +34,8 @@ export class StoreService extends Service<StoreUseCase> {
 			blacklistRepository,
 			counterRepository,
 			sns,
-			uploadManager,
+			s3,
+			canvas,
 		);
 
 		instance = newInstance;

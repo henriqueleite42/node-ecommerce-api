@@ -12,7 +12,7 @@ export const top = (server: HttpManager) => {
 			route.setFunc(() => {
 				const service = new StoreService().getInstance();
 
-				return service.getTop();
+				return service.getTopStores();
 			}),
 	);
 };
