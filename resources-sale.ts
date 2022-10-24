@@ -205,6 +205,7 @@ export const resourcesSale: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-handle-sale-delivery",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		HandleSaleDeliverySubscription: {
@@ -225,6 +226,7 @@ export const resourcesSale: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-setSaleProductAsDelivered",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		SetSaleProductAsDeliveredSubscription: {
@@ -245,6 +247,7 @@ export const resourcesSale: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-notify-seller-sale-delivery-confirmed",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		NotifySellerSaleDeliveryConfirmedSubscription: {

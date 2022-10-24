@@ -62,6 +62,7 @@ export const resourcesDiscord: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-new-sale-announcement",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		NewStoreAnnouncementQueue: {
@@ -69,6 +70,7 @@ export const resourcesDiscord: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-new-store-announcement",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		NewProductAnnouncementQueue: {
@@ -76,6 +78,7 @@ export const resourcesDiscord: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-new-product-announcement",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 
@@ -84,6 +87,7 @@ export const resourcesDiscord: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-notify-seller-custom-automatic-products-sale",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		NotifySellerCustomManualProductsSaleQueue: {
@@ -91,6 +95,7 @@ export const resourcesDiscord: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-notify-seller-custom-manual-products-sale",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		NotifySellerPreMadeManualProductsSaleQueue: {
@@ -98,6 +103,7 @@ export const resourcesDiscord: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-notify-seller-pre-made-manual-products-sale",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		NotifySellerLiveManualProductsSaleQueue: {
@@ -105,6 +111,7 @@ export const resourcesDiscord: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-notify-seller-live-manual-products-sale",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 
@@ -113,6 +120,7 @@ export const resourcesDiscord: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-notify-buyer-sale-paid",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		NotifyBuyerSalePaidSubscription: {
@@ -136,6 +144,7 @@ export const resourcesDiscord: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-notify-buyer-access-granted",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		NotifyBuyerAccessGrantedSubscription: {
@@ -159,6 +168,7 @@ export const resourcesDiscord: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-notify-buyer-sale-delivered",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		NotifyBuyerSaleDeliveredSubscription: {
@@ -182,6 +192,7 @@ export const resourcesDiscord: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-notify-buyer-sale-delivery-confirmed",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		NotifyBuyerSaleDeliveryConfirmedSubscription: {
@@ -205,6 +216,7 @@ export const resourcesDiscord: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-notify-seller-sale-delivery-confirmed",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 	},

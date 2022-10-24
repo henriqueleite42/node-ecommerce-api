@@ -78,6 +78,7 @@ export const resourcesEventAlert: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-discord-new-product-event",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		DiscordNewProductEventSubscription: {
@@ -98,6 +99,7 @@ export const resourcesEventAlert: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-discord-new-sale-event",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		DiscordNewSaleEventSubscription: {
@@ -118,6 +120,7 @@ export const resourcesEventAlert: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-discord-new-store-event",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		DiscordNewStoreEventSubscription: {

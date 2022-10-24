@@ -73,6 +73,10 @@ module.exports = {
           experimentalFileCaching: true,
         },
       },
+			{
+        test: /\.node$/,
+				loader: 'node-loader'
+			}
     ],
   },
   // We still want type checking, just without the burden on build performance,

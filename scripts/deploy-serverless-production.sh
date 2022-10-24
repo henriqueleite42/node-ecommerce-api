@@ -10,5 +10,4 @@ API_MODULE="EVENT-ALERT" yarn deploy:production && \
 API_MODULE="PRODUCT" yarn deploy:production && \
 API_MODULE="SALE" yarn deploy:production && \
 API_MODULE="STORE" yarn deploy:production && \
-API_MODULE="UPLOAD" yarn deploy:production && \
 API_MODULE="WALLET" yarn deploy:production

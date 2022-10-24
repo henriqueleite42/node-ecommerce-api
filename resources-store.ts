@@ -272,6 +272,7 @@ export const resourcesStore: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-increment-stores-count",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		IncrementStoresCountSubscription: {
@@ -292,6 +293,7 @@ export const resourcesStore: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-increment-sales-count",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		IncrementSalesCountSubscription: {
@@ -312,6 +314,7 @@ export const resourcesStore: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-increment-total-billed",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		IncrementTotalBilledSubscription: {
@@ -332,6 +335,7 @@ export const resourcesStore: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-add-product-type",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		AddProductTypeSubscription: {
@@ -352,6 +356,7 @@ export const resourcesStore: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-remove-product-type",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		RemoveProductTypeSubscription: {

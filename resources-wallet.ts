@@ -43,6 +43,7 @@ export const resourcesWallet: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-create-wallet",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		CreateWalletSubscription: {
@@ -63,6 +64,7 @@ export const resourcesWallet: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-decrease-pending-balance",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		DecreasePendingBalanceSubscription: {
@@ -83,6 +85,7 @@ export const resourcesWallet: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-increment-pending-balance",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		IncrementPendingBalanceSubscription: {
@@ -103,6 +106,7 @@ export const resourcesWallet: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-release-pending-balance",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		ReleasePendingBalanceSubscription: {

@@ -11,7 +11,6 @@ import { resourcesEventAlert } from "./resources-event-alert";
 import { resourcesProduct } from "./resources-product";
 import { resourcesSale } from "./resources-sale";
 import { resourcesStore } from "./resources-store";
-import { resourcesUpload } from "./resources-upload";
 import { resourcesWallet } from "./resources-wallet";
 
 import { contentSQS } from "./src/delivery/queue/content";
@@ -195,14 +194,6 @@ const storeConfig = {
 	},
 };
 
-const uploadConfig = {
-	service: "upload",
-	plugins: [
-		"serverless-webpack",
-	],
-	resources: resourcesUpload,
-};
-
 const walletConfig = {
 	service: "wallet",
 	plugins: [
@@ -250,9 +241,6 @@ const getConfig = () => {
 
 		case "STORE":
 			return merge(baseConfig, storeConfig);
-
-		case "UPLOAD":
-			return merge(baseConfig, uploadConfig);
 
 		case "WALLET":
 			return merge(baseConfig, walletConfig);

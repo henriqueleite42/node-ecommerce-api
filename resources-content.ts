@@ -246,19 +246,19 @@ export const resourcesContent: AWS["resources"] = {
 		 * Storage
 		 *
 		 */
-		MediaStorageLambdaInvokePermission: {
-			Type: "AWS::Lambda::Permission",
-			Properties: {
-				FunctionName: {
-					"Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-contentS3UpdateMedia",
-				},
-				Action: "lambda:InvokeFunction",
-				Principal: "s3.amazonaws.com",
-				SourceAccount: {
-					Ref: "AWS::AccountId",
-				},
-			},
-		},
+		// MediaStorageLambdaInvokePermission: {
+		// 	Type: "AWS::Lambda::Permission",
+		// 	Properties: {
+		// 		FunctionName: {
+		// 			"Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-contentS3UpdateMedia",
+		// 		},
+		// 		Action: "lambda:InvokeFunction",
+		// 		Principal: "s3.amazonaws.com",
+		// 		SourceAccount: {
+		// 			Ref: "AWS::AccountId",
+		// 		},
+		// 	},
+		// },
 		MediaStorage: {
 			Type: "AWS::S3::Bucket",
 			Properties: {
@@ -269,17 +269,17 @@ export const resourcesContent: AWS["resources"] = {
 					IgnorePublicAcls : true,
 					RestrictPublicBuckets : true,
 				},
-				NotificationConfiguration: {
-					LambdaConfigurations: [
-						{
-							Event: "s3:ObjectCreated:*",
-							Function: {
-								"Fn::Sub":
-									"arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-contentS3UpdateMedia",
-							},
-						},
-					],
-				},
+				// NotificationConfiguration: {
+				// 	LambdaConfigurations: [
+				// 		{
+				// 			Event: "s3:ObjectCreated:*",
+				// 			Function: {
+				// 				"Fn::Sub":
+				// 					"arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-contentS3UpdateMedia",
+				// 			},
+				// 		},
+				// 	],
+				// },
 				CorsConfiguration: {
 					CorsRules: [
 						{
@@ -302,6 +302,7 @@ export const resourcesContent: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-give-buyer-access-to-pre-made-automatic-sale-products",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		AccessGrantedTopic: {
@@ -318,9 +319,9 @@ export const resourcesContent: AWS["resources"] = {
 		},
 	},
 	Outputs: {
-		RawMediaBucketName: {
+		MediaBucketName: {
 			Value: {
-				Ref: "RawMediaStorage"
+				Ref: "MediaStorage"
 			},
 			Export: {
 				Name: {
@@ -330,7 +331,7 @@ export const resourcesContent: AWS["resources"] = {
 							{
 								Ref: "AWS::StackName",
 							},
-							"RawMediaBucketName",
+							"MediaBucketName",
 						],
 					],
 				},

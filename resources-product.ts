@@ -234,6 +234,7 @@ export const resourcesProduct: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-delay-product-created-notification",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		ProductCreatedTopic: {
@@ -253,6 +254,7 @@ export const resourcesProduct: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-increment-products-count",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		IncrementProductsCountSubscription: {
@@ -273,6 +275,7 @@ export const resourcesProduct: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-increment-sales-count",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		IncrementSalesCountSubscription: {
@@ -293,6 +296,7 @@ export const resourcesProduct: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-increment-total-billed",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		IncrementTotalBilledSubscription: {
@@ -313,6 +317,7 @@ export const resourcesProduct: AWS["resources"] = {
 			Properties: {
 				QueueName:
 					"${self:service}-${opt:stage, 'local'}-update-product-media-count",
+				ReceiveMessageWaitTimeSeconds: 20,
 			},
 		},
 		IncrementMediaCountSubscription: {
