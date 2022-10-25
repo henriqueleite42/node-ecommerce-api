@@ -20,6 +20,11 @@ export interface StoreEntity {
 	avatarUrl?: string;
 	createdAt: Date;
 
+	feedbacks: {
+		positive: number;
+		negative: number;
+	};
+
 	// Only used by the top stores
 	// storeId: "TOP_STORES";
 	imageUrl?: string;

@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
 import type { Type } from "@techmmunity/utils";
@@ -45,6 +46,17 @@ export class Validations {
 		if (typeof p !== "string") {
 			throw new CustomError(
 				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+	}
+
+	public static boolean(key: string, p?: any) {
+		if (typeof p === "undefined") return;
+
+		if (typeof p !== "boolean") {
+			throw new CustomError(
+				`${key} must be a boolean`,
 				StatusCodeEnum.BAD_REQUEST,
 			);
 		}
@@ -489,6 +501,24 @@ export class Validations {
 	}
 
 	public static buyerMessage(key: string, p?: any) {
+		if (typeof p === "undefined") return;
+
+		if (typeof p !== "string") {
+			throw new CustomError(
+				`${key} must be a string`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+
+		if (p.length > 500) {
+			throw new CustomError(
+				`${key} must have a length of at most 500`,
+				StatusCodeEnum.BAD_REQUEST,
+			);
+		}
+	}
+
+	public static feedback(key: string, p?: any) {
 		if (typeof p === "undefined") return;
 
 		if (typeof p !== "string") {

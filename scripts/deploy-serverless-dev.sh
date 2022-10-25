@@ -7,6 +7,7 @@ API_MODULE="COUNTER" yarn deploy:dev && \
 API_MODULE="COUPON" yarn deploy:dev && \
 API_MODULE="DISCORD" yarn deploy:dev && \
 API_MODULE="EVENT-ALERT" yarn deploy:dev && \
+API_MODULE="FEEDBACK" yarn deploy:dev && \
 API_MODULE="PRODUCT" yarn deploy:dev && \
 API_MODULE="SALE" yarn deploy:dev && \
 API_MODULE="STORE" yarn deploy:dev && \

@@ -121,6 +121,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 			products: saleProducts,
 			store: {
 				name: store.name,
+				gender: store.gender,
 				avatarUrl: store.avatarUrl,
 				bannerUrl: store.bannerUrl,
 			},

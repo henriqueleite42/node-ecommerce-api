@@ -7,6 +7,7 @@ API_MODULE="COUNTER" yarn deploy:local && \
 API_MODULE="COUPON" yarn deploy:local && \
 API_MODULE="DISCORD" yarn deploy:local && \
 API_MODULE="EVENT-ALERT" yarn deploy:local && \
+API_MODULE="FEEDBACK" yarn deploy:local && \
 API_MODULE="PRODUCT" yarn deploy:local && \
 API_MODULE="SALE" yarn deploy:local && \
 API_MODULE="STORE" yarn deploy:local && \

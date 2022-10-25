@@ -40,6 +40,11 @@ export interface StoreTable {
 	avatarPath?: string;
 	createdAt: string;
 
+	feedbacks: {
+		positive: number;
+		negative: number;
+	};
+
 	// Only used by the top stores
 	// storeId: "TOP_STORES";
 	imageUrl?: string;
@@ -72,6 +77,11 @@ export class StoreRepositoryDynamoDB
 			description,
 			color,
 			createdAt: new Date(),
+
+			feedbacks: {
+				positive: 0,
+				negative: 0,
+			},
 		};
 
 		await this.dynamodb.send(
@@ -247,6 +257,7 @@ export class StoreRepositoryDynamoDB
 			name: entity.name ? `NAME#${entity.name}` : undefined,
 			description: entity.description,
 			color: entity.color,
+			feedbacks: entity.feedbacks,
 			bannerPath: entity.bannerUrl,
 			avatarPath: entity.avatarUrl,
 			createdAt: entity.createdAt?.toISOString(),
@@ -262,6 +273,7 @@ export class StoreRepositoryDynamoDB
 			name: table.name.replace("NAME#", ""),
 			description: table.description,
 			color: table.color,
+			feedbacks: table.feedbacks,
 			avatarUrl: table.avatarPath
 				? `${process.env.STORE_MEDIA_STORAGE_CLOUDFRONT_URL}/${table.avatarPath}`
 				: undefined,

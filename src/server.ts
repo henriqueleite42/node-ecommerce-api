@@ -7,6 +7,7 @@ import { accountDomain } from "./delivery/http/account";
 import { blacklistDomain } from "./delivery/http/blacklist";
 import { contentDomain } from "./delivery/http/content";
 import { eventAlertDomainDomain } from "./delivery/http/event-alert";
+import { feedbackDomain } from "./delivery/http/feedback";
 import { productDomain } from "./delivery/http/product";
 import { saleDomain } from "./delivery/http/sale";
 import { storeDomain } from "./delivery/http/store";
@@ -29,6 +30,7 @@ const bootstrap = async () => {
 	await blacklistDomain(params);
 	await contentDomain(params);
 	await eventAlertDomainDomain(params);
+	await feedbackDomain(params);
 	await productDomain(params);
 	await saleDomain(params);
 	await storeDomain(params);

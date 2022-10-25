@@ -27,6 +27,7 @@ import { DynamodbRepository } from ".";
 
 import { genId } from "../../utils/id/gen-id";
 
+import type { GenderEnum } from "../../types/enums/gender";
 import type { SaleOriginEnum } from "../../types/enums/origin";
 import { SalesStatusEnum } from "../../types/enums/sale-status";
 
@@ -36,6 +37,7 @@ export interface SaleTable {
 	clientId: string;
 	store: {
 		name: string;
+		gender: GenderEnum;
 		avatarUrl?: string;
 		bannerUrl?: string;
 	};

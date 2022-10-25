@@ -8,6 +8,7 @@ import { resourcesCounter } from "./resources-counter";
 import { resourcesCoupon } from "./resources-coupon";
 import { resourcesDiscord } from "./resources-discord";
 import { resourcesEventAlert } from "./resources-event-alert";
+import { resourcesFeedback } from "./resources-feedback";
 import { resourcesProduct } from "./resources-product";
 import { resourcesSale } from "./resources-sale";
 import { resourcesStore } from "./resources-store";
@@ -98,6 +99,11 @@ const accountConfig = {
 	resources: resourcesAccount,
 };
 
+const blacklistConfig = {
+	service: "blacklist",
+	resources: resourcesBlacklist,
+};
+
 const contentConfig = {
 	service: "content",
 	plugins: [
@@ -159,9 +165,9 @@ const eventsAlertsConfig = {
 	functions: eventAlert,
 };
 
-const blacklistConfig = {
-	service: "blacklist",
-	resources: resourcesBlacklist,
+const feedbackConfig = {
+	service: "feedback",
+	resources: resourcesFeedback,
 };
 
 const productConfig = {
@@ -232,6 +238,9 @@ const getConfig = () => {
 
 		case "EVENT-ALERT":
 			return merge(baseConfig, eventsAlertsConfig);
+
+		case "FEEDBACK":
+			return merge(baseConfig, feedbackConfig);
 
 		case "PRODUCT":
 			return merge(baseConfig, productConfig);

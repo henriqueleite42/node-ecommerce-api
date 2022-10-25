@@ -4,6 +4,7 @@ import type { PaginatedItems } from "./types";
 
 import type { DeliveryMethodEnum } from "../types/enums/delivery-method";
 import type { DiscountTypeEnum } from "../types/enums/discount-type";
+import type { GenderEnum } from "../types/enums/gender";
 import type { SaleOriginEnum } from "../types/enums/origin";
 import type { PaymentMethodEnum } from "../types/enums/payment-method";
 import type { ProductTypeEnum } from "../types/enums/product-type";
@@ -35,6 +36,7 @@ export interface SaleEntity {
 	clientId: string;
 	store: {
 		name: string;
+		gender: GenderEnum;
 		avatarUrl?: string;
 		bannerUrl?: string;
 	};
