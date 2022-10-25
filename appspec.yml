@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /var/www/api-temp
+    destination: /var/www/maite-api
 hooks:
   BeforeInstall:
     - location: scripts/cd-prepare.sh
