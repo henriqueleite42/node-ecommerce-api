@@ -1,0 +1,22 @@
+version: 0.2
+phases:
+  pre_build:
+    commands:
+      - echo Installing source NPM dependencies...
+      - yarn
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Compiling the api folder
+      - yarn build:api
+  post_build:
+    commands:
+      - echo Build completed on `date`
+# Include only the files required for your application to run.
+artifacts:
+  files:
+    - api/**/*
+    - package.json
+    - yarn.lock
+    - appspec.yml
+    - scripts/*

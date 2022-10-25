@@ -36,7 +36,9 @@ export class CanvasAdapter implements ImageManager {
 
 	public constructor() {
 		registerFont(
-			resolve(process.cwd(), "src", "assets", "fonts", "Poppins.ttf"),
+			process.env.NODE_ENV === "production"
+				? resolve(process.cwd(), "api", "assets", "fonts", "Poppins.ttf")
+				: resolve(process.cwd(), "src", "assets", "fonts", "Poppins.ttf"),
 			{
 				family: "poppins",
 			},

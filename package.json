@@ -62,7 +62,7 @@
 		"ts-node": "ts-node",
 		"prepare": "husky install",
 		"build": "serverless package",
-		"build:api": "ncc build src/server.ts -o api -m -s -e aws-sdk -q",
+		"build:api": "ncc build src/server.ts -o api -m -s -e aws-sdk -q && mkdir -p api/assets/fonts && cp src/assets/fonts/Poppins.ttf api/assets/fonts/Poppins.ttf",
 		"start:api": "API_PORT=3000 node index.js",
 		"deploy:production": "NODE_ENV=production env-cmd serverless deploy --stage production",
 		"deploy:dev": "NODE_ENV=dev env-cmd serverless deploy --stage dev",
