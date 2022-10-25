@@ -106,6 +106,13 @@ const blacklistConfig = {
 
 const contentConfig = {
 	service: "content",
+	provider: {
+		environment: {
+			CONTENT_ACCESS_GRANTED_TOPIC_ARN: {
+				Ref: "AccessGrantedTopic"
+			},
+		},
+	},
 	plugins: [
 		"serverless-webpack",
 	],
@@ -133,7 +140,10 @@ const discordConfig = {
 	],
 	provider: {
 		environment: {
-			DISCORD_BOT_TOKEN: `\${ssm:monetizzer-\${opt:stage, 'dev'}-discordBotToken}`,
+			DISCORD_DISCORD_BOT_TOKEN: "${ssm:monetizzer-discordBotToken}",
+			DISCORD_DISCORD_BOT_CLIENT_ID: "${ssm:monetizzer-discordBotClientId}",
+			DISCORD_DISCORD_BOT_CLIENT_SECRET: "${ssm:monetizzer-discordBotClientSecret}",
+			DISCORD_DISCORD_REDIRECT_URI: "${ssm:monetizzer-discordRedirectUri}",
 		},
 	},
 	resources: resourcesDiscord,
@@ -172,6 +182,13 @@ const feedbackConfig = {
 
 const productConfig = {
 	service: "product",
+	provider: {
+		environment: {
+			PRODUCT_DELAY_PRODUCT_CREATION_NOTIFICATION_QUEUE_URL: {
+				Ref: "DelayProductCreatedNotificationQueue"
+			},
+		},
+	},
 	plugins: [
 		"serverless-webpack",
 	],
@@ -184,6 +201,26 @@ const productConfig = {
 
 const saleConfig = {
 	service: "sale",
+	provider: {
+		environment: {
+			CONTENT_GIVE_BUYER_ACCESS_TO_PRE_MADE_AUTOMATIC_SALE_PRODUCTS_QUEUE_URL: {
+				"Fn::ImportValue":
+					"content-${opt:stage, 'local'}:GiveBuyerAccessToPreMadeAutomaticSaleProductsQueueUrl",
+			},
+			DISCORD_NOTIFY_SELLER_CUSTOM_AUTOMATIC_PRODUCTS_SALE_QUEUE_URL: {
+				"Fn::ImportValue":
+					"discord-${opt:stage, 'local'}:NotifySellerCustomAutomaticProductsSaleQueueUrl",
+			},
+			DISCORD_NOTIFY_SELLER_PRE_MADE_MANUAL_PRODUCTS_SALE_QUEUE_URL: {
+				"Fn::ImportValue":
+					"discord-${opt:stage, 'local'}:NotifySellerPreMadeManualProductsSaleQueueUrl",
+			},
+			DISCORD_NOTIFY_SELLER_LIVE_MANUAL_PRODUCTS_SALE_QUEUE_URL: {
+				"Fn::ImportValue":
+					"discord-${opt:stage, 'local'}:NotifySellerPreMadeManualProductsSaleQueueUrl",
+			},
+		},
+	},
 	resources: resourcesSale,
 	functions: saleSQS,
 };

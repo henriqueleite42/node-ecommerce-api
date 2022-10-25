@@ -13,10 +13,10 @@ export const saleDomain = async ({
 	secretsLoader,
 	resourcesLoader,
 }: DomainInput) => {
-	await secretsLoader.loadSecrets("monetizzer/auth");
-	await secretsLoader.loadSecrets("monetizzer/gerencianet");
-	await secretsLoader.loadSecrets("monetizzer/gerencianet-certs-cert");
-	await secretsLoader.loadSecrets("monetizzer/gerencianet-certs-key");
+	await secretsLoader.loadSecrets("monetizzer-auth");
+	await secretsLoader.loadSecrets("monetizzer-gerencianet");
+	await secretsLoader.loadSecrets("monetizzer-gerencianet-certs-cert");
+	await secretsLoader.loadSecrets("monetizzer-gerencianet-certs-key");
 	await resourcesLoader.loadSecrets("sale");
 
 	addCoupon(server);

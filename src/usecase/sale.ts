@@ -614,7 +614,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		if (preMadeAutomaticProducts.length > 0) {
 			await this.queueManager.sendMsg<GiveBuyerAccessToSaleMessage>({
 				to: process.env
-					.CONTENT_GIVE_BUYER_ACCESS_TO_PRE_MADE_AUTOMATIC_SALE_PRODUCTS!,
+					.CONTENT_GIVE_BUYER_ACCESS_TO_PRE_MADE_AUTOMATIC_SALE_PRODUCTS_QUEUE_URL!,
 				message: sale,
 			});
 		}
@@ -644,7 +644,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 			await this.queueManager.sendMsg<NotifySellerSaleMessage>({
 				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 				to: process.env[
-					`${sellerAccount.notifyThrough}_NOTIFY_SELLER_CUSTOM_AUTOMATIC_PRODUCTS_SALE`
+					`${sellerAccount.notifyThrough}_NOTIFY_SELLER_CUSTOM_AUTOMATIC_PRODUCTS_SALE_QUEUE_URL`
 				]!,
 				message: {
 					saleId: sale.saleId,
@@ -660,7 +660,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 			await this.queueManager.sendMsg<NotifySellerSaleMessage>({
 				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 				to: process.env[
-					`${sellerAccount.notifyThrough}_NOTIFY_SELLER_PRE_MADE_MANUAL_PRODUCTS_SALE`
+					`${sellerAccount.notifyThrough}_NOTIFY_SELLER_PRE_MADE_MANUAL_PRODUCTS_SALE_QUEUE_URL`
 				]!,
 				message: {
 					saleId: sale.saleId,
@@ -676,7 +676,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 			await this.queueManager.sendMsg<NotifySellerSaleMessage>({
 				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 				to: process.env[
-					`${sellerAccount.notifyThrough}_NOTIFY_SELLER_LIVE_MANUAL_PRODUCTS_SALE`
+					`${sellerAccount.notifyThrough}_NOTIFY_SELLER_LIVE_MANUAL_PRODUCTS_SALE_QUEUE_URL`
 				]!,
 				message: {
 					saleId: sale.saleId,
@@ -699,7 +699,7 @@ export class SaleUseCaseImplementation implements SaleUseCase {
 		await this.queueManager.sendMsg<SaleDeliveryConfirmedMessage>({
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			to: process.env[
-				`${sellerAccount.notifyThrough}_NOTIFY_SELLER_SALE_DELIVERY_CONFIRMED`
+				`${sellerAccount.notifyThrough}_NOTIFY_SELLER_SALE_DELIVERY_CONFIRMED_QUEUE_URL`
 			]!,
 			message: sale,
 		});

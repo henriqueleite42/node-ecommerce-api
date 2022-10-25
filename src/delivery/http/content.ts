@@ -4,7 +4,7 @@ import { getUserAccessStores } from "./content/get-user-access-store";
 import type { DomainInput } from "./types";
 
 export const contentDomain = async ({ server, secretsLoader }: DomainInput) => {
-	await secretsLoader.loadSecrets("monetizzer/content");
+	await secretsLoader.loadSecrets("monetizzer-auth");
 
 	getContentFile(server);
 	getUrlToUploadMedia(server);

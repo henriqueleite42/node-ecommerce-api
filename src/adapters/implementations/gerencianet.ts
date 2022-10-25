@@ -65,14 +65,14 @@ export class GerenciarnetManager implements PixManager {
 		if (!this.httpsAgent) {
 			this.httpsAgent = new Agent({
 				rejectUnauthorized: true,
-				cert: process.env.GERENCIANET_CERTIFICATE_CERT,
-				key: process.env.GERENCIANET_CERTIFICATE_KEY,
+				cert: process.env.SALE_GERENCIANET_CERTIFICATE_CERT,
+				key: process.env.SALE_GERENCIANET_CERTIFICATE_KEY,
 			});
 		}
 
 		if (new Date().getTime() < this.credentials.expiresAt) {
 			return axios.create({
-				baseURL: process.env.GERENCIANET_URL,
+				baseURL: process.env.SALE_GERENCIANET_URL,
 				httpsAgent: this.httpsAgent,
 				headers: {
 					"Content-Type": "application/json",
@@ -82,7 +82,7 @@ export class GerenciarnetManager implements PixManager {
 		}
 
 		const auth = Buffer.from(
-			`${process.env.GERENCIANET_CLIENT_ID}:${process.env.GERENCIANET_CLIENT_SECRET}`,
+			`${process.env.SALE_GERENCIANET_CLIENT_ID}:${process.env.SALE_GERENCIANET_CLIENT_SECRET}`,
 		).toString("base64");
 
 		const response = await axios
@@ -92,7 +92,7 @@ export class GerenciarnetManager implements PixManager {
 					grant_type: "client_credentials",
 				},
 				{
-					baseURL: process.env.GERENCIANET_URL,
+					baseURL: process.env.SALE_GERENCIANET_URL,
 					httpsAgent: this.httpsAgent,
 					headers: {
 						Authorization: `Basic ${auth}`,
@@ -106,7 +106,7 @@ export class GerenciarnetManager implements PixManager {
 			new Date().getTime() + response.expires_in - 150;
 
 		return axios.create({
-			baseURL: process.env.GERENCIANET_URL,
+			baseURL: process.env.SALE_GERENCIANET_URL,
 			httpsAgent: this.httpsAgent,
 			headers: {
 				"Content-Type": "application/json",
@@ -130,7 +130,7 @@ export class GerenciarnetManager implements PixManager {
 				valor: {
 					original: valueString,
 				},
-				chave: process.env.GERENCIANET_PIX_KEY,
+				chave: process.env.SALE_GERENCIANET_PIX_KEY,
 			})
 			.then(r => r.data);
 

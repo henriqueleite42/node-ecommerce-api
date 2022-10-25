@@ -50,7 +50,7 @@ export class AuthManagerProvider extends AuthManager {
 	private isDiscordAuthorized(credentials: string) {
 		const [, token] = credentials.split("#");
 
-		if (token !== process.env.API_BOT_TOKEN) return false;
+		if (token !== process.env.AUTH_API_BOT_TOKEN) return false;
 
 		const discordData = this.getDiscordData(credentials);
 

@@ -284,7 +284,7 @@ export const resourcesStore: AWS["resources"] = {
 				},
 				Region: "${self:custom.region.${opt:stage, 'local'}}",
 				TopicArn: {
-					"Fn::ImportValue": "store-${opt:stage, 'local'}:StoreCreatedTopicArn",
+					"Ref": "StoreCreatedTopic",
 				},
 			},
 		},

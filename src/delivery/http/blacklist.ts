@@ -5,7 +5,7 @@ export const blacklistDomain = async ({
 	server,
 	secretsLoader,
 }: DomainInput) => {
-	await secretsLoader.loadSecrets("monetizzer/auth");
+	await secretsLoader.loadSecrets("monetizzer-auth");
 
 	blacklist(server);
 };

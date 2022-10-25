@@ -63,7 +63,7 @@
 		"prepare": "husky install",
 		"build": "serverless package",
 		"build:api": "ncc build src/server.ts -o api -m -s -e aws-sdk -q",
-		"start:api": "node index.js",
+		"start:api": "API_PORT=3000 node index.js",
 		"deploy:production": "NODE_ENV=production env-cmd serverless deploy --stage production",
 		"deploy:dev": "NODE_ENV=dev env-cmd serverless deploy --stage dev",
 		"deploy:local": "NODE_ENV=local env-cmd serverless deploy --stage local",

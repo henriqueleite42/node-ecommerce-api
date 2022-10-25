@@ -246,19 +246,19 @@ export const resourcesContent: AWS["resources"] = {
 		 * Storage
 		 *
 		 */
-		// MediaStorageLambdaInvokePermission: {
-		// 	Type: "AWS::Lambda::Permission",
-		// 	Properties: {
-		// 		FunctionName: {
-		// 			"Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-contentS3UpdateMedia",
-		// 		},
-		// 		Action: "lambda:InvokeFunction",
-		// 		Principal: "s3.amazonaws.com",
-		// 		SourceAccount: {
-		// 			Ref: "AWS::AccountId",
-		// 		},
-		// 	},
-		// },
+		MediaStorageLambdaInvokePermission: {
+			Type: "AWS::Lambda::Permission",
+			Properties: {
+				FunctionName: {
+					"Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-contentS3UpdateMedia",
+				},
+				Action: "lambda:InvokeFunction",
+				Principal: "s3.amazonaws.com",
+				SourceAccount: {
+					Ref: "AWS::AccountId",
+				},
+			},
+		},
 		MediaStorage: {
 			Type: "AWS::S3::Bucket",
 			Properties: {
@@ -269,17 +269,17 @@ export const resourcesContent: AWS["resources"] = {
 					IgnorePublicAcls : true,
 					RestrictPublicBuckets : true,
 				},
-				// NotificationConfiguration: {
-				// 	LambdaConfigurations: [
-				// 		{
-				// 			Event: "s3:ObjectCreated:*",
-				// 			Function: {
-				// 				"Fn::Sub":
-				// 					"arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-contentS3UpdateMedia",
-				// 			},
-				// 		},
-				// 	],
-				// },
+				NotificationConfiguration: {
+					LambdaConfigurations: [
+						{
+							Event: "s3:ObjectCreated:*",
+							Function: {
+								"Fn::Sub":
+									"arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-contentS3UpdateMedia",
+							},
+						},
+					],
+				},
 				CorsConfiguration: {
 					CorsRules: [
 						{
@@ -337,7 +337,7 @@ export const resourcesContent: AWS["resources"] = {
 				},
 			}
 		},
-		GiveBuyerAccessToPreMadeAutomaticSaleProductsUrl: {
+		GiveBuyerAccessToPreMadeAutomaticSaleProductsQueueUrl: {
 			Value: {
 				Ref: "GiveBuyerAccessToPreMadeAutomaticSaleProductsQueue"
 			},

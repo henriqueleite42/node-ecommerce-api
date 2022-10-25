@@ -55,7 +55,7 @@ export class DiscordJSAdapter implements DiscordManager {
 	public constructor() {
 		this.discordjs = new REST({
 			version: "10",
-		}).setToken(process.env.DISCORD_BOT_TOKEN!);
+		}).setToken(process.env.DISCORD_DISCORD_BOT_TOKEN!);
 	}
 
 	public async sendMessage({
@@ -89,10 +89,10 @@ export class DiscordJSAdapter implements DiscordManager {
 	public async exchangeCode(code: string) {
 		const result = (await this.discordjs.post(Routes.oauth2TokenExchange(), {
 			body: {
-				client_id: process.env.DISCORD_BOT_CLIENT_ID!,
-				client_secret: process.env.DISCORD_BOT_CLIENT_SECRET!,
+				client_id: process.env.DISCORD_DISCORD_BOT_CLIENT_ID!,
+				client_secret: process.env.DISCORD_DISCORD_BOT_CLIENT_SECRET!,
 				code,
-				redirect_uri: process.env.DISCORD_REDIRECT_URI!,
+				redirect_uri: process.env.DISCORD_DISCORD_REDIRECT_URI!,
 			},
 			headers: {
 				"Content-Type": "application/x-www-form-urlencoded",

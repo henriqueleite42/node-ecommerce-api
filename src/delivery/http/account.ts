@@ -6,7 +6,7 @@ import { signInWithMagicLink } from "./account/sign-in-with-magic-link";
 import type { DomainInput } from "./types";
 
 export const accountDomain = async ({ server, secretsLoader }: DomainInput) => {
-	await secretsLoader.loadSecrets("monetizzer/auth");
+	await secretsLoader.loadSecrets("monetizzer-auth");
 
 	createMagicLink(server);
 	createWithDiscordId(server);

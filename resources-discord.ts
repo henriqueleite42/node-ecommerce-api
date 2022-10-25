@@ -275,9 +275,10 @@ export const resourcesDiscord: AWS["resources"] = {
 				},
 			}
 		},
-		NotifyBuyerSalePaidQueueUrl: {
+
+		NotifySellerCustomAutomaticProductsSaleQueueUrl: {
 			Value: {
-				Ref: "NotifyBuyerSalePaidQueue"
+				Ref: "NotifySellerCustomAutomaticProductsSaleQueue"
 			},
 			Export: {
 				Name: {
@@ -287,15 +288,15 @@ export const resourcesDiscord: AWS["resources"] = {
 							{
 								Ref: "AWS::StackName",
 							},
-							"NotifyBuyerSalePaidQueueUrl",
+							"NotifySellerCustomAutomaticProductsSaleQueueUrl",
 						],
 					],
 				},
 			}
 		},
-		NotifySellerLiveProductsSaleQueueUrl: {
+		NotifySellerPreMadeManualProductsSaleQueueUrl: {
 			Value: {
-				Ref: "NotifySellerLiveProductsSaleQueue"
+				Ref: "NotifySellerPreMadeManualProductsSaleQueue"
 			},
 			Export: {
 				Name: {
@@ -305,15 +306,15 @@ export const resourcesDiscord: AWS["resources"] = {
 							{
 								Ref: "AWS::StackName",
 							},
-							"NotifySellerLiveProductsSaleQueueUrl",
+							"NotifySellerPreMadeManualProductsSaleQueueUrl",
 						],
 					],
 				},
 			}
 		},
-		NotifySellerCustomProductsSaleQueueUrl: {
+		NotifySellerLiveManualProductsSaleQueueUrl: {
 			Value: {
-				Ref: "NotifySellerCustomProductsSaleQueue"
+				Ref: "NotifySellerLiveManualProductsSaleQueue"
 			},
 			Export: {
 				Name: {
@@ -323,12 +324,13 @@ export const resourcesDiscord: AWS["resources"] = {
 							{
 								Ref: "AWS::StackName",
 							},
-							"NotifySellerCustomProductsSaleQueueUrl",
+							"NotifySellerLiveManualProductsSaleQueueUrl",
 						],
 					],
 				},
 			}
 		},
+
 		NotifySellerSaleDeliveryConfirmedQueueUrl: {
 			Value: {
 				Ref: "NotifySellerSaleDeliveryConfirmedQueue"

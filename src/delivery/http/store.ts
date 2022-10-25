@@ -13,7 +13,7 @@ export const storeDomain = async ({
 	secretsLoader,
 	resourcesLoader,
 }: DomainInput) => {
-	await secretsLoader.loadSecrets("monetizzer/auth");
+	await secretsLoader.loadSecrets("monetizzer-auth");
 	await resourcesLoader.loadSecrets("store");
 	await resourcesLoader.loadSecrets("upload");
 

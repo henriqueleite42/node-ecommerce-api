@@ -7,7 +7,7 @@ export const feedbackDomain = async ({
 	server,
 	secretsLoader,
 }: DomainInput) => {
-	await secretsLoader.loadSecrets("monetizzer/auth");
+	await secretsLoader.loadSecrets("monetizzer-auth");
 
 	changeVisibility(server);
 	create(server);

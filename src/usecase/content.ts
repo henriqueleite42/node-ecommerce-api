@@ -209,7 +209,7 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 				} while (cursor);
 
 				await this.topicManager.sendMsg<AccessGrantedMessage>({
-					to: process.env.CONTENT_ACCESS_GRANTED!,
+					to: process.env.CONTENT_ACCESS_GRANTED_TOPIC_ARN!,
 					message: {
 						saleId,
 						clientId,
@@ -247,7 +247,7 @@ export class ContentUseCaseImplementation implements ContentUseCase {
 				]);
 
 				await this.topicManager.sendMsg<AccessGrantedMessage>({
-					to: process.env.CONTENT_ACCESS_GRANTED!,
+					to: process.env.CONTENT_ACCESS_GRANTED_TOPIC_ARN!,
 					message: {
 						saleId,
 						clientId,

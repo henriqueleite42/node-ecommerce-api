@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable no-console */
 
-import { CloudformationAdapter } from "./adapters/implementations/cloudfront";
+import { CloudformationAdapter } from "./adapters/implementations/cloudformation";
 import { SSMAdapter } from "./adapters/implementations/ssm";
 import { accountDomain } from "./delivery/http/account";
 import { blacklistDomain } from "./delivery/http/blacklist";

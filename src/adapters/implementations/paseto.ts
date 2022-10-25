@@ -26,7 +26,7 @@ export class PasetoAdapter implements AccessTokenManager {
 	public constructor() {
 		this.paseto = V4;
 
-		this.privateKey = process.env.PASETO_PRIVATE_KEY!;
+		this.privateKey = process.env.AUTH_PASETO_PRIVATE_KEY!;
 	}
 
 	public async genAccessToken(

@@ -6,7 +6,7 @@ export const eventAlertDomainDomain = async ({
 	server,
 	secretsLoader,
 }: DomainInput) => {
-	await secretsLoader.loadSecrets("monetizzer/auth");
+	await secretsLoader.loadSecrets("monetizzer-auth");
 
 	deleteAllFromDiscordChannel(server);
 	deleteAllFromDiscordGuild(server);
