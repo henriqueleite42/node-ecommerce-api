@@ -27,9 +27,6 @@ import { productS3 } from "./src/delivery/s3/product";
 import { storeS3 } from "./src/delivery/s3/store";
 
 const baseConfig: Partial<AWS> = {
-	plugins: [
-		"serverless-localstack",
-	],
 	configValidationMode: "error",
 	frameworkVersion: "3",
 	package: {
@@ -41,9 +38,8 @@ const baseConfig: Partial<AWS> = {
 			local: "us-east-2",
 			production: "us-east-1",
 		},
-		localstack: {
-			host: "http://localhost",
-			stages: ["local"],
+		webpack: {
+			webpackConfig: "webpack.lambda.config.js"
 		},
 	},
 	provider: {

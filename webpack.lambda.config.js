@@ -15,6 +15,7 @@ module.exports = {
   devtool: isLocal ? 'source-map' : 'cheap-source-map',
 
 	stats: 'errors-only',
+	cache: false,
   // the provided argument will be an object referencing functions as defined
   // in your `serverless.yml` .
   // https://webpack.js.org/concepts/entry-points/
@@ -41,6 +42,8 @@ module.exports = {
   // Node's native modules will also be available.
   externals: [
 		'aws-sdk',
+		'canvas',
+		'sharp',
 	],
 	optimization: {
 		minimize: true,
@@ -72,11 +75,7 @@ module.exports = {
           // Enable file caching, can be quite useful when running offline
           experimentalFileCaching: true,
         },
-      },
-			{
-        test: /\.node$/,
-				loader: 'node-loader'
-			}
+      }
     ],
   },
   // We still want type checking, just without the burden on build performance,

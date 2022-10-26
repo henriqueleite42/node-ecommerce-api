@@ -1,8 +1,0 @@
-*
-!./package.json
-!./yarn.lock
-!./src
-!./resources-*.ts
-!./serverless.ts
-!./tsconfig.json
-!./tsconfig.paths.json

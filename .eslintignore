@@ -56,7 +56,8 @@ tsconfig*
 # Serverless
 /serverless.ts
 /resources*.ts
-/webpack.config.js
+/webpack.api.config.js
+/webpack.lambda.config.js
 serverless.d.ts
 serverless.js
 serverless.js.map
